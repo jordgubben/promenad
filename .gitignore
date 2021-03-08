@@ -1,3 +1,7 @@
+# Vim
+*.swp
+
+#### GitHub Defaults ####
 # Prerequisites
 *.d
 
