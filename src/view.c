@@ -23,6 +23,11 @@ void render_app(const app_t *app) {
 		Vector3 origo = { 0,0,0};
 		DrawSphere(origo, 1, RED);
 
+		FOR_ROWS(l, app->limbs) {
+			vec3_t pos = app->limbs.position[l];
+			DrawSphere(pos.rl, 0.1, BLACK);
+		}
+
 		DrawGrid(10, 1.f);
 	}
 	EndMode3D();
