@@ -17,21 +17,40 @@ typedef struct vec3_ {
 	};
 } vec3_t;
 
+/** A single node in a Cyclic List **/
+typedef struct cl_node {
+	unsigned short next_index, prev_index;
+} cl_node_t;
 
 // Limbs
-enum { max_limb_table_rows = 128, limb_table_id_range = 1024 };
+enum {
+	max_limb_table_rows = 128,
+	limb_table_id_range = 1024,
+	max_limb_table_segnemts = max_limb_table_rows * 8,
+};
 typedef struct limb_table_ {
 	// Meta
 	uint16_t sparse_id[limb_table_id_range];
 	row_id_t dense_id[max_limb_table_rows];
 	uint16_t num_rows, next_id;
 
-	// Data
+	// Columns
 	vec3_t position[max_limb_table_rows];
+	uint16_t root_segment[max_limb_table_rows];
+
+	// Segment pool
+	cl_node_t segment_nodes[max_limb_table_segnemts];
+	vec3_t segment_positions[max_limb_table_segnemts];
+	float segment_distances[max_limb_table_segnemts];
 } limb_table_t;
 
 // Limb CRUD
+void init_limb_table(limb_table_t *);
 row_id_t create_limb(vec3_t pos, limb_table_t *);
+void add_segment_to_limb(row_id_t, vec3_t pos, limb_table_t *);
+
+// Render limbs
+void render_limb_skeletons(const limb_table_t *);
 
 // App
 typedef struct app_ {

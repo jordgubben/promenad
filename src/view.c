@@ -23,12 +23,29 @@ void render_app(const app_t *app) {
 		Vector3 origo = { 0,0,0};
 		DrawSphere(origo, 1, RED);
 
-		FOR_ROWS(l, app->limbs) {
-			vec3_t pos = app->limbs.position[l];
-			DrawSphere(pos.rl, 0.1, BLACK);
-		}
+		render_limb_skeletons(&app->limbs);
 
 		DrawGrid(10, 1.f);
 	}
 	EndMode3D();
+}
+
+
+void render_limb_skeletons(const limb_table_t *table) {
+	FOR_ROWS(l, *table) {
+		vec3_t pos = table->position[l];
+		DrawSphere(pos.rl, 0.1, BLACK);
+
+		int segment = table->root_segment[l];
+		while (segment) {
+			vec3_t seg_pos = table->segment_positions[segment];
+			DrawLine3D(pos.rl, seg_pos.rl, ORANGE);
+			DrawSphere(seg_pos.rl, 0.05, MAROON);
+
+			// Next segment (if any)
+			pos = seg_pos;
+			segment = table->segment_nodes[segment].next_index;
+			if (segment == table->root_segment[l]) { segment = 0; }
+		}
+	}
 }
