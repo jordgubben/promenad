@@ -4,7 +4,7 @@ An slice of life adventure in procedural animation and possibly some AI. Special
 
 ## Folders
 
-`src/` – Our code.
-`res` – Models, textures, config-files etc.
-`bin/` – Where the executables go.
-`tmp/` – Build intermediates, logs etc.
+  - `src/` – Our code.  
+  - `res/` – Models, textures, config-files etc.  
+  - `bin/` – Where the executables go.
+  - `tmp/` – Build intermediates, logs etc.
