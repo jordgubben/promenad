@@ -26,6 +26,8 @@ jobs:
 
       - name: Build it
         run: make
+        working-directory: ./src
 
       - name: Check it
         run: make check
+        working-directory: ./src
