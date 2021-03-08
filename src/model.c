@@ -23,8 +23,9 @@
 	(assert(T_HAS_ID(t,r)), (t).c[T_INDEX(t,r)] = (v))
 
 
-void init_cl_pool(cl_node_t nodes[], size_t num_nodes);
-uint16_t take_free_cl_node(cl_node_t []);
+void init_cl_pool(cl_node_t [], size_t num_nodes);
+unsigned short take_free_cl_node(cl_node_t []);
+unsigned short append_cl_node_after(unsigned short anchor, cl_node_t []);
 
 //// App
 
@@ -40,10 +41,13 @@ void init_app(app_t * app) {
 			vec3_t pos = {x, 0, z};
 			row_id_t id = create_limb(pos, &app->limbs);
 
-			vec3_t segment_pos;
-			segment_pos = pos;
-			segment_pos.y += 1;
-			add_segment_to_limb(id, segment_pos, &app->limbs);
+			// First segment
+			pos.y += 1;
+			add_segment_to_limb(id, pos, &app->limbs);
+
+			// Second segment
+			pos.y += 0.5;
+			add_segment_to_limb(id, pos, &app->limbs);
 		}
 	}
 }
@@ -81,17 +85,30 @@ row_id_t create_limb(vec3_t pos, limb_table_t *table) {
 
 
 /**
-Add a aegment at the end of the given limb.
+Add a segment at the end of the given limb.
 **/
 void add_segment_to_limb(row_id_t limb, vec3_t pos, limb_table_t *table) {
-	int new_seg = take_free_cl_node(table->segment_nodes);
 
 	int limb_index = T_INDEX(*table, limb);
-	if (table->root_segment[limb_index] == 0) {
-		table->segment_positions[new_seg] = pos;
-		table->segment_distances[new_seg] =
-			vec3_distance(table->position[limb_index], pos);
+	int root_seg = table->root_segment[limb_index];
+	if (root_seg == 0) {
+		// Add first node
+		int new_seg = take_free_cl_node(table->segment_nodes);
 		table->root_segment[limb_index] = new_seg;
+
+		// Set properties
+		vec3_t limb_pos = table->position[limb_index];
+		table->segment_positions[new_seg] = pos;
+		table->segment_distances[new_seg] = vec3_distance(limb_pos, pos);
+	} else {
+		// Insert at end
+		uint16_t last_seg = table->segment_nodes[root_seg].prev_index;
+		int new_seg = append_cl_node_after(last_seg, table->segment_nodes);
+
+		// Set properties
+		vec3_t last_seg_pos = table->segment_positions[last_seg];
+		table->segment_positions[new_seg] = pos;
+		table->segment_distances[new_seg] = vec3_distance(last_seg_pos, pos);
 	}
 }
 
@@ -113,7 +130,7 @@ void init_cl_pool(cl_node_t nodes[], size_t num_nodes) {
 /*
 Take a free cyclic list node from the pool.
 */
-uint16_t take_free_cl_node(cl_node_t pool[]) {
+unsigned short take_free_cl_node(cl_node_t pool[]) {
 	assert(pool[0].prev_index != 0 && pool[0].next_index != 0);
 
 	// Find a free node in the pool
@@ -128,4 +145,21 @@ uint16_t take_free_cl_node(cl_node_t pool[]) {
 	pool[n].next_index = n;
 
 	return n;
+}
+
+/*
+Append cyclic list node after.
+*/
+unsigned short append_cl_node_after(unsigned short anchor, cl_node_t pool[]) {
+	unsigned int new_node = take_free_cl_node(pool);
+
+	// Connect new node to neighbours
+	pool[new_node].prev_index = anchor;
+	pool[new_node].next_index = pool[anchor].next_index;
+
+	// Insert new node into list
+	pool[pool[new_node].prev_index].next_index = new_node;
+	pool[pool[new_node].next_index].prev_index = new_node;
+
+	return new_node;
 }
