@@ -83,6 +83,29 @@ row_id_t create_limb(vec3_t pos, limb_table_t *table) {
 	return limb_id;
 }
 
+/**
+Get the current limb at the given index.
+**/
+row_id_t get_limb_id(uint16_t index, const limb_table_t *table) {
+	return T_ID(*table, index);
+}
+
+
+/**
+Collect limb segments into an array (with max size).
+**/
+size_t collect_limb_segments(row_id_t limb, const limb_table_t *table, limb_segment_t out[], size_t max) {
+	int root_seg = table->root_segment[T_INDEX(*table, limb)];
+	if (!root_seg) { return 0; }
+
+	for (int i = 0, seg = root_seg;  i < max ; i++) {
+		out[i] = table->segments[seg];
+		seg = table->segment_nodes[seg].next_index;
+		if (seg == root_seg) { return i + 1; }
+	}
+
+	return max;
+}
 
 /**
 Add a segment at the end of the given limb.

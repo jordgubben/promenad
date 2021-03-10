@@ -50,7 +50,12 @@ typedef struct limb_table_ {
 // Limb CRUD
 void init_limb_table(limb_table_t *);
 row_id_t create_limb(vec3_t pos, limb_table_t *);
+row_id_t get_limb_id(uint16_t index, const limb_table_t *);
+size_t collect_limb_segments(row_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
 void add_segment_to_limb(row_id_t, vec3_t pos, limb_table_t *);
+
+// Limb kinematics
+void reposition_limb_segments_with_fabrik(vec3_t end, limb_segment_t [], size_t num);
 
 // Render limbs
 void render_limb_skeletons(const limb_table_t *);
