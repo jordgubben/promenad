@@ -4,7 +4,18 @@
 #include "overview.h"
 
 
-static vec3_t end_effector = {0, 3, 0};
+//// Input ////
+
+void process_input(float dt, app_t *app) {
+
+	if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.x += dt; }
+	if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.x -= dt; }
+	if (IsKeyDown(KEY_UP)) { app->common_end_effector.y += dt; }
+	if (IsKeyDown(KEY_DOWN)) { app->common_end_effector.y -= dt; }
+
+}
+
+//// Rendering ////
 
 /**
 Render all the things.
@@ -23,12 +34,9 @@ void render_app(const app_t *app) {
 	// Render something at origo
 	BeginMode3D(camera);
 	{
-		Vector3 origo = { 0,0,0};
-		DrawSphere(origo, 1, RED);
+		DrawSphere(app->common_end_effector.rl, 0.1f, GOLD);
 
-		DrawSphere(end_effector.rl, 0.1f, GOLD);
-
-		render_limb_skeletons(&app->limbs);
+		render_limb_skeletons(app->common_end_effector, &app->limbs);
 
 		DrawGrid(10, 1.f);
 	}
@@ -36,7 +44,7 @@ void render_app(const app_t *app) {
 }
 
 
-void render_limb_skeletons(const limb_table_t *table) {
+void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 	FOR_ROWS(l, *table) {
 		row_id_t limb = get_limb_id(l, table);
 

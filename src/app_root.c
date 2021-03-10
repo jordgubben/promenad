@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
 	while(!WindowShouldClose()) {
 		// Update
 		float dt = minf(GetFrameTime(), 1.f/30.f);
+		process_input(dt, &app);
 		update_app(dt, &app);
 
 		// Render
