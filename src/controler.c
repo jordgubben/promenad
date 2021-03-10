@@ -6,6 +6,7 @@
 Update all the things.
 **/
 void update_app(float dt, app_t *app) {
+	if (app->paused) { return; }
 
 	// Set common end_effector for all limbs (for now)
 	FOR_ROWS(l, app->limbs) {

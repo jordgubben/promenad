@@ -7,12 +7,14 @@
 //// Input ////
 
 void process_input(float dt, app_t *app) {
+	// Toggle pause
+	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
 
+	// Move common end effector with arrow keys
 	if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.x += dt; }
 	if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.x -= dt; }
 	if (IsKeyDown(KEY_UP)) { app->common_end_effector.y += dt; }
 	if (IsKeyDown(KEY_DOWN)) { app->common_end_effector.y -= dt; }
-
 }
 
 //// Rendering ////

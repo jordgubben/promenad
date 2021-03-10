@@ -33,6 +33,8 @@ unsigned short append_cl_node_after(unsigned short anchor, cl_node_t []);
 Init all the things.
 **/
 void init_app(app_t * app) {
+	app->paused = false;
+
 	init_limb_table(&app->limbs);
 
 	// Create a bunch of limbs with their roots in a grid

@@ -64,6 +64,7 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);
 
 // App
 typedef struct app_ {
+	bool paused;
 	limb_table_t limbs;
 	vec3_t common_end_effector;
 } app_t;
