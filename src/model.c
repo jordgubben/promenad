@@ -37,8 +37,8 @@ void init_app(app_t * app) {
 
 	// Create a bunch of limbs with their roots in a grid
 	FOR_RANGE(x, -5,5) {
-		FOR_RANGE(z, -5, 5) {
-			vec3_t pos = {x, 0, z};
+		FOR_RANGE(z, -1, 2) {
+			vec3_t pos = {1*x, 0, 3*z};
 			row_id_t id = create_limb(pos, &app->limbs);
 
 			// First segment
@@ -46,8 +46,10 @@ void init_app(app_t * app) {
 			add_segment_to_limb(id, pos, &app->limbs);
 
 			// Second segment
-			pos.y += 0.5;
-			add_segment_to_limb(id, pos, &app->limbs);
+			FOR_IN(i, abs(x) * abs(x)) {
+				pos.y += 0.5;
+				add_segment_to_limb(id, pos, &app->limbs);
+			}
 		}
 	}
 }
