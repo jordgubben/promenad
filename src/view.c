@@ -37,6 +37,11 @@ void render_app(const app_t *app) {
 	BeginMode3D(camera);
 	{
 		DrawSphere(app->common_end_effector.rl, 0.1f, GOLD);
+		{
+			vec3_t shadow = app->common_end_effector;
+			shadow.y = 0;
+			DrawSphere(shadow.rl, 0.1f, ORANGE);
+		}
 
 		render_limb_skeletons(app->common_end_effector, &app->limbs);
 
