@@ -39,6 +39,7 @@ typedef struct limb_table_ {
 	uint16_t num_rows, next_id;
 
 	// Columns
+	vec3_t end_effector[max_limb_table_rows];
 	vec3_t position[max_limb_table_rows];
 	uint16_t root_segment[max_limb_table_rows];
 
@@ -55,6 +56,7 @@ size_t collect_limb_segments(row_id_t, const limb_table_t *, limb_segment_t out[
 void add_segment_to_limb(row_id_t, vec3_t pos, limb_table_t *);
 
 // Limb kinematics
+void move_limbs_towards_end_effectors(float dt, limb_table_t *);
 void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segment_t [], size_t num);
 
 // Render limbs
