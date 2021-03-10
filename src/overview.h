@@ -23,6 +23,10 @@ typedef struct cl_node {
 } cl_node_t;
 
 // Limbs
+typedef struct limb_segment_ {
+	vec3_t position;
+	float distance;
+} limb_segment_t;
 enum {
 	max_limb_table_rows = 128,
 	limb_table_id_range = 1024,
@@ -40,8 +44,7 @@ typedef struct limb_table_ {
 
 	// Segment pool
 	cl_node_t segment_nodes[max_limb_table_segnemts];
-	vec3_t segment_positions[max_limb_table_segnemts];
-	float segment_distances[max_limb_table_segnemts];
+	limb_segment_t segments[max_limb_table_segnemts];
 } limb_table_t;
 
 // Limb CRUD

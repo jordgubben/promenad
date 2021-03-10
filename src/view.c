@@ -38,7 +38,7 @@ void render_limb_skeletons(const limb_table_t *table) {
 
 		int segment = table->root_segment[l];
 		while (segment) {
-			vec3_t seg_pos = table->segment_positions[segment];
+			vec3_t seg_pos = table->segments[segment].position;
 			DrawLine3D(pos.rl, seg_pos.rl, ORANGE);
 			DrawSphere(seg_pos.rl, 0.05, MAROON);
 

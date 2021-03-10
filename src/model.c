@@ -98,17 +98,17 @@ void add_segment_to_limb(row_id_t limb, vec3_t pos, limb_table_t *table) {
 
 		// Set properties
 		vec3_t limb_pos = table->position[limb_index];
-		table->segment_positions[new_seg] = pos;
-		table->segment_distances[new_seg] = vec3_distance(limb_pos, pos);
+		limb_segment_t segment = { pos, vec3_distance(pos, limb_pos) };
+		table->segments[new_seg] = segment;
 	} else {
 		// Insert at end
 		uint16_t last_seg = table->segment_nodes[root_seg].prev_index;
 		int new_seg = append_cl_node_after(last_seg, table->segment_nodes);
 
 		// Set properties
-		vec3_t last_seg_pos = table->segment_positions[last_seg];
-		table->segment_positions[new_seg] = pos;
-		table->segment_distances[new_seg] = vec3_distance(last_seg_pos, pos);
+		vec3_t last_seg_pos = table->segments[last_seg].position;
+		limb_segment_t segment = { pos, vec3_distance(last_seg_pos, pos)};
+		table->segments[new_seg] = segment;
 	}
 }
 
