@@ -3,6 +3,9 @@
 #define IN_VIEW
 #include "overview.h"
 
+
+static vec3_t end_effector = {0, 3, 0};
+
 /**
 Render all the things.
 **/
@@ -23,8 +26,7 @@ void render_app(const app_t *app) {
 		Vector3 origo = { 0,0,0};
 		DrawSphere(origo, 1, RED);
 
-		Vector3 end_effector = { 0, 3, 0};
-		DrawSphere(end_effector, 0.1f, GOLD);
+		DrawSphere(end_effector.rl, 0.1f, GOLD);
 
 		render_limb_skeletons(&app->limbs);
 
@@ -58,9 +60,9 @@ void render_limb_skeletons(const limb_table_t *table) {
 		// Render limb segments IK target positions
 		limb_segment_t segments[32];
 		size_t num_segments = collect_limb_segments(limb, table, segments, 32);
-		vec3_t end_effector = {0, 3,0};
-		reposition_limb_segments_with_fabrik(end_effector, segments, num_segments);
-		pos = table->position[l];
+		vec3_t origin = table->position[l];
+		reposition_limb_segments_with_fabrik(origin, end_effector, segments, num_segments);
+		pos = origin;
 		FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
 			DrawLine3D(pos.rl, seg_itr->position.rl, BLUE);
 			pos = seg_itr->position;

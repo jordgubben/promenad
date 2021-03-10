@@ -55,7 +55,7 @@ size_t collect_limb_segments(row_id_t, const limb_table_t *, limb_segment_t out[
 void add_segment_to_limb(row_id_t, vec3_t pos, limb_table_t *);
 
 // Limb kinematics
-void reposition_limb_segments_with_fabrik(vec3_t end, limb_segment_t [], size_t num);
+void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segment_t [], size_t num);
 
 // Render limbs
 void render_limb_skeletons(const limb_table_t *);
