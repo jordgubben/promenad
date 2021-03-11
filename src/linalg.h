@@ -3,6 +3,11 @@
 
 #include <math.h>
 
+// Important constants
+static const float tau = 6.28318530717958647692f;
+static const float pi = 3.14159265358979323846f;
+
+
 /***
 Vector with 3 elements (+ paddding)
 ***/
@@ -249,6 +254,14 @@ typedef union vec4_ {
 #endif
 } vec4_t;
 
+// All the axis directions
+static const vec4_t vec4_positive_x = {+1, 0, 0, 0};
+static const vec4_t vec4_positive_y = { 0,+1, 0, 0};
+static const vec4_t vec4_positive_z = { 0, 0,+1, 0};
+static const vec4_t vec4_negative_x = {-1, 0, 0, 0};
+static const vec4_t vec4_negative_y = { 0,-1, 0, 0};
+static const vec4_t vec4_negative_z = { 0, 0,-1, 0};
+
 static inline vec4_t vec4(float x, float y, float z, float w) {
 	vec4_t v = { x, y, z, w };
 	return v;
@@ -267,6 +280,16 @@ static inline float vec4_dot(vec4_t v1, vec4_t v2) {
 	return  (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
 }
 
+
+
+/**
+Round every scalar in the vector.
+**/
+static inline vec4_t vec4_round(vec4_t v){
+	vec4_t r = { roundf(v.x), roundf(v.y), roundf(v.z), roundf(v.w) };
+	return r;
+
+}
 
 /***
 Matrix 4x4 (column major)
@@ -317,6 +340,17 @@ static inline mat4_t mat4_transpose(mat4_t m) {
 
 
 /**
+Rotate clockwise (in radians) around the y-axis.
+**/
+static inline mat4_t mat4_rotation_y(float r) {
+	mat4_t m = mat4_identity;
+	m.m11 = m.m33 = cosf(r);
+	m.m13 = sinf(r);
+	m.m31 = -m.m13;
+	return m;
+}
+
+/**
 Multiply a *column* vector with a matrix.
 **/
 static inline vec4_t mat4_mul_vec4(mat4_t m, vec4_t v) {
@@ -335,7 +369,16 @@ static inline vec4_t mat4_mul_vec4(mat4_t m, vec4_t v) {
 }
 
 #ifdef IN_TESTS
-TEST_CASE("Opperations on a 4x4 matrix") {
+bool operator== (const vec4_t& v1, const vec4_t& v2) {
+	return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w;
+}
+
+std::ostream& operator<<(std::ostream& out, const vec4_t& v) {
+	out << "( " << v.x << ", " << v.y << ", " << v.z << ", " <<  v.w << ")";
+	return out;
+}
+
+TEST_CASE("Operations using  4x4 matricies") {
 	SECTION("Matrix translation") {
 		mat4_t t = mat4_translate(vec3(1,2,3));
 		CHECK(t.e[12] == 1);
@@ -343,6 +386,25 @@ TEST_CASE("Opperations on a 4x4 matrix") {
 		CHECK(t.e[14] == 3);
 		vec4_t p = mat4_mul_vec4(t, vec4(10,20,30,1));
 		CHECK(p.vec3 == vec3(11,22,33));
+	}
+
+	SECTION("Rotate clockwise 90 degrees around the y-axis") {
+		mat4_t r = mat4_rotation_y(tau / 4);
+
+		SECTION("Transfrom +x -> -z") {
+			CHECK(vec4_round(mat4_mul_vec4(r, vec4_positive_x)) == vec4_negative_z);
+			CHECK(vec4_round(mat4_mul_vec4(r, vec4_negative_x)) == vec4_positive_z);
+		}
+
+		SECTION("Has no effect on an vector on the y axis") {
+			CHECK(vec4_round(mat4_mul_vec4(r, vec4_positive_y)) == vec4_positive_y);
+			CHECK(vec4_round(mat4_mul_vec4(r, vec4_negative_y)) == vec4_negative_y);
+		}
+
+		SECTION("Transfrom +z -> +x") {
+			CHECK(vec4_round(mat4_mul_vec4(r, vec4_positive_z)) == vec4_positive_x);
+			CHECK(vec4_round(mat4_mul_vec4(r, vec4_negative_z)) == vec4_negative_x);
+		}
 	}
 }
 #endif // IN_TESTS
