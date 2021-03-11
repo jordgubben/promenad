@@ -65,6 +65,7 @@ struct Model;
 typedef struct app_ {
 	bool paused;
 	struct Model *actor_model;
+	mat4_t actor_transform;
 	limb_table_t limbs;
 	vec3_t common_end_effector;
 } app_t;

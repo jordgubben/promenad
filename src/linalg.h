@@ -262,6 +262,12 @@ typedef union mat4_ {
 #endif
 } mat4_t;
 
+static const mat4_t mat4_identity = {
+	1,0,0,0,
+	0,1,0,0,
+	0,0,1,0,
+	0,0,0,1,
+};
 
 #else
 #warning "Header linalg.h included more than once"

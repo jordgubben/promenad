@@ -36,7 +36,11 @@ void render_app(const app_t *app) {
 	// Render something at origo
 	BeginMode3D(camera);
 	{
-		DrawModel(*app->actor_model, vec3(0,1,0).rl, 1.0f, BLUE);
+		{
+			Model model = *app->actor_model;
+			model.transform = app->actor_transform.rl;
+			DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
+		}
 
 		DrawSphere(app->common_end_effector.rl, 0.1f, GOLD);
 		{
