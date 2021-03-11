@@ -36,6 +36,8 @@ void render_app(const app_t *app) {
 	// Render something at origo
 	BeginMode3D(camera);
 	{
+		DrawModel(*app->actor_model, vec3(0,1,0).rl, 1.0f, BLUE);
+
 		DrawSphere(app->common_end_effector.rl, 0.1f, GOLD);
 		{
 			vec3_t shadow = app->common_end_effector;

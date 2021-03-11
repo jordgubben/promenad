@@ -55,15 +55,23 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 // Render limbs
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);
 
+
+// Resources
+#ifndef RAYLIB_H
+struct Model;
+#endif
+
 // App
 typedef struct app_ {
 	bool paused;
+	struct Model *actor_model;
 	limb_table_t limbs;
 	vec3_t common_end_effector;
 } app_t;
 
 
 void init_app(app_t *);
+void term_app(app_t *);
 void process_input(float dt, app_t*);
 void update_app(float dt, app_t *);
 void render_app(const app_t *);

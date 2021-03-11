@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <raylib.h>
 
 #define IN_MODEL
 #include "overview.h"
@@ -53,8 +54,22 @@ void init_app(app_t * app) {
 			}
 		}
 	}
+
+	// Create actor model
+	app->actor_model = malloc(sizeof(Model));
+	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 }
 
+
+/**
+Terminate all the things.
+**/
+void term_app(app_t *app) {
+	// Free actor model
+	UnloadModel(*app->actor_model);
+	free(app->actor_model);
+	app->actor_model = NULL;
+}
 
 
 //// Limb CRUD

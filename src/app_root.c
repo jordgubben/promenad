@@ -38,6 +38,8 @@ int main(int argc, char** argv) {
 		EndDrawing();
 	}
 
+	// K, thx, bye
+	term_app(&app);
 	CloseWindow();
 	return 0;
 }
