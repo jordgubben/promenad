@@ -350,6 +350,30 @@ static inline mat4_t mat4_rotation_y(float r) {
 	return m;
 }
 
+
+/**
+Multiply two 4x4 matrices with each other.
+**/
+static inline mat4_t mat4_mul(mat4_t m1, mat4_t m2) {
+	// Rows from the first matrix
+	vec4_t r1 = { m1.m11, m1.m12, m1.m13, m1.m14};
+	vec4_t r2 = { m1.m21, m1.m22, m1.m23, m1.m24};
+	vec4_t r3 = { m1.m31, m1.m32, m1.m33, m1.m34};
+	vec4_t r4 = { m1.m41, m1.m42, m1.m43, m1.m44};
+
+	// Columns from the second matrix
+	vec4_t c1 = m2.c1, c2 = m2.c2, c3 = m2.c3, c4 = m2.c4;
+
+	// Combine them
+	mat4_t r;
+	r.m11 = vec4_dot(r1, c1); r.m12 = vec4_dot(r1, c2); r.m13 = vec4_dot(r1, c3); r.m14 = vec4_dot(r1, c4);
+	r.m21 = vec4_dot(r2, c1); r.m22 = vec4_dot(r2, c2); r.m23 = vec4_dot(r2, c3); r.m24 = vec4_dot(r2, c4);
+	r.m31 = vec4_dot(r3, c1); r.m32 = vec4_dot(r3, c2); r.m33 = vec4_dot(r3, c3); r.m34 = vec4_dot(r3, c4);
+	r.m41 = vec4_dot(r4, c1); r.m42 = vec4_dot(r4, c2); r.m43 = vec4_dot(r4, c3); r.m44 = vec4_dot(r4, c4);
+	return r;
+}
+
+
 /**
 Multiply a *column* vector with a matrix.
 **/
@@ -404,6 +428,27 @@ TEST_CASE("Operations using  4x4 matricies") {
 		SECTION("Transfrom +z -> +x") {
 			CHECK(vec4_round(mat4_mul_vec4(r, vec4_positive_z)) == vec4_positive_x);
 			CHECK(vec4_round(mat4_mul_vec4(r, vec4_negative_z)) == vec4_negative_x);
+		}
+	}
+
+	SECTION("Multiplying a y-axis 90 deg rotation with it self multiple times creates the desired result") {
+		SECTION("using o * r") {
+			const mat4_t ry = mat4_rotation_y(pi / 2);
+
+			// Two times
+			const mat4_t r2 = mat4_mul(ry, ry);
+			CHECK(vec4_round(mat4_mul_vec4(r2, vec4_positive_x)) == vec4_negative_x);
+			CHECK(vec4_round(mat4_mul_vec4(r2, vec4_positive_z)) == vec4_negative_z);
+
+			// Three times
+			const mat4_t r3 = mat4_mul(r2, ry);
+			CHECK(vec4_round(mat4_mul_vec4(r3, vec4_positive_x)) == vec4_positive_z);
+			CHECK(vec4_round(mat4_mul_vec4(r3, vec4_positive_z)) == vec4_negative_x);
+
+			// Four times (all the way round)
+			const mat4_t r4 = mat4_mul(r3, ry);
+			CHECK(vec4_round(mat4_mul_vec4(r4, vec4_positive_x)) == vec4_positive_x);
+			CHECK(vec4_round(mat4_mul_vec4(r4, vec4_positive_z)) == vec4_positive_z);
 		}
 	}
 }
