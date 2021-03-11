@@ -4,6 +4,7 @@
 #define IN_VIEW
 #include "overview.h"
 
+#define DRAW_COORDINATE_SYSTEM_HELPERS 1
 
 //// Input ////
 
@@ -53,6 +54,12 @@ void render_app(const app_t *app) {
 		}
 
 		render_limb_skeletons(app->common_end_effector, &app->limbs);
+
+#if DRAW_COORDINATE_SYSTEM_HELPERS
+		DrawCube(vec3(5,0,0).rl, 1.f, .1f, .1f, RED);
+		DrawCube(vec3(0,5,0).rl, .1f, 1.f, .1f, GREEN);
+		DrawCube(vec3(0,0,5).rl, .1f, .1f, 1.f, BLUE);
+#endif // DRAW_COORDINATE_SYSTEM_HELPERS
 
 		DrawGrid(10, 1.f);
 	}
