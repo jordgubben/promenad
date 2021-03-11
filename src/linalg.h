@@ -3,6 +3,18 @@
 
 #include <math.h>
 
+/***
+Vector with 3 elements (+ paddding)
+***/
+typedef struct vec3_ {
+	union {
+		struct { float x, y, z, w_; };
+#ifdef RAYLIB_H
+		Vector3 rl;
+#endif
+	};
+} vec3_t;
+
 /**
 A vector from one point to another.
 **/

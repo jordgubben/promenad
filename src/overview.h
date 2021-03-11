@@ -5,17 +5,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "linalg.h"
+
 // Basic types
 typedef struct row_id_ { uint16_t id; } row_id_t;
-
-typedef struct vec3_ {
-	union {
-		struct { float x, y, z, w_; };
-#ifdef RAYLIB_H
-		Vector3 rl;
-#endif
-	};
-} vec3_t;
 
 /** A single node in a Cyclic List **/
 typedef struct cl_node {

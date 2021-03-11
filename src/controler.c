@@ -1,6 +1,5 @@
 #define IN_CONTROLER
 #include "overview.h"
-#include "linalg.h"
 
 /**
 Update all the things.

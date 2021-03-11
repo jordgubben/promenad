@@ -2,7 +2,6 @@
 
 #define IN_MODEL
 #include "overview.h"
-#include "linalg.h"
 
 //// Sparce table macros
 #define T(t,r,c) (t).c[r]
