@@ -145,6 +145,12 @@ bool operator== (const vec3_t& v1, const vec3_t& v2) {
 	return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
 }
 
+std::ostream& operator<<(std::ostream& out, const vec3_t& v) {
+	out << "( " << v.x << ", " << v.y << ", " << v.z << ")";
+	return out;
+}
+
+
 TEST_CASE("Operations on 3 element vectors") {
 	SECTION("A  vector with only zeros has the length 0") {
 		REQUIRE(vec3_length(vec3(0,0,0)) == 0);
@@ -243,9 +249,27 @@ typedef union vec4_ {
 #endif
 } vec4_t;
 
+static inline vec4_t vec4(float x, float y, float z, float w) {
+	vec4_t v = { x, y, z, w };
+	return v;
+}
+
+static inline vec4_t vec4_from_vec3(vec3_t v, float w) {
+	vec4_t r = { v.x, v.y, v.z, w };
+	return r;
+}
+
+
+/**
+Dot product of two vectors.
+**/
+static inline float vec4_dot(vec4_t v1, vec4_t v2) {
+	return  (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z) + (v1.w * v2.w);
+}
+
 
 /***
-Matrix 4x4 i(column major)
+Matrix 4x4 (column major)
 ***/
 typedef union mat4_ {
 	// Matrix elements m(Row, Column)
@@ -268,6 +292,60 @@ static const mat4_t mat4_identity = {
 	0,0,1,0,
 	0,0,0,1,
 };
+
+
+/**
+Matrix that translate a vector by the given amount.
+**/
+static inline mat4_t mat4_translate(vec3_t t) {
+	mat4_t m = mat4_identity;
+	m.c4 = vec4_from_vec3(t, 1);
+	return m;
+}
+
+/**
+Transpose of the given matrix.
+**/
+static inline mat4_t mat4_transpose(mat4_t m) {
+	mat4_t r;
+	r.m11 = m.m11; r.m21 = m.m12; r.m31 = m.m13; r.m41 = m.m14;
+	r.m12 = m.m21; r.m22 = m.m22; r.m32 = m.m23; r.m42 = m.m24;
+	r.m13 = m.m31; r.m23 = m.m32; r.m33 = m.m33; r.m43 = m.m34;
+	r.m14 = m.m41; r.m24 = m.m42; r.m34 = m.m43; r.m44 = m.m44;
+	return r;
+}
+
+
+/**
+Multiply a *column* vector with a matrix.
+**/
+static inline vec4_t mat4_mul_vec4(mat4_t m, vec4_t v) {
+	vec4_t r1 = { m.m11, m.m12, m.m13, m.m14};
+	vec4_t r2 = { m.m21, m.m22, m.m23, m.m24};
+	vec4_t r3 = { m.m31, m.m32, m.m33, m.m34};
+	vec4_t r4 = { m.m41, m.m42, m.m43, m.m44};
+
+	vec4_t r = {
+		vec4_dot(r1, v),
+		vec4_dot(r2, v),
+		vec4_dot(r3, v),
+		vec4_dot(r4, v)
+	};
+	return r;
+}
+
+#ifdef IN_TESTS
+TEST_CASE("Opperations on a 4x4 matrix") {
+	SECTION("Matrix translation") {
+		mat4_t t = mat4_translate(vec3(1,2,3));
+		CHECK(t.e[12] == 1);
+		CHECK(t.e[13] == 2);
+		CHECK(t.e[14] == 3);
+		vec4_t p = mat4_mul_vec4(t, vec4(10,20,30,1));
+		CHECK(p.vec3 == vec3(11,22,33));
+	}
+}
+#endif // IN_TESTS
 
 #else
 #warning "Header linalg.h included more than once"

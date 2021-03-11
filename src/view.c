@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <raylib.h>
 
 #define IN_VIEW
@@ -19,6 +20,8 @@ void process_input(float dt, app_t *app) {
 
 //// Rendering ////
 
+void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s, Color c);
+
 /**
 Render all the things.
 **/
@@ -38,7 +41,7 @@ void render_app(const app_t *app) {
 	{
 		{
 			Model model = *app->actor_model;
-			model.transform = app->actor_transform.rl;
+			model.transform = mat4_transpose(app->actor_transform).rl;
 			DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
 		}
 
@@ -54,6 +57,8 @@ void render_app(const app_t *app) {
 		DrawGrid(10, 1.f);
 	}
 	EndMode3D();
+
+	draw_matrix_as_text("Actor transform", app->actor_transform, 50, 10, 15, BLACK);
 }
 
 
@@ -90,4 +95,20 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		}
 
 	}
+}
+
+void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s, Color c) {
+	char str[1024];
+	snprintf(str, 1024, "%s:\n"
+		"[ %1.2f, %1.2f, %1.2f, %1.2f|\n"
+		"| %1.2f, %1.2f, %1.2f, %1.2f|\n"
+		"| %1.2f, %1.2f, %1.2f, %1.2f|\n"
+		"| %1.2f, %1.2f, %1.2f, %1.2f]",
+		title,
+		m.m11, m.m12, m.m13, m.m14,
+		m.m21, m.m22, m.m23, m.m24,
+		m.m31, m.m32, m.m33, m.m34,
+		m.m41, m.m42, m.m43, m.m44
+		);
+	DrawText(str, x, y, s, c);
 }

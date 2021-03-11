@@ -60,7 +60,7 @@ void init_app(app_t * app) {
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
 	// Setup actor transform
-	app->actor_transform = mat4_identity;
+	app->actor_transform = mat4_translate(vec3(0,1,0));
 }
 
 
