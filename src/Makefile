@@ -18,7 +18,7 @@ CPP_OBJECTS= $(patsubst %.cpp,$(TMP_DIR)/_%.opp, $(CPP_SOURCES))
 
 
 # Default build target
-all: $(BIN_DIR)/promenad $(BIN_DIR)/tests
+all: $(BIN_DIR)/promenad $(BIN_DIR)/tests tags
 
 ## Run things
 
@@ -55,6 +55,12 @@ $(TMP_DIR)/_%.opp: %.cpp $(C_HEADERS) PathFinder.hpp
 # https://github.com/catchorg/Catch2/blob/master/docs/slow-compiles.md
 $(TMP_DIR)/libcatch2.a: catch2_lib.cpp
 	$(CXX) -c $(CXXFLAGS) $< -o $@
+
+
+## Utils
+
+tags: *.c *.h
+	ctags *.c *.h
 
 ## Dirs
 $(BIN_DIR):
