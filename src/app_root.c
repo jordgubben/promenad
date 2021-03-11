@@ -10,6 +10,8 @@ float minf(float a, float b) { return (a > b ? a : b); }
 int main(int argc, char** argv) {
 #define PRINT_SIZE_OF(t) printf("%s: %zub\n", #t, sizeof(t))
 	PRINT_SIZE_OF(vec3_t);
+	PRINT_SIZE_OF(vec4_t);
+	PRINT_SIZE_OF(mat4_t);
 	PRINT_SIZE_OF(limb_table_t);
 	PRINT_SIZE_OF(app_t);
 

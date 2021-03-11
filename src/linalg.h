@@ -231,6 +231,38 @@ TEST_CASE("Operations on 3 element vectors") {
 }
 #endif // IN_TESTS
 
+
+/***
+A vector wit four elements (no padding).
+***/
+typedef union vec4_ {
+	struct { float x,y,z,w; };
+	vec3_t vec3;
+#ifdef RAYLIB_H
+	Vector4 rl;
+#endif
+} vec4_t;
+
+
+/***
+Matrix 4x4 i(column major)
+***/
+typedef union mat4_ {
+	// Matrix elements m(Row, Column)
+	struct {
+		float m11, m21, m31, m41;
+		float m12, m22, m32, m42;
+		float m13, m23, m33, m43;
+		float m14, m24, m34, m44;
+	};
+	struct { vec4_t c1, c2, c3, c4; };
+	struct { float e[16]; };
+#ifdef RAYLIB_H
+	Matrix rl;
+#endif
+} mat4_t;
+
+
 #else
 #warning "Header linalg.h included more than once"
 #endif
