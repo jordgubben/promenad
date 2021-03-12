@@ -65,7 +65,8 @@ void render_app(const app_t *app) {
 	}
 	EndMode3D();
 
-	draw_matrix_as_text("Actor transform", app->actors.transform[0], 50, 10, 15, BLACK);
+	draw_matrix_as_text("Actor 'to world' transform", app->actors.to_world[0], 50, 10, 15, BLACK);
+	draw_matrix_as_text("Actor 'to object' transform", app->actors.to_object[0], 250, 10, 15, BLACK);
 }
 
 /**
@@ -75,7 +76,7 @@ Render actors in table.
 void render_actors(const Model* actor_model, const actor_table_t *table) {
 	FOR_ROWS(a, *table){
 		Model model = *actor_model;
-		model.transform = mat4_transpose(table->transform[a]).rl;
+		model.transform = mat4_transpose(table->to_world[a]).rl;
 		DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
 	}
 }

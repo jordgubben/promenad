@@ -89,10 +89,20 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 }
 
 /**
-Calculate a transformation matrix from the gven location.
+Calculate 'to world' transformation matrix from the gven location.
 **/
-mat4_t mat4_from_location(location_t l) {
+mat4_t to_world_from_location(location_t l) {
 	mat4_t t = mat4_translate(l.position);
 	mat4_t r = mat4_rotation_y(l.orientation_y);
 	return mat4_mul(t, r);
+}
+
+
+/**
+Calculate 'to object' transformation matrix from the gven location.
+**/
+mat4_t to_object_from_location(location_t l) {
+	mat4_t t = mat4_translate(vec3_mul(l.position, -1));
+	mat4_t r = mat4_rotation_y(-l.orientation_y);
+	return mat4_mul(r, t);
 }

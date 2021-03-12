@@ -112,7 +112,8 @@ actor_id_t create_actor(vec3_t pos, float rot, actor_table_t *table) {
 	// Set row datao
 	location_t loc = {pos, rot};
 	table->location[index] = loc;
-	table->transform[index] = mat4_from_location(loc);
+	table->to_world[index] = to_world_from_location(loc);
+	table->to_object[index] = to_object_from_location(loc);
 
 	return actor_id;
 }
@@ -123,7 +124,8 @@ Calculate the transform for every actors location.
 **/
 void calculate_actor_transforms(actor_table_t *table) {
 	FOR_ROWS(a, *table) {
-		table->transform[a] = mat4_from_location(table->location[a]);
+		table->to_world[a] = to_world_from_location(table->location[a]);
+		table->to_object[a] = to_object_from_location(table->location[a]);
 	}
 }
 
@@ -242,7 +244,7 @@ void reposition_attached_limbs(
 		int actor_index = T_INDEX(*actors, attachments->owner[la]);
 		int limb_index = T_INDEX(*limbs, attachments->limb[la]);
 		vec3_t p = attachments->relative_position[la];
-		p = mat4_mul_vec4(actors->transform[actor_index], vec4_from_vec3(p, 1)).vec3;
+		p = mat4_mul_vec4(actors->to_world[actor_index], vec4_from_vec3(p, 1)).vec3;
 		limbs->position[limb_index] = p;
 	}
 }

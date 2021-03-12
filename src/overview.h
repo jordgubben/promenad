@@ -12,6 +12,10 @@
 struct Model;
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Basic types
 
 /** A single node in a Cyclic List **/
@@ -23,7 +27,8 @@ typedef struct location_ {
 	vec3_t position;
 	float orientation_y;
 } location_t;
-mat4_t mat4_from_location(location_t l);
+mat4_t to_world_from_location(location_t l);
+mat4_t to_object_from_location(location_t l);
 
 //// Actor ////
 typedef struct actor_id_ { uint16_t id; } actor_id_t;
@@ -39,7 +44,8 @@ typedef struct actor_table_ {
 
 	// Column(s)
 	location_t location[max_actor_table_rows];
-	mat4_t transform[max_actor_table_rows];
+	mat4_t to_world[max_actor_table_rows];
+	mat4_t to_object[max_actor_table_rows];
 } actor_table_t;
 
 // Actor CRUD
@@ -128,6 +134,10 @@ void render_app(const app_t *);
 #define FOR_RANGE(i, s, n) for (int i = (s); i < (n); i++)
 #define FOR_ITR(type, itr, arr, num) for (type *itr = arr; itr != arr + (num); itr++)
 #define FOR_ROWS(r,t) for (size_t r = 0; r < (t).num_rows; r++)
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #else
 #warning "Included overvieew.h twice!"
