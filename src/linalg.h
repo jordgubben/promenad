@@ -392,6 +392,14 @@ static inline vec4_t mat4_mul_vec4(mat4_t m, vec4_t v) {
 	return r;
 }
 
+/**
+Multiply a 3-element *column* vector (assisted by a fourth element) with a matrix.
+**/
+static inline vec3_t mat4_mul_vec3(mat4_t m, vec3_t v, float s) {
+	return mat4_mul_vec4(m, vec4_from_vec3(v, s)).vec3;
+}
+
+
 #ifdef IN_TESTS
 bool operator== (const vec4_t& v1, const vec4_t& v2) {
 	return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z && v1.w == v2.w;

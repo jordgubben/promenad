@@ -19,8 +19,20 @@ void process_input(float dt, app_t *app) {
 	if (IsKeyDown(KEY_DOWN)) { app->common_end_effector.y -= dt; }
 
 	// Tank controls
-	if (IsKeyDown(KEY_A)) { app->actors.location[0].orientation_y -= dt * tau; }
-	if (IsKeyDown(KEY_D)) { app->actors.location[0].orientation_y += dt * tau; }
+	if (IsKeyDown(KEY_W)) {
+		app->actors.location[0].position = vec3_add(
+			app->actors.location[0].position,
+			vec3_mul(get_actor_forward_dir(get_actor_id(0, &app->actors), &app->actors), dt * 2)
+			);
+	}
+	if (IsKeyDown(KEY_S)) {
+		app->actors.location[0].position = vec3_sub(
+			app->actors.location[0].position,
+			vec3_mul(get_actor_forward_dir(get_actor_id(0, &app->actors), &app->actors), dt * 2)
+			);
+	}
+	if (IsKeyDown(KEY_A)) { app->actors.location[0].orientation_y += dt * 0.25 * tau; }
+	if (IsKeyDown(KEY_D)) { app->actors.location[0].orientation_y -= dt * 0.25 * tau; }
 }
 
 //// Rendering ////

@@ -118,6 +118,14 @@ actor_id_t create_actor(vec3_t pos, float rot, actor_table_t *table) {
 	return actor_id;
 }
 
+actor_id_t get_actor_id(uint16_t index, const actor_table_t *table) {
+	return T_ID(*table, index);
+}
+
+vec3_t get_actor_forward_dir(actor_id_t actor, const actor_table_t *table) {
+	return mat4_mul_vec3(table->to_world[T_INDEX(*table, actor)], vec3(1,0,0), 0);
+}
+
 mat4_t get_actor_to_object_transform(actor_id_t actor, const actor_table_t *table) {
 	return table->to_object[T_INDEX(*table, actor)];
 }

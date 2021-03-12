@@ -50,6 +50,8 @@ typedef struct actor_table_ {
 
 // Actor CRUD
 actor_id_t create_actor(vec3_t, float, actor_table_t *);
+actor_id_t get_actor_id(uint16_t index, const actor_table_t *);
+vec3_t get_actor_forward_dir(actor_id_t, const actor_table_t *);
 mat4_t get_actor_to_object_transform(actor_id_t, const actor_table_t *);
 void calculate_actor_transforms(actor_table_t *);
 
