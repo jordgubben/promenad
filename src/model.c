@@ -36,6 +36,7 @@ Init all the things.
 **/
 void init_app(app_t * app) {
 	app->paused = false;
+	app->common_end_effector = vec3(3, 2, 0);
 
 	init_limb_table(&app->limbs);
 
@@ -64,7 +65,18 @@ void init_app(app_t * app) {
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
 	// Setup actors
-	create_actor(vec3(0,1,0), 0, &app->actors);
+	{
+		actor_id_t actor = create_actor(vec3(0,1,0), 0, &app->actors);
+
+		limb_id_t right_arm = create_limb(vec3(0, 2, +1), &app->limbs);
+		add_segment_to_limb(right_arm, vec3(0, 2, +3), &app->limbs);
+		add_segment_to_limb(right_arm, vec3(0, 2, +4), &app->limbs);
+
+		limb_id_t left_arm = create_limb(vec3(0, 2, -1), &app->limbs);
+		add_segment_to_limb(left_arm, vec3(0, 2, -3), &app->limbs);
+		add_segment_to_limb(left_arm, vec3(0, 2, -4), &app->limbs);
+	}
+
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
 	create_actor(vec3(0, 1, +3), +0.5 * pi, &app->actors);
 }
