@@ -8,7 +8,6 @@
 #include "linalg.h"
 
 // Basic types
-typedef struct row_id_ { uint16_t id; } row_id_t;
 
 /** A single node in a Cyclic List **/
 typedef struct cl_node {
@@ -16,6 +15,7 @@ typedef struct cl_node {
 } cl_node_t;
 
 // Limbs
+typedef struct limb_id_ { uint16_t id; } limb_id_t;
 typedef struct limb_segment_ {
 	vec3_t position;
 	float distance;
@@ -28,7 +28,7 @@ enum {
 typedef struct limb_table_ {
 	// Meta
 	uint16_t sparse_id[limb_table_id_range];
-	row_id_t dense_id[max_limb_table_rows];
+	limb_id_t dense_id[max_limb_table_rows];
 	uint16_t num_rows, next_id;
 
 	// Columns
@@ -43,10 +43,10 @@ typedef struct limb_table_ {
 
 // Limb CRUD
 void init_limb_table(limb_table_t *);
-row_id_t create_limb(vec3_t pos, limb_table_t *);
-row_id_t get_limb_id(uint16_t index, const limb_table_t *);
-size_t collect_limb_segments(row_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
-void add_segment_to_limb(row_id_t, vec3_t pos, limb_table_t *);
+limb_id_t create_limb(vec3_t pos, limb_table_t *);
+limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
+size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
+void add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
 
 // Limb kinematics
 void move_limbs_towards_end_effectors(float dt, limb_table_t *);

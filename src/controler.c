@@ -9,7 +9,7 @@ void update_app(float dt, app_t *app) {
 
 	// Set common end_effector for all limbs (for now)
 	FOR_ROWS(l, app->limbs) {
-		row_id_t limb = get_limb_id(l, &app->limbs);
+		limb_id_t limb = get_limb_id(l, &app->limbs);
 		app->limbs.end_effector[l] = app->common_end_effector;
 	}
 
@@ -24,7 +24,7 @@ Gradually move limb segments toward their desired positions.
 **/
 void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 	FOR_ROWS(l, *table) {
-		row_id_t limb = get_limb_id(l, table);
+		limb_id_t limb = get_limb_id(l, table);
 
 		// Move limb segments
 		limb_segment_t segments[32];

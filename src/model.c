@@ -41,7 +41,7 @@ void init_app(app_t * app) {
 	FOR_RANGE(x, -5,5) {
 		FOR_RANGE(z, -1, 2) {
 			vec3_t pos = {1*x, 0, 3*z};
-			row_id_t id = create_limb(pos, &app->limbs);
+			limb_id_t id = create_limb(pos, &app->limbs);
 
 			// First segment
 			pos.y += 1;
@@ -89,11 +89,11 @@ void init_limb_table(limb_table_t *table) {
 /**
 Create a limb at the given position.
 **/
-row_id_t create_limb(vec3_t pos, limb_table_t *table) {
+limb_id_t create_limb(vec3_t pos, limb_table_t *table) {
 	assert(table->num_rows < max_limb_table_rows);
 
 	// Add row to sparse set
-	row_id_t limb_id = { table->next_id++};
+	limb_id_t limb_id = { table->next_id++};
 	int index = table->num_rows++;
 	table->sparse_id[limb_id.id] = index;
 	table->dense_id[index] = limb_id;
@@ -108,7 +108,7 @@ row_id_t create_limb(vec3_t pos, limb_table_t *table) {
 /**
 Get the current limb at the given index.
 **/
-row_id_t get_limb_id(uint16_t index, const limb_table_t *table) {
+limb_id_t get_limb_id(uint16_t index, const limb_table_t *table) {
 	return T_ID(*table, index);
 }
 
@@ -116,7 +116,7 @@ row_id_t get_limb_id(uint16_t index, const limb_table_t *table) {
 /**
 Collect limb segments into an array (with max size).
 **/
-size_t collect_limb_segments(row_id_t limb, const limb_table_t *table, limb_segment_t out[], size_t max) {
+size_t collect_limb_segments(limb_id_t limb, const limb_table_t *table, limb_segment_t out[], size_t max) {
 	int root_seg = table->root_segment[T_INDEX(*table, limb)];
 	if (!root_seg) { return 0; }
 
@@ -132,7 +132,7 @@ size_t collect_limb_segments(row_id_t limb, const limb_table_t *table, limb_segm
 /**
 Add a segment at the end of the given limb.
 **/
-void add_segment_to_limb(row_id_t limb, vec3_t pos, limb_table_t *table) {
+void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 
 	int limb_index = T_INDEX(*table, limb);
 	int root_seg = table->root_segment[limb_index];

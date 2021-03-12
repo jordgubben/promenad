@@ -71,7 +71,7 @@ void render_app(const app_t *app) {
 
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 	FOR_ROWS(l, *table) {
-		row_id_t limb = get_limb_id(l, table);
+		limb_id_t limb = get_limb_id(l, table);
 
 		// Render root
 		vec3_t pos = table->position[l];
