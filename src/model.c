@@ -59,8 +59,10 @@ void init_app(app_t * app) {
 	app->actor_model = malloc(sizeof(Model));
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
-	// Setup actor transform
+	// Setup actors
 	create_actor(vec3(0,1,0), 0, &app->actors);
+	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
+	create_actor(vec3(0, 1, +3), +0.5 * pi, &app->actors);
 }
 
 

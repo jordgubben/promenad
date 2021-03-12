@@ -44,11 +44,7 @@ void render_app(const app_t *app) {
 	// Render something at origo
 	BeginMode3D(camera);
 	{
-		{
-			Model model = *app->actor_model;
-			model.transform = mat4_transpose(app->actors.transform[0]).rl;
-			DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
-		}
+		render_actors(app->actor_model, &app->actors);
 
 		DrawSphere(app->common_end_effector.rl, 0.1f, GOLD);
 		{
@@ -72,6 +68,17 @@ void render_app(const app_t *app) {
 	draw_matrix_as_text("Actor transform", app->actors.transform[0], 50, 10, 15, BLACK);
 }
 
+/**
+Render actors in table.
+(Expects to be called inside raylibs 'Draw3D' mode)
+**/
+void render_actors(const Model* actor_model, const actor_table_t *table) {
+	FOR_ROWS(a, *table){
+		Model model = *actor_model;
+		model.transform = mat4_transpose(table->transform[a]).rl;
+		DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
+	}
+}
 
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 	FOR_ROWS(l, *table) {

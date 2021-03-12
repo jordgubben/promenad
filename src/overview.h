@@ -7,6 +7,11 @@
 
 #include "linalg.h"
 
+// Raylib without Raylib
+#ifndef RAYLIB_H
+struct Model;
+#endif
+
 // Basic types
 
 /** A single node in a Cyclic List **/
@@ -42,7 +47,7 @@ actor_id_t create_actor(vec3_t, float, actor_table_t *);
 void calculate_actor_transforms(actor_table_t *);
 
 // Actor render
-void render_actors(const actor_table_t *);
+void render_actors(const struct Model *, const actor_table_t *);
 
 //// Limbs ////
 typedef struct limb_id_ { uint16_t id; } limb_id_t;
@@ -85,11 +90,6 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 // Render limbs
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);
 
-
-// Resources
-#ifndef RAYLIB_H
-struct Model;
-#endif
 
 // App
 typedef struct app_ {
