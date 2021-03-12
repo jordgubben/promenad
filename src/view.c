@@ -17,6 +17,10 @@ void process_input(float dt, app_t *app) {
 	if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.x -= dt; }
 	if (IsKeyDown(KEY_UP)) { app->common_end_effector.y += dt; }
 	if (IsKeyDown(KEY_DOWN)) { app->common_end_effector.y -= dt; }
+
+	// Tank controls
+	if (IsKeyDown(KEY_A)) { app->actors.location[0].orientation_y -= dt * tau; }
+	if (IsKeyDown(KEY_D)) { app->actors.location[0].orientation_y += dt * tau; }
 }
 
 //// Rendering ////
@@ -42,7 +46,7 @@ void render_app(const app_t *app) {
 	{
 		{
 			Model model = *app->actor_model;
-			model.transform = mat4_transpose(app->actor_transform).rl;
+			model.transform = mat4_transpose(app->actors.transform[0]).rl;
 			DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
 		}
 
@@ -65,7 +69,7 @@ void render_app(const app_t *app) {
 	}
 	EndMode3D();
 
-	draw_matrix_as_text("Actor transform", app->actor_transform, 50, 10, 15, BLACK);
+	draw_matrix_as_text("Actor transform", app->actors.transform[0], 50, 10, 15, BLACK);
 }
 
 

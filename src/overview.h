@@ -14,7 +14,37 @@ typedef struct cl_node {
 	unsigned short next_index, prev_index;
 } cl_node_t;
 
-// Limbs
+typedef struct location_ {
+	vec3_t position;
+	float orientation_y;
+} location_t;
+mat4_t mat4_from_location(location_t l);
+
+//// Actor ////
+typedef struct actor_id_ { uint16_t id; } actor_id_t;
+enum {
+	max_actor_table_rows = 128,
+	actor_table_id_range = 1024,
+};
+typedef struct actor_table_ {
+	// Meta
+	uint16_t sparse_id[actor_table_id_range];
+	actor_id_t dense_id[max_actor_table_rows];
+	uint16_t num_rows, next_id;
+
+	// Column(s)
+	location_t location[max_actor_table_rows];
+	mat4_t transform[max_actor_table_rows];
+} actor_table_t;
+
+// Actor CRUD
+actor_id_t create_actor(vec3_t, float, actor_table_t *);
+void calculate_actor_transforms(actor_table_t *);
+
+// Actor render
+void render_actors(const actor_table_t *);
+
+//// Limbs ////
 typedef struct limb_id_ { uint16_t id; } limb_id_t;
 typedef struct limb_segment_ {
 	vec3_t position;
@@ -65,7 +95,7 @@ struct Model;
 typedef struct app_ {
 	bool paused;
 	struct Model *actor_model;
-	mat4_t actor_transform;
+	actor_table_t actors;
 	limb_table_t limbs;
 	vec3_t common_end_effector;
 } app_t;

@@ -7,12 +7,13 @@ Update all the things.
 void update_app(float dt, app_t *app) {
 	if (app->paused) { return; }
 
+	calculate_actor_transforms(&app->actors);
+
 	// Set common end_effector for all limbs (for now)
 	FOR_ROWS(l, app->limbs) {
 		limb_id_t limb = get_limb_id(l, &app->limbs);
 		app->limbs.end_effector[l] = app->common_end_effector;
 	}
-
 
 	move_limbs_towards_end_effectors(dt, &app->limbs);
 }
@@ -84,4 +85,13 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 		// Save as previous position
 		prev_pos = arr[i].position;
 	}
+}
+
+/**
+Calculate a transformation matrix from the gven location.
+**/
+mat4_t mat4_from_location(location_t l) {
+	mat4_t t = mat4_translate(l.position);
+	mat4_t r = mat4_rotation_y(l.orientation_y);
+	return mat4_mul(t, r);
 }

@@ -60,7 +60,7 @@ void init_app(app_t * app) {
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
 	// Setup actor transform
-	app->actor_transform = mat4_translate(vec3(0,1,0));
+	create_actor(vec3(0,1,0), 0, &app->actors);
 }
 
 
@@ -76,8 +76,39 @@ void term_app(app_t *app) {
 }
 
 
-//// Limb CRUD
+//// Actor CRUD
+/**
+Create a single actor.
+**/
+actor_id_t create_actor(vec3_t pos, float rot, actor_table_t *table) {
+	assert(table->num_rows < max_actor_table_rows);
 
+	// Add row to sparse set
+	actor_id_t actor_id = { table->next_id++};
+	int index = table->num_rows++;
+	table->sparse_id[actor_id.id] = index;
+	table->dense_id[index] = actor_id;
+
+	// Set row datao
+	location_t loc = {pos, rot};
+	table->location[index] = loc;
+	table->transform[index] = mat4_from_location(loc);
+
+	return actor_id;
+}
+
+
+/**
+Calculate the transform for every actors location.
+**/
+void calculate_actor_transforms(actor_table_t *table) {
+	FOR_ROWS(a, *table) {
+		table->transform[a] = mat4_from_location(table->location[a]);
+	}
+}
+
+
+//// Limb CRUD
 
 /**
 Init the given limb table.
