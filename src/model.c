@@ -233,7 +233,7 @@ void attach_limb_to_actor(
 /**
 Snap limb positions in place relative to their owning actor.
 **/
-void reposition_attacked_limbs(
+void reposition_attached_limbs(
 		const limb_attachment_table_t * attachments, const actor_table_t *actors,
 		limb_table_t *limbs
 		) {

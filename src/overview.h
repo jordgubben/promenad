@@ -102,7 +102,7 @@ typedef struct limb_attachment_table_ {
 
 // Limb attachment CRUD
 void attach_limb_to_actor(limb_id_t, actor_id_t, const limb_table_t*, limb_attachment_table_t *);
-void reposition_attacked_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
+void reposition_attached_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
 
 
 // App
