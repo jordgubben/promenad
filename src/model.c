@@ -71,10 +71,12 @@ void init_app(app_t * app) {
 		limb_id_t right_arm = create_limb(vec3(0, 2, +1), &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, 2, +3), &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, 2, +4), &app->limbs);
+		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->limb_attachments);
 
 		limb_id_t left_arm = create_limb(vec3(0, 2, -1), &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, 2, -3), &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, 2, -4), &app->limbs);
+		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->limb_attachments);
 	}
 
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
@@ -163,6 +165,13 @@ limb_id_t get_limb_id(uint16_t index, const limb_table_t *table) {
 
 
 /**
+Get the world space position of the given limb.
+**/
+vec3_t get_limb_position(limb_id_t limb, const limb_table_t *table) {
+	return T_CELL(*table, limb, position);
+}
+
+/**
 Collect limb segments into an array (with max size).
 **/
 size_t collect_limb_segments(limb_id_t limb, const limb_table_t *table, limb_segment_t out[], size_t max) {
@@ -207,6 +216,36 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 }
 
 
+//// Limb attachment CRUD
+void attach_limb_to_actor(
+		limb_id_t limb, actor_id_t actor,
+		const limb_table_t *limbs, limb_attachment_table_t *table
+		) {
+
+	assert(table->num_rows < max_limb_attachment_table_rows);
+
+	int n = table->num_rows++;
+	table->owner[n] = actor;
+	table->limb[n] = limb;
+	table->relative_position[n] = get_limb_position(limb, limbs);
+}
+
+/**
+Snap limb positions in place relative to their owning actor.
+**/
+void reposition_attacked_limbs(
+		const limb_attachment_table_t * attachments, const actor_table_t *actors,
+		limb_table_t *limbs
+		) {
+
+	FOR_ROWS(la, *attachments) {
+		int actor_index = T_INDEX(*actors, attachments->owner[la]);
+		int limb_index = T_INDEX(*limbs, attachments->limb[la]);
+		vec3_t p = attachments->relative_position[la];
+		p = mat4_mul_vec4(actors->transform[actor_index], vec4_from_vec3(p, 1)).vec3;
+		limbs->position[limb_index] = p;
+	}
+}
 
 //// Cyclic list ////
 

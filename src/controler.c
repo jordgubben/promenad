@@ -15,6 +15,7 @@ void update_app(float dt, app_t *app) {
 		app->limbs.end_effector[l] = app->common_end_effector;
 	}
 
+	reposition_attacked_limbs(&app->limb_attachments, &app->actors, &app->limbs);
 	move_limbs_towards_end_effectors(dt, &app->limbs);
 }
 

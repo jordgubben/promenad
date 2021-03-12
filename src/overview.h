@@ -80,6 +80,7 @@ typedef struct limb_table_ {
 void init_limb_table(limb_table_t *);
 limb_id_t create_limb(vec3_t pos, limb_table_t *);
 limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
+vec3_t get_limb_position(limb_id_t, const limb_table_t *);
 size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
 void add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
 
@@ -90,6 +91,19 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 // Render limbs
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);
 
+//// Limb attachments
+enum {max_limb_attachment_table_rows = max_limb_table_rows };
+typedef struct limb_attachment_table_ {
+	actor_id_t owner[max_limb_attachment_table_rows];
+	limb_id_t limb[max_limb_attachment_table_rows];
+	vec3_t relative_position[max_limb_attachment_table_rows];
+	uint16_t num_rows;
+} limb_attachment_table_t;
+
+// Limb attachment CRUD
+void attach_limb_to_actor(limb_id_t, actor_id_t, const limb_table_t*, limb_attachment_table_t *);
+void reposition_attacked_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
+
 
 // App
 typedef struct app_ {
@@ -97,6 +111,7 @@ typedef struct app_ {
 	struct Model *actor_model;
 	actor_table_t actors;
 	limb_table_t limbs;
+	limb_attachment_table_t limb_attachments;
 	vec3_t common_end_effector;
 } app_t;
 
