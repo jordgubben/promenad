@@ -71,12 +71,12 @@ void init_app(app_t * app) {
 		limb_id_t right_arm = create_limb(vec3(0, 2, +1), &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, 2, +3), &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, 2, +4), &app->limbs);
-		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->limb_attachments);
+		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
 
 		limb_id_t left_arm = create_limb(vec3(0, 2, -1), &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, 2, -3), &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, 2, -4), &app->limbs);
-		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->limb_attachments);
+		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
 	}
 
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
@@ -118,6 +118,9 @@ actor_id_t create_actor(vec3_t pos, float rot, actor_table_t *table) {
 	return actor_id;
 }
 
+mat4_t get_actor_to_object_transform(actor_id_t actor, const actor_table_t *table) {
+	return table->to_object[T_INDEX(*table, actor)];
+}
 
 /**
 Calculate the transform for every actors location.
@@ -221,7 +224,8 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 //// Limb attachment CRUD
 void attach_limb_to_actor(
 		limb_id_t limb, actor_id_t actor,
-		const limb_table_t *limbs, limb_attachment_table_t *table
+		const limb_table_t *limbs, const actor_table_t *actors,
+		limb_attachment_table_t *table
 		) {
 
 	assert(table->num_rows < max_limb_attachment_table_rows);
@@ -229,7 +233,11 @@ void attach_limb_to_actor(
 	int n = table->num_rows++;
 	table->owner[n] = actor;
 	table->limb[n] = limb;
-	table->relative_position[n] = get_limb_position(limb, limbs);
+
+	// Relative limb placement
+	vec3_t p = get_limb_position(limb, limbs);
+	mat4_t to_obj = get_actor_to_object_transform(actor, actors);
+	table->relative_position[n] = mat4_mul_vec4(to_obj, vec4_from_vec3(p, 1)).vec3;
 }
 
 /**

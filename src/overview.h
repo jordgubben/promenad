@@ -50,6 +50,7 @@ typedef struct actor_table_ {
 
 // Actor CRUD
 actor_id_t create_actor(vec3_t, float, actor_table_t *);
+mat4_t get_actor_to_object_transform(actor_id_t, const actor_table_t *);
 void calculate_actor_transforms(actor_table_t *);
 
 // Actor render
@@ -107,7 +108,9 @@ typedef struct limb_attachment_table_ {
 } limb_attachment_table_t;
 
 // Limb attachment CRUD
-void attach_limb_to_actor(limb_id_t, actor_id_t, const limb_table_t*, limb_attachment_table_t *);
+void attach_limb_to_actor(
+	limb_id_t, actor_id_t, const limb_table_t*, const actor_table_t *,
+	limb_attachment_table_t *);
 void reposition_attached_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
 
 
