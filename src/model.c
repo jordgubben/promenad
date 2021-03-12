@@ -4,6 +4,8 @@
 #define IN_MODEL
 #include "overview.h"
 
+#define LIMB_FOREST 0
+
 //// Sparce table macros
 #define T(t,r,c) (t).c[r]
 
@@ -37,6 +39,7 @@ void init_app(app_t * app) {
 
 	init_limb_table(&app->limbs);
 
+#if LIMB_FOREST
 	// Create a bunch of limbs with their roots in a grid
 	FOR_RANGE(x, -5,5) {
 		FOR_RANGE(z, -1, 2) {
@@ -54,6 +57,7 @@ void init_app(app_t * app) {
 			}
 		}
 	}
+#endif
 
 	// Create actor model
 	app->actor_model = malloc(sizeof(Model));
