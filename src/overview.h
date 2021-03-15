@@ -9,6 +9,7 @@
 
 // Raylib without Raylib
 #ifndef RAYLIB_H
+struct Camera3D;
 struct Model;
 #endif
 
@@ -131,7 +132,7 @@ void init_app(app_t *);
 void term_app(app_t *);
 void process_input(float dt, app_t*);
 void update_app(float dt, app_t *);
-void render_app(const app_t *);
+void render_app(const struct Camera3D *, const app_t *);
 
 //// Utils
 // Loops

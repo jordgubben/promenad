@@ -42,19 +42,10 @@ void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s,
 /**
 Render all the things.
 **/
-void render_app(const app_t *app) {
-	// Define the camera to look into our 3d world
-	Camera3D camera = { 0 };
-	camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
-	camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
-	camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
-	camera.fovy = 45.0f;
-	camera.type = CAMERA_PERSPECTIVE;
-	SetCameraMode(camera, CAMERA_FREE);
-	UpdateCamera(&camera);
+void render_app(const struct Camera3D *camera,  const app_t *app) {
 
 	// Render something at origo
-	BeginMode3D(camera);
+	BeginMode3D(*camera);
 	{
 		render_actors(app->actor_model, &app->actors);
 

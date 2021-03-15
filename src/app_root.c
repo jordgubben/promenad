@@ -19,6 +19,16 @@ int main(int argc, char** argv) {
 	InitWindow(640, 480, "Hello, Promenad!");
 	SetTargetFPS(144);
 
+	// Define the camera to look into our 3d world
+	Camera3D camera = { 0 };
+	camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
+	camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+	camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
+	camera.fovy = 45.0f;
+	camera.type = CAMERA_PERSPECTIVE;
+	SetCameraMode(camera, CAMERA_FREE);
+	UpdateCamera(&camera);
+
 	// App setup
 	app_t app= { 0 };
 	init_app(&app);
@@ -31,9 +41,10 @@ int main(int argc, char** argv) {
 		update_app(dt, &app);
 
 		// Render
+		UpdateCamera(&camera);
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
-		render_app(&app);
+		render_app(&camera, &app);
 		DrawFPS(0,0);
 		EndDrawing();
 	}
