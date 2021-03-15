@@ -212,6 +212,7 @@ size_t collect_limb_segments(limb_id_t limb, const limb_table_t *table, limb_seg
 Add a segment at the end of the given limb.
 **/
 void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
+	limb_segment_t limb_segment_from_root_tip(vec3_t root, vec3_t tip);
 
 	int limb_index = T_INDEX(*table, limb);
 	int root_seg = table->root_segment[limb_index];
@@ -222,8 +223,7 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 
 		// Set properties
 		vec3_t limb_pos = table->position[limb_index];
-		limb_segment_t segment = { pos, vec3_distance(pos, limb_pos) };
-		table->segments[new_seg] = segment;
+		table->segments[new_seg] = limb_segment_from_root_tip(limb_pos, pos);
 	} else {
 		// Insert at end
 		uint16_t last_seg = table->segment_nodes[root_seg].prev_index;
@@ -231,9 +231,16 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 
 		// Set properties
 		vec3_t last_seg_pos = table->segments[last_seg].position;
-		limb_segment_t segment = { pos, vec3_distance(last_seg_pos, pos)};
-		table->segments[new_seg] = segment;
+		table->segments[new_seg] = limb_segment_from_root_tip(last_seg_pos, pos);
 	}
+}
+
+/*
+Create a limb segment that tstretches from one point to another.
+*/
+limb_segment_t limb_segment_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
+	limb_segment_t segment = { tip_pos, vec3_distance(joint_pos, tip_pos)};
+	return segment;
 }
 
 
