@@ -462,6 +462,72 @@ TEST_CASE("Operations using  4x4 matricies") {
 }
 #endif // IN_TESTS
 
+
+/***
+Unit quaternion.
+***/
+typedef union quat_ {
+	struct {float x,y, z, w;};
+	vec4_t vec4;
+	vec3_t vec3;
+#ifdef RAYLIB_H
+	Quaternion rl;
+#endif
+} quat_t;
+
+static const quat_t quat_identity = {0,0,0,1};
+
+static inline quat_t quat_from_axis_angle(vec3_t axis, float angle) {
+	vec3_t n = vec3_normal(axis);
+	quat_t q = {
+		axis.x * sinf(angle/2),
+		axis.y * sinf(angle/2),
+		axis.z * sinf(angle/2),
+		cosf(angle/2)
+	};
+	return q;
+}
+
+static inline quat_t quat_mul(quat_t q1, quat_t q2) {
+	quat_t r;
+	r.vec3 = vec3_cross(q1.vec3, q2.vec3);
+	r.vec3 = vec3_add(r.vec3, vec3_mul(q1.vec3, q2.w));
+	r.vec3 = vec3_add(r.vec3, vec3_mul(q2.vec3, q1.w));
+	r.w = q1.w * q2.w - vec3_dot(q1.vec3, q2.vec3);
+	return r;
+}
+
+static inline bool quat_eq(quat_t q1, quat_t q2) {
+	return q1.x == q2.x && q1.y == q2.y && q2.z == q2.z && q1.w == q2.w;
+}
+
+#ifdef IN_TESTS
+
+bool operator==(const quat_t& q1, const quat_t& q2) {
+	return quat_eq(q1, q2);
+}
+
+std::ostream& operator<<(std::ostream& out, const quat_t& q) {
+	out << "(" << q.vec3 << "| " << q.w << ")";
+	return out;
+}
+
+TEST_CASE("Quaternion operations") {
+	SECTION("Multiplying a quatenion with it's opposite yields an identity quaternion") {
+		quat_t q = quat_from_axis_angle(vec3(1,0,0), pi);
+		quat_t i = quat_from_axis_angle(vec3(1,0,0), -pi);
+
+		// True both one way..
+		quat_t r1 = quat_mul(q, i);
+		CHECK(r1 == quat_identity);
+
+		// ..and the other
+		quat_t r2 = quat_mul(i, q);
+		CHECK(r2 == quat_identity);
+	}
+}
+
+#endif // IN_TESTS
 #else
 #warning "Header linalg.h included more than once"
 #endif
