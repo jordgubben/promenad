@@ -144,6 +144,14 @@ static inline vec3_t vec3_cross(vec3_t v1, vec3_t v2) {
 	return r;
 }
 
+/**
+Round every scalar in the vector.
+**/
+static inline vec3_t vec3_round(vec3_t v){
+	vec3_t r = { roundf(v.x), roundf(v.y), roundf(v.z), NAN };
+	return r;
+
+}
 #ifdef IN_TESTS
 
 bool operator== (const vec3_t& v1, const vec3_t& v2) {
@@ -477,6 +485,21 @@ typedef union quat_ {
 
 static const quat_t quat_identity = {0,0,0,1};
 
+/**
+The conjugate of the given quaternion.
+**/
+static inline quat_t quat_conjugate(quat_t q) {
+	quat_t qi = {-q.x, -q.y, -q.z, q.w};
+	return qi;
+}
+
+/**
+The inverse of the given (unit) quaternion.
+**/
+static inline quat_t quat_inverse(quat_t q) {
+	return quat_conjugate(q);
+}
+
 static inline quat_t quat_from_axis_angle(vec3_t axis, float angle) {
 	vec3_t n = vec3_normal(axis);
 	quat_t q = {
@@ -497,6 +520,16 @@ static inline quat_t quat_mul(quat_t q1, quat_t q2) {
 	return r;
 }
 
+
+/**
+Apply the rotation of a quaternion to a vector.
+**/
+static vec3_t quat_rotate_vec3(quat_t q, vec3_t v) {
+	quat_t p = {v.x, v.y,  v.z, 0 };
+	quat_t qi = quat_inverse(q);
+	return quat_mul(q, quat_mul(p, qi)).vec3;
+}
+
 static inline bool quat_eq(quat_t q1, quat_t q2) {
 	return q1.x == q2.x && q1.y == q2.y && q2.z == q2.z && q1.w == q2.w;
 }
@@ -515,15 +548,51 @@ std::ostream& operator<<(std::ostream& out, const quat_t& q) {
 TEST_CASE("Quaternion operations") {
 	SECTION("Multiplying a quatenion with it's opposite yields an identity quaternion") {
 		quat_t q = quat_from_axis_angle(vec3(1,0,0), pi);
-		quat_t i = quat_from_axis_angle(vec3(1,0,0), -pi);
+		quat_t qo = quat_from_axis_angle(vec3(1,0,0), -pi);
 
 		// True both one way..
-		quat_t r1 = quat_mul(q, i);
+		quat_t r1 = quat_mul(q, qo);
 		CHECK(r1 == quat_identity);
 
 		// ..and the other
-		quat_t r2 = quat_mul(i, q);
+		quat_t r2 = quat_mul(qo, q);
 		CHECK(r2 == quat_identity);
+	}
+
+	SECTION("Multiplying a quatenion with it's inverse yields an identity quaternion") {
+		quat_t q = quat_from_axis_angle(vec3(1,0,0), pi);
+		quat_t qi = quat_inverse(q);
+
+		// True both one way..
+		quat_t r1 = quat_mul(q, qi);
+		CHECK(r1 == quat_identity);
+
+		// ..and the other
+		quat_t r2 = quat_mul(qi, q);
+		CHECK(r2 == quat_identity);
+	}
+
+	SECTION("Rotating a point 90 deg with a quaternion yyields the expected result") {
+		SECTION("x-axis") {
+			quat_t q = quat_from_axis_angle(vec3(+1,0,0), pi/2);
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(+1,0,0))) == vec3(+1,0,0));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,+1,0))) == vec3(0,0,+1));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,0,+1))) == vec3(0,-1,0));
+		}
+
+		SECTION("y-axis") {
+			quat_t q = quat_from_axis_angle(vec3(0,+1,0), pi/2);
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(+1,0,0))) == vec3(0,0,-1));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,+1,0))) == vec3(0,+1,0));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,0,+1))) == vec3(+1,0,0));
+		}
+
+		SECTION("z-axis") {
+			quat_t q = quat_from_axis_angle(vec3(0,0,+1), pi/2);
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(+1,0,0))) == vec3(0,+1,0));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,+1,0))) == vec3(-1,0,0));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,0,+1))) == vec3(0,0,+1));
+		}
 	}
 }
 
