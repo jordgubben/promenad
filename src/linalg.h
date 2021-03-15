@@ -20,6 +20,8 @@ typedef struct vec3_ {
 	};
 } vec3_t;
 
+static const vec3_t vec3_origo = {0,0,0};
+
 /**
 Create a vector from 3 scalars.
 **/

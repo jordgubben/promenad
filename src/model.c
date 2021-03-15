@@ -81,6 +81,14 @@ void init_app(app_t * app) {
 
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
 	create_actor(vec3(0, 1, +3), +0.5 * pi, &app->actors);
+
+	// Large arm from origo
+	{
+		limb_id_t arm = create_limb(vec3_origo, &app->limbs);
+		add_segment_to_limb(arm, vec3(0,3,0), &app->limbs);
+		add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
+		add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
+	}
 }
 
 
