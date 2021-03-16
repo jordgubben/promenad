@@ -62,42 +62,38 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 	}
 }
 
-void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segment_t arr[], size_t num) {
+void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
 	// Forward pass
-	arr[num - 1].joint_pos = vec3_add(arr[num -1].joint_pos, vec3_between(arr[num -1].tip_pos, end));
-	arr[num - 1].tip_pos = end;
-	arr[num - 1].orientation =
-		quat_from_vec3_pair(vec3(1,0,0), vec3_between(arr[num-1].joint_pos, arr[num-1].tip_pos));
-	for (int i = num - 2; i >= 0 ; i--) {
-		float d = vec3_distance(arr[i].tip_pos, arr[i + 1].tip_pos);
-		vec3_t n = vec3_normal(vec3_between(arr[i].tip_pos, arr[i + 1].tip_pos));
-		float length = arr[i + 1].distance;
+	vec3_t goal_pos = end_pos;
+	for (int i = num - 1; i >= 0 ; i--) {
+		float d = vec3_distance(arr[i].joint_pos, goal_pos);
+		vec3_t n = vec3_normal(vec3_between(arr[i].joint_pos, goal_pos));
+		float length = arr[i].distance;
 
 		// Move forward along n if longer than the constraint
 		// (and backwards if shorter than constraint)
 		float change = d - length;
-		arr[i].tip_pos = vec3_add(arr[i].tip_pos, vec3_mul(n, change));
-		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, +1 * length));
-		arr[i].orientation =
-			quat_from_vec3_pair(vec3(1,0,0), vec3_between(arr[i].joint_pos, arr[i].tip_pos));
+		arr[i].joint_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, change));
+		arr[i].tip_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, length));
+		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
+
+		// Continue to the next one
+		goal_pos = arr[i].joint_pos;
 	}
 
 	// Inverse pass
-	vec3_t prev_pos = origin;
+	// (Pretend origin is a limb segment without length)
+	vec3_t prev_tip_pos = origin;
 	for (int i = 0; i < num; i++) {
-		float d = vec3_distance(prev_pos, arr[i].tip_pos);
-		vec3_t n = vec3_normal(vec3_between(prev_pos, arr[i].tip_pos));
-		float length = arr[i].distance;
+		// Place joint at the previous tip
+		arr[i].joint_pos = prev_tip_pos;
 
-		// Move back along if to far from previous position
-		float change = d - length;
-		arr[i].tip_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, change));
-		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, +1 * length));
-		arr[i].orientation =
-			quat_from_vec3_pair(vec3(1,0,0), vec3_between(arr[i].joint_pos, arr[i].tip_pos));
-
-		// Save as previous position
-		prev_pos = arr[i].tip_pos;
+		// Point bone towards next segment joint
+		// (or the end effector if we are at the last joint)
+		vec3_t next_pos  = (i+1 < num ? arr[i+1].joint_pos : end_pos) ;
+		vec3_t n = vec3_normal(vec3_between(arr[i].joint_pos, next_pos));
+		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
+		prev_tip_pos = arr[i].tip_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, arr[i].distance));
 	}
 }
 
