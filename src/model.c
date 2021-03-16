@@ -230,7 +230,7 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 		int new_seg = append_cl_node_after(last_seg, table->segment_nodes);
 
 		// Set properties
-		vec3_t last_seg_pos = table->segments[last_seg].position;
+		vec3_t last_seg_pos = table->segments[last_seg].tip_pos;
 		table->segments[new_seg] = limb_segment_from_root_tip(last_seg_pos, pos);
 	}
 }
@@ -239,7 +239,7 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 Create a limb segment that tstretches from one point to another.
 */
 limb_segment_t limb_segment_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
-	limb_segment_t segment = { tip_pos, vec3_distance(joint_pos, tip_pos)};
+	limb_segment_t segment = { joint_pos, tip_pos, vec3_distance(joint_pos, tip_pos)};
 	return segment;
 }
 

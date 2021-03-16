@@ -91,18 +91,18 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		limb_id_t limb = get_limb_id(l, table);
 
 		// Render root
-		vec3_t pos = table->position[l];
-		DrawSphere(pos.rl, 0.1, BLACK);
+		vec3_t root_pos = table->position[l];
+		DrawSphere(root_pos.rl, 0.15, BLACK);
 
 		// Render segments in their current positions
 		int segment = table->root_segment[l];
 		while (segment) {
-			vec3_t seg_pos = table->segments[segment].position;
-			DrawLine3D(pos.rl, seg_pos.rl, ORANGE);
-			DrawSphere(seg_pos.rl, 0.05, MAROON);
+			limb_segment_t seg = table->segments[segment];
+			DrawLine3D(seg.joint_pos.rl, seg.tip_pos.rl, ORANGE);
+			DrawSphere(seg.joint_pos.rl, 0.10, MAROON);
+			DrawSphere(seg.tip_pos.rl, 0.05, MAROON);
 
 			// Next segment (if any)
-			pos = seg_pos;
 			segment = table->segment_nodes[segment].next_index;
 			if (segment == table->root_segment[l]) { segment = 0; }
 		}
@@ -114,10 +114,8 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		render_segment_joint_spaces(origin, segments, num_segments);
 		reposition_limb_segments_with_fabrik(origin, end_effector, segments, num_segments);
 		render_segment_joint_spaces(origin, segments, num_segments);
-		pos = origin;
 		FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
-			DrawLine3D(pos.rl, seg_itr->position.rl, BLUE);
-			pos = seg_itr->position;
+			DrawLine3D(seg_itr->joint_pos.rl, seg_itr->tip_pos.rl, BLUE);
 		}
 	}
 }
@@ -127,8 +125,8 @@ void render_segment_joint_spaces(vec3_t origin_pos, limb_segment_t segments[], s
 	// Draw joint spaces
 	vec3_t last_pos = origin_pos;
 	FOR_IN(i, num_segments-1) {
-		vec3_t joint_pos = segments[i].position;
-		vec3_t next_pos = segments[i + 1].position;
+		vec3_t joint_pos = segments[i].tip_pos;
+		vec3_t next_pos = segments[i + 1].tip_pos;
 
 		// Bone direction
 		vec3_t front1 = vec3_normal(vec3_between(last_pos, joint_pos));

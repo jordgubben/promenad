@@ -39,13 +39,17 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 		uint16_t seg_index = table->root_segment[l];
 		FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
 			// Difference
-			vec3_t *current_pos = &table->segments[seg_index].position;
-			vec3_t diff = vec3_between(*current_pos, seg_itr->position);
+			limb_segment_t *current_seg = &table->segments[seg_index];
 
-			// Move there in one second from now (🐢 ⬅️  🐰)
-			current_pos->x += diff.x * dt;
-			current_pos->y += diff.y * dt;
-			current_pos->z += diff.z * dt;
+			// Move tip there in one second from now (🐢 ⬅️  🐰)
+			vec3_t tip_diff = vec3_between(current_seg->tip_pos, seg_itr->tip_pos);
+			vec3_t tip_change = vec3_mul(tip_diff, dt);
+			current_seg->tip_pos = vec3_add(current_seg->tip_pos, tip_change);
+
+			// Move joint there in one second from now (🐢 ⬅️  🐰)
+			vec3_t joint_diff = vec3_between(current_seg->joint_pos, seg_itr->joint_pos);
+			vec3_t joint_change = vec3_mul(joint_diff, dt);
+			current_seg->joint_pos = vec3_add(current_seg->joint_pos, joint_change);
 
 			// Continue to next segment
 			seg_index = table->segment_nodes[seg_index].next_index;
@@ -56,35 +60,34 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 
 void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segment_t arr[], size_t num) {
 	// Forward pass
-	arr[num - 1].position = end;
+	arr[num - 1].joint_pos = vec3_add(arr[num -1].joint_pos, vec3_between(arr[num -1].tip_pos, end));
+	arr[num - 1].tip_pos = end;
 	for (int i = num - 2; i >= 0 ; i--) {
-		float d = vec3_distance(arr[i].position, arr[i + 1].position);
-		vec3_t n = vec3_normal(vec3_between(arr[i].position, arr[i + 1].position));
-		float constraint = arr[i + 1].distance;
+		float d = vec3_distance(arr[i].tip_pos, arr[i + 1].tip_pos);
+		vec3_t n = vec3_normal(vec3_between(arr[i].tip_pos, arr[i + 1].tip_pos));
+		float length = arr[i + 1].distance;
 
 		// Move forward along n if longer than the constraint
 		// (and backwards if shorter than constraint)
-		float change = d - constraint;
-		arr[i].position.x += n.x * change;
-		arr[i].position.y += n.y * change;
-		arr[i].position.z += n.z * change;
+		float change = d - length;
+		arr[i].tip_pos = vec3_add(arr[i].tip_pos, vec3_mul(n, change));
+		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, length));
 	}
 
 	// Inverse pass
 	vec3_t prev_pos = origin;
 	for (int i = 0; i < num; i++) {
-		float d = vec3_distance(prev_pos, arr[i].position);
-		vec3_t n = vec3_normal(vec3_between(prev_pos, arr[i].position));
-		float constraint = arr[i].distance;
+		float d = vec3_distance(prev_pos, arr[i].tip_pos);
+		vec3_t n = vec3_normal(vec3_between(prev_pos, arr[i].tip_pos));
+		float length = arr[i].distance;
 
-		// Move back along n if to far from previous position
-		float change = d - constraint;
-		arr[i].position.x -= n.x * change;
-		arr[i].position.y -= n.y * change;
-		arr[i].position.z -= n.z * change;
+		// Move back along if to far from previous position
+		float change = d - length;
+		arr[i].tip_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, change));
+		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, length));
 
 		// Save as previous position
-		prev_pos = arr[i].position;
+		prev_pos = arr[i].tip_pos;
 	}
 }
 
