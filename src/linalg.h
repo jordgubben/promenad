@@ -513,6 +513,30 @@ static inline quat_t quat_from_axis_angle(vec3_t axis, float angle) {
 	return q;
 }
 
+
+/**
+Quaternion representing the shortest rotation from one vector to the other.
+**/
+static inline quat_t quat_from_vec3_pair(vec3_t v1, vec3_t v2) {
+	// Normalize input
+	v1 = vec3_normal(v1); v2 = vec3_normal(v2);
+
+	// Do various calculations
+	float e = vec3_dot(v1, v2);
+	vec3_t c = vec3_cross(v1, v2);
+	float s = sqrtf(2 * (1 + e));
+	vec3_t qv = vec3_mul(c, 1.0f/s);
+	float qw = s/2.0f;
+
+	// Assemble it
+	quat_t q = {qv.x, qv.y, qv.z, qw};
+	return q;
+}
+
+
+/**
+Multiply two quaternions.
+**/
 static inline quat_t quat_mul(quat_t q1, quat_t q2) {
 	quat_t r;
 	r.vec3 = vec3_cross(q1.vec3, q2.vec3);
@@ -574,7 +598,7 @@ TEST_CASE("Quaternion operations") {
 		CHECK(r2 == quat_identity);
 	}
 
-	SECTION("Rotating a point 90 deg with a quaternion yyields the expected result") {
+	SECTION("Rotating a point 90 deg with a quaternion yields the expected result") {
 		SECTION("x-axis") {
 			quat_t q = quat_from_axis_angle(vec3(+1,0,0), pi/2);
 			CHECK(vec3_round(quat_rotate_vec3(q, vec3(+1,0,0))) == vec3(+1,0,0));
@@ -591,6 +615,15 @@ TEST_CASE("Quaternion operations") {
 
 		SECTION("z-axis") {
 			quat_t q = quat_from_axis_angle(vec3(0,0,+1), pi/2);
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(+1,0,0))) == vec3(0,+1,0));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,+1,0))) == vec3(-1,0,0));
+			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,0,+1))) == vec3(0,0,+1));
+		}
+	}
+
+	SECTION("Quaternion rotation from two vectors") {
+		SECTION("x-axis -> y-axis") {
+			quat_t q = quat_from_vec3_pair(vec3(1,0,0), vec3(0,1,0));
 			CHECK(vec3_round(quat_rotate_vec3(q, vec3(+1,0,0))) == vec3(0,+1,0));
 			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,+1,0))) == vec3(-1,0,0));
 			CHECK(vec3_round(quat_rotate_vec3(q, vec3(0,0,+1))) == vec3(0,0,+1));
