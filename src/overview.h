@@ -63,6 +63,7 @@ void render_actors(const struct Model *, const actor_table_t *);
 typedef struct limb_id_ { uint16_t id; } limb_id_t;
 typedef struct limb_segment_ {
 	vec3_t joint_pos, tip_pos;
+	quat_t orientation;
 	float distance;
 } limb_segment_t;
 enum {

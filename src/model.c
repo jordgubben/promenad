@@ -239,7 +239,8 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 Create a limb segment that tstretches from one point to another.
 */
 limb_segment_t limb_segment_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
-	limb_segment_t segment = { joint_pos, tip_pos, vec3_distance(joint_pos, tip_pos)};
+	quat_t orientation = quat_from_vec3_pair(vec3(1,0,0), vec3_between(joint_pos, tip_pos));
+	limb_segment_t segment = { joint_pos, tip_pos, orientation, vec3_distance(joint_pos, tip_pos)};
 	return segment;
 }
 

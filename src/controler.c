@@ -51,6 +51,10 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 			vec3_t joint_change = vec3_mul(joint_diff, dt);
 			current_seg->joint_pos = vec3_add(current_seg->joint_pos, joint_change);
 
+			// Adjust orientation
+			current_seg->orientation =
+				quat_from_vec3_pair(vec3(1,0,0), vec3_between(current_seg->joint_pos, current_seg->tip_pos));
+
 			// Continue to next segment
 			seg_index = table->segment_nodes[seg_index].next_index;
 		}
@@ -62,6 +66,8 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 	// Forward pass
 	arr[num - 1].joint_pos = vec3_add(arr[num -1].joint_pos, vec3_between(arr[num -1].tip_pos, end));
 	arr[num - 1].tip_pos = end;
+	arr[num - 1].orientation =
+		quat_from_vec3_pair(vec3(1,0,0), vec3_between(arr[num-1].joint_pos, arr[num-1].tip_pos));
 	for (int i = num - 2; i >= 0 ; i--) {
 		float d = vec3_distance(arr[i].tip_pos, arr[i + 1].tip_pos);
 		vec3_t n = vec3_normal(vec3_between(arr[i].tip_pos, arr[i + 1].tip_pos));
@@ -71,7 +77,9 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 		// (and backwards if shorter than constraint)
 		float change = d - length;
 		arr[i].tip_pos = vec3_add(arr[i].tip_pos, vec3_mul(n, change));
-		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, length));
+		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, +1 * length));
+		arr[i].orientation =
+			quat_from_vec3_pair(vec3(1,0,0), vec3_between(arr[i].joint_pos, arr[i].tip_pos));
 	}
 
 	// Inverse pass
@@ -84,7 +92,9 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segmen
 		// Move back along if to far from previous position
 		float change = d - length;
 		arr[i].tip_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, change));
-		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, length));
+		arr[i].joint_pos = vec3_sub(arr[i].tip_pos, vec3_mul(n, +1 * length));
+		arr[i].orientation =
+			quat_from_vec3_pair(vec3(1,0,0), vec3_between(arr[i].joint_pos, arr[i].tip_pos));
 
 		// Save as previous position
 		prev_pos = arr[i].tip_pos;

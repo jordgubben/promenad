@@ -85,7 +85,7 @@ void render_actors(const Model* actor_model, const actor_table_t *table) {
 }
 
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
-	void render_segment_joint_spaces(vec3_t, limb_segment_t [], size_t);
+	void render_segment_joint_orientations(vec3_t, limb_segment_t [], size_t);
 
 	FOR_ROWS(l, *table) {
 		limb_id_t limb = get_limb_id(l, table);
@@ -111,9 +111,9 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		limb_segment_t segments[32];
 		size_t num_segments = collect_limb_segments(limb, table, segments, 32);
 		vec3_t origin = table->position[l];
-		render_segment_joint_spaces(origin, segments, num_segments);
+		render_segment_joint_orientations(origin, segments, num_segments);
 		reposition_limb_segments_with_fabrik(origin, end_effector, segments, num_segments);
-		render_segment_joint_spaces(origin, segments, num_segments);
+		render_segment_joint_orientations(origin, segments, num_segments);
 		FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
 			DrawLine3D(seg_itr->joint_pos.rl, seg_itr->tip_pos.rl, BLUE);
 		}
@@ -121,31 +121,16 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 }
 
 
-void render_segment_joint_spaces(vec3_t origin_pos, limb_segment_t segments[], size_t num_segments) {
+void render_segment_joint_orientations(vec3_t origin_pos, limb_segment_t segments[], size_t num_segments) {
 	// Draw joint spaces
-	vec3_t last_pos = origin_pos;
-	FOR_IN(i, num_segments-1) {
-		vec3_t joint_pos = segments[i].tip_pos;
-		vec3_t next_pos = segments[i + 1].tip_pos;
-
-		// Bone direction
-		vec3_t front1 = vec3_normal(vec3_between(last_pos, joint_pos));
-		vec3_t front2 = vec3_normal(vec3_between(joint_pos, next_pos));
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, front1).rl, SKYBLUE);
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, front2).rl, SKYBLUE);
+	FOR_IN(i, num_segments) {
+		vec3_t joint_pos = segments[i].joint_pos;
+		quat_t joint_ori = segments[i].orientation;
 
 		// Bone "right" (?)
-		vec3_t side = vec3_cross(front1, front2);
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, side).rl, PINK);
-
-		// Bone "up"
-		vec3_t up1 = vec3_cross(vec3_normal(side), front1);
-		vec3_t up2 = vec3_cross(vec3_normal(side), front2);
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, up1).rl, LIME);
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, up2).rl, LIME);
-
-		// Next joint
-		last_pos = joint_pos;
+		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(1,0,0))).rl, RED);
+		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(0,1,0))).rl, GREEN);
+		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(0,0,1))).rl, BLUE);
 	}
 }
 
