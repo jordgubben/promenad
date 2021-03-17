@@ -124,7 +124,12 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment
 		// (and backwards if shorter than constraint)
 		float change = d - length;
 		arr[i].joint_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, change));
-		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
+
+		// Rotate as little as possible
+		vec3_t dir = quat_rotate_vec3(arr[i].orientation, vec3(1,0,0));
+		arr[i].orientation = quat_mul(quat_from_vec3_pair(dir, n), arr[i].orientation);
+
+		// Calculate tip (secondary value)
 		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, length);
 
 		// Continue to the next one
@@ -149,7 +154,10 @@ void apply_fabrik_inverse_pass(
 		// (or the end effector if we are at the last joint)
 		vec3_t next_pos  = (i+1 < num ? arr[i+1].joint_pos : end_pos) ;
 		vec3_t n = vec3_normal(vec3_between(arr[i].joint_pos, next_pos));
-		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
+
+		// Rotate as little as posible
+		vec3_t dir = quat_rotate_vec3(arr[i].orientation, vec3(1,0,0));
+		arr[i].orientation = quat_mul(quat_from_vec3_pair(dir, n), arr[i].orientation);
 
 		// Constrain segment to parrent
 		switch (arr[i].constraint.type) {
