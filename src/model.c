@@ -68,12 +68,12 @@ void init_app(app_t * app) {
 	{
 		actor_id_t actor = create_actor(vec3(0,1,0), 0, &app->actors);
 
-		limb_id_t right_arm = create_limb(vec3(0, 2, +1), &app->limbs);
+		limb_id_t right_arm = create_limb(vec3(0, 2, +1), quat_identity, &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, 2, +3), &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, 2, +4), &app->limbs);
 		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
 
-		limb_id_t left_arm = create_limb(vec3(0, 2, -1), &app->limbs);
+		limb_id_t left_arm = create_limb(vec3(0, 2, -1), quat_identity, &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, 2, -3), &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, 2, -4), &app->limbs);
 		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
@@ -84,7 +84,7 @@ void init_app(app_t * app) {
 
 	// Large arm from origo
 	{
-		limb_id_t arm = create_limb(vec3_origo, &app->limbs);
+		limb_id_t arm = create_limb(vec3_origo, quat_identity, &app->limbs);
 		add_segment_to_limb(arm, vec3(0,3,0), &app->limbs);
 		add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
 		add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
@@ -161,7 +161,7 @@ void init_limb_table(limb_table_t *table) {
 /**
 Create a limb at the given position.
 **/
-limb_id_t create_limb(vec3_t pos, limb_table_t *table) {
+limb_id_t create_limb(vec3_t pos, quat_t ori, limb_table_t *table) {
 	assert(table->num_rows < max_limb_table_rows);
 
 	// Add row to sparse set
@@ -172,6 +172,7 @@ limb_id_t create_limb(vec3_t pos, limb_table_t *table) {
 
 	// Set row data
 	table->position[index] = pos;
+	table->orientation[index] = ori;
 	table->root_segment[index] = 0;
 
 	return limb_id;

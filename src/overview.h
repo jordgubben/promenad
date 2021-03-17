@@ -87,6 +87,7 @@ typedef struct limb_table_ {
 	// Columns
 	vec3_t end_effector[max_limb_table_rows];
 	vec3_t position[max_limb_table_rows];
+	quat_t orientation[max_limb_table_rows];
 	uint16_t root_segment[max_limb_table_rows];
 
 	// Segment pool
@@ -96,7 +97,7 @@ typedef struct limb_table_ {
 
 // Limb CRUD
 void init_limb_table(limb_table_t *);
-limb_id_t create_limb(vec3_t pos, limb_table_t *);
+limb_id_t create_limb(vec3_t pos, quat_t ori, limb_table_t *);
 limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
 uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);

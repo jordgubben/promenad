@@ -50,9 +50,10 @@ SCENARIO("Joint constraints") {
 	init_limb_table(&limbs);
 
 	GIVEN("A two segment arm with pointing toward +x") {
-		limb_id_t arm = create_limb(vec3_origo, &limbs);
+		limb_id_t arm = create_limb(vec3_origo, quat_identity, &limbs);
 		uint16_t s1 = add_segment_to_limb(arm, vec3(2,0,0), &limbs);
 		uint16_t s2 = add_segment_to_limb(arm, vec3(4,0,0), &limbs);
+
 		WHEN("attempting to reach point directly above") {
 			move_limb_directly_to(arm, vec3(0,10,0), &limbs);
 			THEN("Joints reposition as expected") {

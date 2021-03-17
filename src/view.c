@@ -37,6 +37,7 @@ void process_input(float dt, app_t *app) {
 
 //// Rendering ////
 
+void render_orientation_gizmo(vec3_t pos, quat_t ori);
 void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s, Color c);
 
 /**
@@ -92,6 +93,8 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 
 		// Render root
 		vec3_t root_pos = table->position[l];
+		quat_t root_ori = table->orientation[l];
+		render_orientation_gizmo(root_pos, root_ori);
 		DrawSphere(root_pos.rl, 0.15, BLACK);
 
 		// Render segments in their current positions
@@ -126,12 +129,14 @@ void render_segment_joint_orientations(vec3_t origin_pos, limb_segment_t segment
 	FOR_IN(i, num_segments) {
 		vec3_t joint_pos = segments[i].joint_pos;
 		quat_t joint_ori = segments[i].orientation;
-
-		// Bone "right" (?)
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(1,0,0))).rl, RED);
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(0,1,0))).rl, GREEN);
-		DrawLine3D(joint_pos.rl, vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(0,0,1))).rl, BLUE);
+		render_orientation_gizmo(joint_pos, joint_ori);
 	}
+}
+
+void render_orientation_gizmo(vec3_t pos, quat_t ori) {
+	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(1,0,0))).rl, RED);
+	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(0,1,0))).rl, GREEN);
+	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(0,0,1))).rl, BLUE);
 }
 
 void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s, Color c) {
