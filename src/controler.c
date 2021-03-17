@@ -7,7 +7,7 @@
 #include <stdio.h>
 #define TRACE_VEC3(v) printf("%s():%u \t| " #v " = (%f, %f, %f)\n", __func__, __LINE__, (v).x, (v).y, (v).z)
 #else
-#define TRACE_VEC3(_) (_)
+#define TRACE_VEC3(_) (_ = _)
 #endif
 
 /**
