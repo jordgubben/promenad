@@ -90,6 +90,14 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 }
 
 void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
+	void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num);
+	void apply_fabrik_inverse_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num);
+
+	apply_fabrik_forward_pass(origin, end_pos, arr, num);
+	apply_fabrik_inverse_pass(origin, end_pos, arr, num);
+}
+
+void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
 	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Forward pass
@@ -109,6 +117,10 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, l
 		// Continue to the next one
 		goal_pos = arr[i].joint_pos;
 	}
+}
+
+void apply_fabrik_inverse_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
+	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Inverse pass
 	// (Pretend origin is a limb segment without length)
