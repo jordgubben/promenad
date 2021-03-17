@@ -90,6 +90,8 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 }
 
 void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
+	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
+
 	// Forward pass
 	vec3_t goal_pos = end_pos;
 	for (int i = num - 1; i >= 0 ; i--) {
@@ -101,8 +103,8 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, l
 		// (and backwards if shorter than constraint)
 		float change = d - length;
 		arr[i].joint_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, change));
-		arr[i].tip_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, length));
 		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
+		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, length);
 
 		// Continue to the next one
 		goal_pos = arr[i].joint_pos;
@@ -120,8 +122,14 @@ void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, l
 		vec3_t next_pos  = (i+1 < num ? arr[i+1].joint_pos : end_pos) ;
 		vec3_t n = vec3_normal(vec3_between(arr[i].joint_pos, next_pos));
 		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
-		prev_tip_pos = arr[i].tip_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, arr[i].distance));
+		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, arr[i].distance);
+		prev_tip_pos = arr[i].tip_pos;
 	}
+}
+
+vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length) {
+	vec3_t n = quat_rotate_vec3(ori, vec3(1,0,0));
+	return vec3_add(joint_pos, vec3_mul(n, length));
 }
 
 /**
