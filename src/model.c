@@ -4,6 +4,7 @@
 #define IN_MODEL
 #include "overview.h"
 
+#define EXAMPLE_ACTORS 0
 #define LIMB_FOREST 0
 
 //// Sparce table macros
@@ -64,6 +65,7 @@ void init_app(app_t * app) {
 	app->actor_model = malloc(sizeof(Model));
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
+#if EXAMPLE_ACTORS
 	// Setup actors
 	{
 		actor_id_t actor = create_actor(vec3(0,1,0), 0, &app->actors);
@@ -81,6 +83,7 @@ void init_app(app_t * app) {
 
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
 	create_actor(vec3(0, 1, +3), +0.5 * pi, &app->actors);
+#endif
 
 	// Large arm from origo
 	{
