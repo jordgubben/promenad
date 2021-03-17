@@ -186,10 +186,22 @@ limb_id_t get_limb_id(uint16_t index, const limb_table_t *table) {
 
 
 /**
+Get the index of the given limb.
+**/
+uint16_t get_limb_index(limb_id_t limb, const limb_table_t *table) {
+	return T_INDEX(*table, limb);
+}
+
+/**
 Get the world space position of the given limb.
 **/
 vec3_t get_limb_position(limb_id_t limb, const limb_table_t *table) {
 	return T_CELL(*table, limb, position);
+}
+
+vec3_t get_segment_joint_position(uint16_t segment_index, const limb_table_t *table) {
+	assert(segment_index < max_limb_table_segnemts);
+	return table->segments[segment_index].joint_pos;
 }
 
 /**
@@ -211,7 +223,7 @@ size_t collect_limb_segments(limb_id_t limb, const limb_table_t *table, limb_seg
 /**
 Add a segment at the end of the given limb.
 **/
-void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
+uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 	limb_segment_t limb_segment_from_root_tip(vec3_t root, vec3_t tip);
 
 	int limb_index = T_INDEX(*table, limb);
@@ -224,6 +236,7 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 		// Set properties
 		vec3_t limb_pos = table->position[limb_index];
 		table->segments[new_seg] = limb_segment_from_root_tip(limb_pos, pos);
+		return new_seg;
 	} else {
 		// Insert at end
 		uint16_t last_seg = table->segment_nodes[root_seg].prev_index;
@@ -232,7 +245,13 @@ void add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 		// Set properties
 		vec3_t last_seg_pos = table->segments[last_seg].tip_pos;
 		table->segments[new_seg] = limb_segment_from_root_tip(last_seg_pos, pos);
+		return new_seg;
 	}
+}
+
+void set_segment_constraint(uint16_t segment_index, limb_segment_constraint_e type, limb_table_t *table) {
+	assert(segment_index < max_limb_table_segnemts);
+	table->segments[segment_index].constraint = type;
 }
 
 /*
@@ -240,7 +259,11 @@ Create a limb segment that tstretches from one point to another.
 */
 limb_segment_t limb_segment_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
 	quat_t orientation = quat_from_vec3_pair(vec3(1,0,0), vec3_between(joint_pos, tip_pos));
-	limb_segment_t segment = { joint_pos, tip_pos, orientation, vec3_distance(joint_pos, tip_pos)};
+	limb_segment_t segment = {
+		jc_no_constraint,
+		joint_pos, tip_pos,
+		orientation, vec3_distance(joint_pos, tip_pos),
+		};
 	return segment;
 }
 

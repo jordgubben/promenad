@@ -61,7 +61,14 @@ void render_actors(const struct Model *, const actor_table_t *);
 
 //// Limbs ////
 typedef struct limb_id_ { uint16_t id; } limb_id_t;
+typedef enum limb_segment_constraint_ {
+	jc_no_constraint = 0, //(length only)
+	jc_rotate_along_extention,
+
+	num_limb_segment_constraints // Not a constraint :P
+} limb_segment_constraint_e;
 typedef struct limb_segment_ {
+	limb_segment_constraint_e constraint;
 	vec3_t joint_pos, tip_pos;
 	quat_t orientation;
 	float distance;
@@ -91,12 +98,16 @@ typedef struct limb_table_ {
 void init_limb_table(limb_table_t *);
 limb_id_t create_limb(vec3_t pos, limb_table_t *);
 limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
+uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);
+vec3_t get_segment_joint_position(uint16_t seg, const limb_table_t *);
 size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
-void add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
+uint16_t add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
+void set_segment_constraint(uint16_t seg, limb_segment_constraint_e, limb_table_t *);
 
 // Limb kinematics
 void move_limbs_towards_end_effectors(float dt, limb_table_t *);
+void move_limb_directly_to(limb_id_t, vec3_t end, limb_table_t *);
 void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segment_t [], size_t num);
 
 // Render limbs

@@ -21,6 +21,33 @@ void update_app(float dt, app_t *app) {
 
 
 //// Limb kinematics ////
+
+void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) {
+	int limb_index = get_limb_index(limb, table);
+
+	// Move copy of limb segments
+	limb_segment_t segments[32];
+	size_t num_segments = collect_limb_segments(limb, table, segments, 32);
+	vec3_t origin = table->position[limb_index];
+	reposition_limb_segments_with_fabrik(origin, end_pos, segments, num_segments);
+
+	// Reapply changes (directly)
+	uint16_t seg_index = table->root_segment[limb_index];
+	FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
+		// Overwrite
+		limb_segment_t *current_seg = &table->segments[seg_index];
+		current_seg->joint_pos = seg_itr->joint_pos;
+		current_seg->tip_pos = seg_itr->tip_pos;
+		current_seg->orientation =
+			quat_from_vec3_pair(
+				vec3(1,0,0),
+				vec3_between(current_seg->joint_pos, current_seg->tip_pos));
+
+		// Continue to next segment
+		seg_index = table->segment_nodes[seg_index].next_index;
+	}
+}
+
 /**
 Gradually move limb segments toward their desired positions.
 **/
