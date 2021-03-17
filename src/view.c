@@ -13,8 +13,14 @@ void process_input(float dt, app_t *app) {
 	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
 
 	// Move common end effector with arrow keys
-	if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.x += dt; }
-	if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.x -= dt; }
+	if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
+		if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.z -= dt; }
+		if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.z += dt; }
+	} else {
+		if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.x += dt; }
+		if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.x -= dt; }
+	}
+
 	if (IsKeyDown(KEY_UP)) { app->common_end_effector.y += dt; }
 	if (IsKeyDown(KEY_DOWN)) { app->common_end_effector.y -= dt; }
 
