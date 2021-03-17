@@ -91,7 +91,8 @@ void init_app(app_t * app) {
 		limb_id_t arm = create_limb(vec3_origo, arm_ori, &app->limbs);
 		uint16_t s1 = add_segment_to_limb(arm, vec3(0,3,0), &app->limbs);
 		apply_pole_constraint(s1, &app->limbs);
-		add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
+		uint16_t s2 = add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
+		apply_hinge_constraint(s2, 0, pi/2, &app->limbs);
 		add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
 	}
 }
@@ -257,7 +258,15 @@ uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 
 void apply_pole_constraint(uint16_t segment_index, limb_table_t *table) {
 	assert(segment_index < max_limb_table_segnemts);
-	table->segments[segment_index].constraint = jc_pole;
+	table->segments[segment_index].constraint.type = jc_pole;
+}
+
+
+void apply_hinge_constraint(uint16_t segment_index, float min_ang, float max_ang, limb_table_t *table) {
+	assert(segment_index < max_limb_table_segnemts);
+	table->segments[segment_index].constraint.type = jc_hinge;
+	table->segments[segment_index].constraint.min_ang = min_ang;
+	table->segments[segment_index].constraint.max_ang = max_ang;
 }
 
 /*
@@ -266,7 +275,7 @@ Create a limb segment that tstretches from one point to another.
 limb_segment_t limb_segment_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
 	quat_t orientation = quat_from_vec3_pair(vec3(1,0,0), vec3_between(joint_pos, tip_pos));
 	limb_segment_t segment = {
-		jc_no_constraint,
+		{jc_no_constraint, 0.f, 0.f},
 		joint_pos, tip_pos,
 		orientation, vec3_distance(joint_pos, tip_pos),
 		};

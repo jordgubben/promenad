@@ -152,7 +152,7 @@ void apply_fabrik_inverse_pass(
 		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
 
 		// Constrain segment to parrent
-		switch (arr[i].constraint) {
+		switch (arr[i].constraint.type) {
 			case jc_no_constraint: {} break;
 			case jc_pole: {
 				vec3_t prev_dir = quat_rotate_vec3(prev_ori, vec3(1,0,0));

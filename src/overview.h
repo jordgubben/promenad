@@ -64,11 +64,15 @@ typedef struct limb_id_ { uint16_t id; } limb_id_t;
 typedef enum limb_segment_constraint_ {
 	jc_no_constraint = 0, //(length only)
 	jc_pole,
+	jc_hinge,
 
 	num_limb_segment_constraints // Not a constraint :P
 } limb_segment_constraint_e;
 typedef struct limb_segment_ {
-	limb_segment_constraint_e constraint;
+	struct {
+		limb_segment_constraint_e type;
+		float min_ang, max_ang;
+	} constraint;
 	vec3_t joint_pos, tip_pos;
 	quat_t orientation;
 	float distance;
@@ -105,6 +109,7 @@ vec3_t get_segment_joint_position(uint16_t seg, const limb_table_t *);
 size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
 uint16_t add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
 void apply_pole_constraint(uint16_t seg, limb_table_t *);
+void apply_hinge_constraint(uint16_t seg, float min_ang, float max_ang, limb_table_t *);
 
 // Limb kinematics
 void move_limbs_towards_end_effectors(float dt, limb_table_t *);
