@@ -92,8 +92,8 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		limb_id_t limb = get_limb_id(l, table);
 
 		// Render root
-		vec3_t root_pos = table->position[l];
-		quat_t root_ori = table->orientation[l];
+		const vec3_t root_pos = table->position[l];
+		const quat_t root_ori = table->orientation[l];
 		render_orientation_gizmo(root_pos, root_ori);
 		DrawSphere(root_pos.rl, 0.15, BLACK);
 
@@ -113,10 +113,9 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		// Render limb segments IK target positions
 		limb_segment_t segments[32];
 		size_t num_segments = collect_limb_segments(limb, table, segments, 32);
-		vec3_t origin = table->position[l];
-		render_segment_joint_orientations(origin, segments, num_segments);
-		reposition_limb_segments_with_fabrik(origin, end_effector, segments, num_segments);
-		render_segment_joint_orientations(origin, segments, num_segments);
+		render_segment_joint_orientations(root_pos, segments, num_segments);
+		reposition_limb_segments_with_fabrik(root_pos, root_ori, end_effector, segments, num_segments);
+		render_segment_joint_orientations(root_pos, segments, num_segments);
 		FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
 			DrawLine3D(seg_itr->joint_pos.rl, seg_itr->tip_pos.rl, BLUE);
 		}

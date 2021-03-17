@@ -1,5 +1,14 @@
+#include <assert.h>
+
 #define IN_CONTROLER
 #include "overview.h"
+
+#ifdef LOG_CONTROLER
+#include <stdio.h>
+#define TRACE_VEC3(v) printf("%s():%u \t| " #v " = (%f, %f, %f)\n", __func__, __LINE__, (v).x, (v).y, (v).z)
+#else
+#define TRACE_VEC3(_) (_)
+#endif
 
 /**
 Update all the things.
@@ -28,8 +37,9 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 	// Move copy of limb segments
 	limb_segment_t segments[32];
 	size_t num_segments = collect_limb_segments(limb, table, segments, 32);
-	vec3_t origin = table->position[limb_index];
-	reposition_limb_segments_with_fabrik(origin, end_pos, segments, num_segments);
+	vec3_t root_pos = table->position[limb_index];
+	quat_t root_ori = table->orientation[limb_index];
+	reposition_limb_segments_with_fabrik(root_pos, root_ori, end_pos, segments, num_segments);
 
 	// Reapply changes (directly)
 	uint16_t seg_index = table->root_segment[limb_index];
@@ -58,9 +68,10 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 		// Move limb segments
 		limb_segment_t segments[32];
 		size_t num_segments = collect_limb_segments(limb, table, segments, 32);
-		vec3_t origin = table->position[l];
+		vec3_t root_pos = table->position[l];
+		quat_t root_ori = table->orientation[l];
 		vec3_t end_effector = table->end_effector[l];
-		reposition_limb_segments_with_fabrik(origin, end_effector, segments, num_segments);
+		reposition_limb_segments_with_fabrik(root_pos, root_ori, end_effector, segments, num_segments);
 
 		// Reapply changes (gradually)
 		uint16_t seg_index = table->root_segment[l];
@@ -89,12 +100,14 @@ void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
 	}
 }
 
-void reposition_limb_segments_with_fabrik(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
+void reposition_limb_segments_with_fabrik(
+		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,
+		limb_segment_t arr[], size_t num) {
 	void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num);
-	void apply_fabrik_inverse_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num);
+	void apply_fabrik_inverse_pass(vec3_t, quat_t, const vec3_t end_pos, limb_segment_t arr[], size_t num);
 
-	apply_fabrik_forward_pass(origin, end_pos, arr, num);
-	apply_fabrik_inverse_pass(origin, end_pos, arr, num);
+	apply_fabrik_forward_pass(root_pos, end_pos, arr, num);
+	apply_fabrik_inverse_pass(root_pos, root_ori, end_pos, arr, num);
 }
 
 void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
@@ -119,12 +132,15 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment
 	}
 }
 
-void apply_fabrik_inverse_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
+void apply_fabrik_inverse_pass(
+		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,
+		limb_segment_t arr[], size_t num) {
 	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Inverse pass
-	// (Pretend origin is a limb segment without length)
-	vec3_t prev_tip_pos = origin;
+	// (Pretend root is a limb segment without length)
+	vec3_t prev_tip_pos = root_pos;
+	quat_t prev_ori = root_ori;
 	for (int i = 0; i < num; i++) {
 		// Place joint at the previous tip
 		arr[i].joint_pos = prev_tip_pos;
@@ -134,8 +150,28 @@ void apply_fabrik_inverse_pass(vec3_t origin, const vec3_t end_pos, limb_segment
 		vec3_t next_pos  = (i+1 < num ? arr[i+1].joint_pos : end_pos) ;
 		vec3_t n = vec3_normal(vec3_between(arr[i].joint_pos, next_pos));
 		arr[i].orientation = quat_from_vec3_pair(vec3(1,0,0), n);
+
+		// Constrain segment to parrent
+		switch (arr[i].constraint) {
+			case jc_no_constraint: {} break;
+			case jc_rotate_along_extention: {
+				vec3_t prev_dir = quat_rotate_vec3(prev_ori, vec3(1,0,0));
+				if (vec3_dot(prev_dir, n) < 1) {
+					TRACE_VEC3(n);
+					TRACE_VEC3(prev_dir);
+					quat_t r = quat_from_vec3_pair(n, prev_dir);
+					arr[i].orientation = quat_mul(r, arr[i].orientation);
+				}
+			} break;
+			case num_limb_segment_constraints: { assert(false); } break;
+		}
+
+		// Calculate tip (secondary value)
 		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, arr[i].distance);
+
+		// Continue to the next one
 		prev_tip_pos = arr[i].tip_pos;
+		prev_ori = arr[i].orientation;
 	}
 }
 

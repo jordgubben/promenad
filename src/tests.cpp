@@ -54,11 +54,27 @@ SCENARIO("Joint constraints") {
 		uint16_t s1 = add_segment_to_limb(arm, vec3(2,0,0), &limbs);
 		uint16_t s2 = add_segment_to_limb(arm, vec3(4,0,0), &limbs);
 
+		THEN("Joint posisitons are where we expect") {
+			CHECK( vec3(0,0,0) == vec3_round(get_segment_joint_position(s1, &limbs)));
+			CHECK( vec3(2,0,0) == vec3_round(get_segment_joint_position(s2, &limbs)));
+		}
+
 		WHEN("attempting to reach point directly above") {
 			move_limb_directly_to(arm, vec3(0,10,0), &limbs);
 			THEN("Joints reposition as expected") {
 				CHECK( vec3(0,0,0) == vec3_round(get_segment_joint_position(s1, &limbs)));
 				CHECK( vec3(0,2,0) == vec3_round(get_segment_joint_position(s2, &limbs)));
+			}
+		}
+
+		AND_GIVEN("the first segment may only rotate around it's extended axis") {
+			set_segment_constraint(s1, jc_rotate_along_extention, &limbs);
+			WHEN("attempting to reach point above") {
+				move_limb_directly_to(arm, vec3(4,4,0), &limbs);
+				THEN("Second joint stays in place (but may be rotated)") {
+					vec3_t p2 = get_segment_joint_position(s2, &limbs);
+					CHECK(vec3_round(p2) == vec3(2,0,0));
+				}
 			}
 		}
 	}

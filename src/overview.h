@@ -109,7 +109,9 @@ void set_segment_constraint(uint16_t seg, limb_segment_constraint_e, limb_table_
 // Limb kinematics
 void move_limbs_towards_end_effectors(float dt, limb_table_t *);
 void move_limb_directly_to(limb_id_t, vec3_t end, limb_table_t *);
-void reposition_limb_segments_with_fabrik(vec3_t origin, vec3_t end, limb_segment_t [], size_t num);
+void reposition_limb_segments_with_fabrik(
+	vec3_t root_pos, quat_t root_ori, vec3_t end,
+	limb_segment_t [], size_t num);
 
 // Render limbs
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);
