@@ -63,7 +63,7 @@ void render_actors(const struct Model *, const actor_table_t *);
 typedef struct limb_id_ { uint16_t id; } limb_id_t;
 typedef enum limb_segment_constraint_ {
 	jc_no_constraint = 0, //(length only)
-	jc_rotate_along_extention,
+	jc_pole,
 
 	num_limb_segment_constraints // Not a constraint :P
 } limb_segment_constraint_e;
@@ -104,7 +104,7 @@ vec3_t get_limb_position(limb_id_t, const limb_table_t *);
 vec3_t get_segment_joint_position(uint16_t seg, const limb_table_t *);
 size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
 uint16_t add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
-void set_segment_constraint(uint16_t seg, limb_segment_constraint_e, limb_table_t *);
+void apply_pole_constraint(uint16_t seg, limb_table_t *);
 
 // Limb kinematics
 void move_limbs_towards_end_effectors(float dt, limb_table_t *);

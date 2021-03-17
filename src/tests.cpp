@@ -68,7 +68,7 @@ SCENARIO("Joint constraints") {
 		}
 
 		AND_GIVEN("the first segment may only rotate around it's extended axis") {
-			set_segment_constraint(s1, jc_rotate_along_extention, &limbs);
+			apply_pole_constraint(s1, &limbs);
 			WHEN("attempting to reach point above") {
 				move_limb_directly_to(arm, vec3(4,4,0), &limbs);
 				THEN("Second joint stays in place (but may be rotated)") {

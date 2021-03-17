@@ -154,7 +154,7 @@ void apply_fabrik_inverse_pass(
 		// Constrain segment to parrent
 		switch (arr[i].constraint) {
 			case jc_no_constraint: {} break;
-			case jc_rotate_along_extention: {
+			case jc_pole: {
 				vec3_t prev_dir = quat_rotate_vec3(prev_ori, vec3(1,0,0));
 				if (vec3_dot(prev_dir, n) < 1) {
 					TRACE_VEC3(n);

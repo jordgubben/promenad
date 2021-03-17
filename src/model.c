@@ -90,7 +90,7 @@ void init_app(app_t * app) {
 		quat_t arm_ori = quat_from_axis_angle(vec3(0,0,1), pi/2);
 		limb_id_t arm = create_limb(vec3_origo, arm_ori, &app->limbs);
 		uint16_t s1 = add_segment_to_limb(arm, vec3(0,3,0), &app->limbs);
-		set_segment_constraint(s1, jc_rotate_along_extention, &app->limbs);
+		apply_pole_constraint(s1, &app->limbs);
 		add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
 		add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
 	}
@@ -255,9 +255,9 @@ uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 	}
 }
 
-void set_segment_constraint(uint16_t segment_index, limb_segment_constraint_e type, limb_table_t *table) {
+void apply_pole_constraint(uint16_t segment_index, limb_table_t *table) {
 	assert(segment_index < max_limb_table_segnemts);
-	table->segments[segment_index].constraint = type;
+	table->segments[segment_index].constraint = jc_pole;
 }
 
 /*
