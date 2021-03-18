@@ -2,6 +2,7 @@
 #define LINALG_H
 
 #include <math.h>
+#include <assert.h>
 
 // Important constants
 static const float tau = 6.28318530717958647692f;
@@ -22,11 +23,22 @@ typedef struct vec3_ {
 
 static const vec3_t vec3_origo = {0,0,0};
 
+
+/**
+Assert, using C assert(), that values in vectos are numbers (neither nan or inf).
+**/
+static inline vec3_t assert_vec3(vec3_t v) {
+	assert(!isnan(v.x) && !isinf(v.x));
+	assert(!isnan(v.y) && !isinf(v.y));
+	assert(!isnan(v.z) && !isinf(v.z));
+	return v;
+}
 /**
 Create a vector from 3 scalars.
 **/
 static inline vec3_t vec3(float x, float y, float z) {
 	vec3_t r = {x, y, z, NAN};
+	assert_vec3(r);
 	return r;
 }
 
@@ -39,6 +51,7 @@ static inline vec3_t vec3_between(vec3_t p1, vec3_t p2) {
 	float dz = p2.z - p1.z;
 
 	vec3_t d = {dx, dy, dz};
+	assert_vec3(d);
 	return d;
 }
 
@@ -65,6 +78,7 @@ static inline vec3_t vec3_normal(vec3_t v) {
 	float l = vec3_length(v);
 	if (l == 0) { return vec3(0,0,0); }
 	vec3_t n = {v.x/l, v.y/l, v.z/l};
+	assert_vec3(n);
 	return n;
 }
 /**
@@ -84,6 +98,7 @@ static inline vec3_t vec3_add(vec3_t v1, vec3_t v2) {
 		v1.y + v2.y,
 		v1.z + v2.z,
 	};
+	assert_vec3(r);
 	return r;
 }
 
@@ -97,6 +112,7 @@ static inline vec3_t vec3_sub(vec3_t v1, vec3_t v2) {
 		v1.y - v2.y,
 		v1.z - v2.z,
 	};
+	assert_vec3(r);
 	return r;
 }
 
@@ -110,6 +126,7 @@ static inline vec3_t vec3_mul(vec3_t v, float s) {
 		v.y * s,
 		v.z * s,
 	};
+	assert_vec3(r);
 	return r;
 }
 
@@ -122,6 +139,7 @@ static inline vec3_t vec3_div(vec3_t v, float s) {
 		v.y / s,
 		v.z / s,
 	};
+	assert_vec3(r);
 	return r;
 }
 
@@ -143,6 +161,7 @@ static inline vec3_t vec3_cross(vec3_t v1, vec3_t v2) {
 		v1.z * v2.x - v1.x * v2.z,
 		v1.x * v2.y - v1.y * v2.x
 	};
+	assert_vec3(r);
 	return r;
 }
 
@@ -151,6 +170,7 @@ Round every scalar in the vector.
 **/
 static inline vec3_t vec3_round(vec3_t v){
 	vec3_t r = { roundf(v.x), roundf(v.y), roundf(v.z), NAN };
+	assert_vec3(r);
 	return r;
 
 }
