@@ -89,11 +89,18 @@ void init_app(app_t * app) {
 	{
 		quat_t arm_ori = quat_from_axis_angle(vec3(0,0,1), pi/2);
 		limb_id_t arm = create_limb(vec3_origo, arm_ori, &app->limbs);
+
+		// Segment #1
 		uint16_t s1 = add_segment_to_limb(arm, vec3(0,3,0), &app->limbs);
-		apply_pole_constraint(s1, &app->limbs);
+		apply_hinge_constraint(s1, 0, pi/2, &app->limbs);
+
+		// Segment #2
 		uint16_t s2 = add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
 		apply_hinge_constraint(s2, 0, pi/2, &app->limbs);
-		add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
+
+		// Segment 3
+		uint16_t s3 = add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
+		apply_hinge_constraint(s3, 0, pi/2, &app->limbs);
 	}
 }
 
