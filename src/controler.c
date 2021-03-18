@@ -25,11 +25,21 @@ void update_app(float dt, app_t *app) {
 	}
 
 	reposition_attached_limbs(&app->limb_attachments, &app->actors, &app->limbs);
-	move_limbs_towards_end_effectors(dt, &app->limbs);
+	move_limbs_directly_to_end_effectors(&app->limbs);
 }
 
 
 //// Limb kinematics ////
+
+/**
+Use IK to move all limbs to (or as close as possible to) their end effectors.
+**/
+void move_limbs_directly_to_end_effectors(limb_table_t *table) {
+	FOR_ROWS(limb_index, *table) {
+		limb_id_t limb = get_limb_id(limb_index, table);
+		move_limb_directly_to(limb, table->end_effector[limb_index], table);
+	}
+}
 
 void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) {
 	int limb_index = get_limb_index(limb, table);
@@ -60,8 +70,10 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 
 /**
 Gradually move limb segments toward their desired positions.
+
+(Deprecated or put on hold)
 **/
-void move_limbs_towards_end_effectors(float dt, limb_table_t *table) {
+void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *table) {
 	FOR_ROWS(l, *table) {
 		limb_id_t limb = get_limb_id(l, table);
 
