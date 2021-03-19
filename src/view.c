@@ -88,6 +88,9 @@ void render_actors(const Model* actor_model, const actor_table_t *table) {
 		Model model = *actor_model;
 		model.transform = mat4_transpose(table->to_world[a]).rl;
 		DrawModel(model, vec3(0,0,0).rl, 1.0f, BLUE);
+
+		vec3_t nose_pos = mat4_mul_vec3(table->to_world[a], vec3(0.4, 0.5, 0), 1.f);
+		DrawSphere(nose_pos.rl, 0.2, PINK);
 	}
 }
 
