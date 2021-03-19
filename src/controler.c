@@ -10,6 +10,9 @@
 #define TRACE_VEC3(_) (_ = _)
 #endif
 
+
+void update_leg_end_effectors(float dt, const actor_table_t *, const limb_attachment_table_t *, limb_table_t *);
+
 /**
 Update all the things.
 **/
@@ -23,9 +26,52 @@ void update_app(float dt, app_t *app) {
 	reposition_attached_limbs(&app->legs, &app->actors, &app->limbs);
 
 	// Update kinematics
+	update_leg_end_effectors(dt, &app->actors, &app->legs, &app->limbs);
 	move_limbs_directly_to_end_effectors(&app->limbs);
 }
 
+
+//// Actor animation ////
+
+void update_leg_end_effectors(float dt,
+		const actor_table_t *actors,
+		const limb_attachment_table_t *leg_attachments,
+		limb_table_t *limbs) {
+
+
+	FOR_ROWS(i, *leg_attachments) {
+		actor_id_t actor = leg_attachments->owner[i];
+		limb_id_t limb = leg_attachments->limb[i];
+		int limb_index = get_limb_index(limb, limbs);
+
+		// End effector in actors objec space
+		mat4_t to_obj = get_actor_to_object_transform(actor, actors);
+		const vec3_t leg_ee_wpos = limbs->end_effector[limb_index];
+		vec3_t leg_ee_opos = mat4_mul_vec3(to_obj, leg_ee_wpos, 1);
+
+		// Move foot forward if lifted
+		if (leg_ee_wpos.y > 0) {
+			leg_ee_opos.x += dt * 2;
+		}
+
+		// Lift foot if behind actor
+		if (leg_ee_opos.x < -1 && leg_ee_opos.y < -2) {
+			leg_ee_opos.y += dt * 0.5;
+		}
+
+		// Drop foot if in front of actor
+		if (leg_ee_opos.x > +1 && leg_ee_wpos.y > 0 ) {
+			leg_ee_opos.y -= dt * 1.5;
+		}
+
+		// Snap foot placement in front of actor
+		leg_ee_opos.z = leg_attachments->relative_position[i].z;
+
+		// Transform back to worls space
+		mat4_t to_world = get_actor_to_world_transform(actor, actors);
+		limbs->end_effector[limb_index] = mat4_mul_vec3(to_world, leg_ee_opos, 1);
+	}
+}
 
 //// Limb kinematics ////
 
