@@ -69,16 +69,20 @@ void init_app(app_t * app) {
 #if EXAMPLE_ACTORS
 	// Setup actors
 	{
-		actor_id_t actor = create_actor(vec3(0,1,0), 0, &app->actors);
+		actor_id_t actor = create_actor(vec3(0,3,0), 0, &app->actors);
 
-		limb_id_t right_arm = create_limb(vec3(0, 2, +1), quat_identity, &app->limbs);
-		add_segment_to_limb(right_arm, vec3(0, 2, +3), &app->limbs);
-		add_segment_to_limb(right_arm, vec3(0, 2, +4), &app->limbs);
+		float shoulder_height = 3.5f;
+
+		// Right arm
+		limb_id_t right_arm = create_limb(vec3(0, shoulder_height, +1), quat_identity, &app->limbs);
+		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +3), &app->limbs);
+		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +4), &app->limbs);
 		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
 
-		limb_id_t left_arm = create_limb(vec3(0, 2, -1), quat_identity, &app->limbs);
-		add_segment_to_limb(left_arm, vec3(0, 2, -3), &app->limbs);
-		add_segment_to_limb(left_arm, vec3(0, 2, -4), &app->limbs);
+		// Left arm
+		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &app->limbs);
+		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -3), &app->limbs);
+		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -4), &app->limbs);
 		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
 	}
 
