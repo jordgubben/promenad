@@ -23,6 +23,14 @@ typedef struct vec3_ {
 
 static const vec3_t vec3_origo = {0,0,0};
 
+// All the axis directions
+static const vec3_t vec3_positive_x = {+1, 0, 0, NAN};
+static const vec3_t vec3_positive_y = { 0,+1, 0, NAN};
+static const vec3_t vec3_positive_z = { 0, 0,+1, NAN};
+static const vec3_t vec3_negative_x = {-1, 0, 0, NAN};
+static const vec3_t vec3_negative_y = { 0,-1, 0, NAN};
+static const vec3_t vec3_negative_z = { 0, 0,-1, NAN};
+
 
 /**
 Assert, using C assert(), that values in vectos are numbers (neither nan or inf).
@@ -33,6 +41,7 @@ static inline vec3_t assert_vec3(vec3_t v) {
 	assert(!isnan(v.z) && !isinf(v.z));
 	return v;
 }
+
 /**
 Create a vector from 3 scalars.
 **/
@@ -41,6 +50,7 @@ static inline vec3_t vec3(float x, float y, float z) {
 	assert_vec3(r);
 	return r;
 }
+
 
 /**
 A vector from one point to another.
@@ -164,6 +174,27 @@ static inline vec3_t vec3_cross(vec3_t v1, vec3_t v2) {
 	assert_vec3(r);
 	return r;
 }
+
+
+/**
+A vector orthogonal to the given one.
+
+https://stackoverflow.com/a/11741520
+**/
+static inline vec3_t vec3_orthogonal(vec3_t v) {
+	float x = fabsf(v.x);
+	float y = fabsf(v.y);
+	float z = fabsf(v.z);
+
+	// Axis least similar to v
+	vec3_t other = x < y ?
+		(x < z ? vec3_positive_x : vec3_positive_z) :
+		(y < z ? vec3_positive_y : vec3_positive_z);
+
+	// Orthogonal to both
+	return vec3_cross(v, other);
+}
+
 
 /**
 Round every scalar in the vector.
@@ -541,8 +572,14 @@ static inline quat_t quat_from_vec3_pair(vec3_t v1, vec3_t v2) {
 	// Normalize input
 	v1 = vec3_normal(v1); v2 = vec3_normal(v2);
 
-	// Do various calculations
+	// Take special care if vectors are opposite of each other
 	float e = vec3_dot(v1, v2);
+	if ( e <= -1.f) {
+		vec3_t axis = vec3_normal(vec3_orthogonal(v1));
+		return quat_from_axis_angle(axis, pi);
+	}
+
+	// Do various calculations
 	vec3_t c = vec3_cross(v1, v2);
 	float s = sqrtf(2 * (1 + e));
 	vec3_t qv = vec3_mul(c, 1.0f/s);
@@ -616,6 +653,17 @@ TEST_CASE("Quaternion operations") {
 		// ..and the other
 		quat_t r2 = quat_mul(qi, q);
 		CHECK(r2 == quat_identity);
+	}
+
+	SECTION("Quaternion from vector pair") {
+		SECTION("Direct opposites can be rotated to each other") {
+			vec3_t v1 = vec3(+1,0,0);
+			vec3_t v2 = vec3(-1,0,0);
+			quat_t qv = quat_from_vec3_pair(v1, v2);
+
+			CHECK(vec3_round(quat_rotate_vec3(qv, v1)) == v2);
+			CHECK(vec3_round(quat_rotate_vec3(qv, v2)) == v1);
+		}
 	}
 
 	SECTION("Rotating a point 90 deg with a quaternion yields the expected result") {
