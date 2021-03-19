@@ -38,6 +38,9 @@ void update_leg_end_effectors(float dt,
 		const limb_attachment_table_t *leg_attachments,
 		limb_table_t *limbs) {
 
+	const float leg_forward_speed = 4.f;
+	const float leg_lift_speed = 0.5;
+	const float leg_drop_speed = 1.5;
 
 	FOR_ROWS(i, *leg_attachments) {
 		actor_id_t actor = leg_attachments->owner[i];
@@ -51,17 +54,17 @@ void update_leg_end_effectors(float dt,
 
 		// Move foot forward if lifted
 		if (leg_ee_wpos.y > 0) {
-			leg_ee_opos.x += dt * 2;
+			leg_ee_opos.x += dt * leg_forward_speed;
 		}
 
 		// Lift foot if behind actor
 		if (leg_ee_opos.x < -1 && leg_ee_opos.y < -2) {
-			leg_ee_opos.y += dt * 0.5;
+			leg_ee_opos.y += dt * leg_lift_speed;
 		}
 
 		// Drop foot if in front of actor
 		if (leg_ee_opos.x > +1 && leg_ee_wpos.y > 0 ) {
-			leg_ee_opos.y -= dt * 1.5;
+			leg_ee_opos.y -= dt * leg_drop_speed;
 		}
 
 		// Snap foot placement in front of actor
