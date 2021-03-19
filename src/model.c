@@ -38,25 +38,27 @@ Init all the things.
 **/
 void init_app(app_t * app) {
 	app->paused = false;
-	app->common_end_effector = vec3(3, 2, 0);
 
-	init_limb_table(&app->limbs);
+	population_t *pop = &app->population;
+	pop->common_end_effector = vec3(3, 2, 0);
+
+	init_limb_table(&pop->limbs);
 
 #if LIMB_FOREST
 	// Create a bunch of limbs with their roots in a grid
 	FOR_RANGE(x, -5,5) {
 		FOR_RANGE(z, -1, 2) {
 			vec3_t pos = {1*x, 0, 3*z};
-			limb_id_t id = create_limb(pos, &app->limbs);
+			limb_id_t id = create_limb(pos, &pop->limbs);
 
 			// First segment
 			pos.y += 1;
-			add_segment_to_limb(id, pos, &app->limbs);
+			add_segment_to_limb(id, pos, &pop->limbs);
 
 			// Second segment
 			FOR_IN(i, abs(x) * abs(x)) {
 				pos.y += 0.5;
-				add_segment_to_limb(id, pos, &app->limbs);
+				add_segment_to_limb(id, pos, &pop->limbs);
 			}
 		}
 	}
@@ -69,60 +71,60 @@ void init_app(app_t * app) {
 #if EXAMPLE_ACTORS
 	// Setup actors
 	{
-		actor_id_t actor = create_actor(vec3(0,3,0), 0, &app->actors);
+		actor_id_t actor = create_actor(vec3(0,3,0), 0, &pop->actors);
 
 		float shoulder_height = 3.5f;
 		float hip_height = 1.5f;
 		float hip_side = 0.5f;
 
 		// Right arm
-		limb_id_t right_arm = create_limb(vec3(0, shoulder_height, +1), quat_identity, &app->limbs);
-		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +3), &app->limbs);
-		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +4), &app->limbs);
-		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->actors, &app->arms);
-		set_limb_end_effector(right_arm, vec3(2, shoulder_height, +1), &app->limbs);
+		limb_id_t right_arm = create_limb(vec3(0, shoulder_height, +1), quat_identity, &pop->limbs);
+		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +3), &pop->limbs);
+		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +4), &pop->limbs);
+		attach_limb_to_actor(right_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
+		set_limb_end_effector(right_arm, vec3(2, shoulder_height, +1), &pop->limbs);
 
 		// Left arm
-		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &app->limbs);
-		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -3), &app->limbs);
-		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -4), &app->limbs);
-		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->actors, &app->arms);
-		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &app->limbs);
+		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &pop->limbs);
+		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -3), &pop->limbs);
+		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -4), &pop->limbs);
+		attach_limb_to_actor(left_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
+		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &pop->limbs);
 
 		// Right leg
-		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &app->limbs);
-		add_segment_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &app->limbs);
-		add_segment_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &app->limbs);
-		attach_limb_to_actor(right_leg, actor, &app->limbs, &app->actors, &app->legs);
+		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &pop->limbs);
+		add_segment_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &pop->limbs);
+		add_segment_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &pop->limbs);
+		attach_limb_to_actor(right_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
 
 		// Left leg
-		limb_id_t left_leg = create_limb(vec3(0, hip_height, -1 * hip_side), quat_identity, &app->limbs);
-		add_segment_to_limb(left_leg, vec3(0, hip_height -1, -1 * hip_side), &app->limbs);
-		add_segment_to_limb(left_leg, vec3(0, hip_height -2, -1 * hip_side), &app->limbs);
-		attach_limb_to_actor(left_leg, actor, &app->limbs, &app->actors, &app->legs);
+		limb_id_t left_leg = create_limb(vec3(0, hip_height, -1 * hip_side), quat_identity, &pop->limbs);
+		add_segment_to_limb(left_leg, vec3(0, hip_height -1, -1 * hip_side), &pop->limbs);
+		add_segment_to_limb(left_leg, vec3(0, hip_height -2, -1 * hip_side), &pop->limbs);
+		attach_limb_to_actor(left_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
 	}
 
-	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
-	create_actor(vec3(0, 1, +3), +0.5 * pi, &app->actors);
+	create_actor(vec3(0, 1, -3), -0.5 * pi, &pop->actors);
+	create_actor(vec3(0, 1, +3), +0.5 * pi, &pop->actors);
 #endif
 
 #if EXAMPLE_ARM
 	// Large arm from origo
 	{
 		quat_t arm_ori = quat_from_axis_angle(vec3(0,0,1), pi/2);
-		limb_id_t arm = create_limb(vec3_origo, arm_ori, &app->limbs);
+		limb_id_t arm = create_limb(vec3_origo, arm_ori, &pop->limbs);
 
 		// Segment #1
-		uint16_t s1 = add_segment_to_limb(arm, vec3(0,3,0), &app->limbs);
-		apply_hinge_constraint(s1, 0, pi/2, &app->limbs);
+		uint16_t s1 = add_segment_to_limb(arm, vec3(0,3,0), &pop->limbs);
+		apply_hinge_constraint(s1, 0, pi/2, &pop->limbs);
 
 		// Segment #2
-		uint16_t s2 = add_segment_to_limb(arm, vec3(0,6,0), &app->limbs);
-		apply_hinge_constraint(s2, 0, pi/2, &app->limbs);
+		uint16_t s2 = add_segment_to_limb(arm, vec3(0,6,0), &pop->limbs);
+		apply_hinge_constraint(s2, 0, pi/2, &pop->limbs);
 
 		// Segment 3
-		uint16_t s3 = add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
-		apply_hinge_constraint(s3, 0, pi/2, &app->limbs);
+		uint16_t s3 = add_segment_to_limb(arm, vec3(0,9,0), &pop->limbs);
+		apply_hinge_constraint(s3, 0, pi/2, &pop->limbs);
 	}
 #endif // EXAMPLE_ARM
 }

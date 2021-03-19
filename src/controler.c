@@ -18,16 +18,17 @@ Update all the things.
 **/
 void update_app(float dt, app_t *app) {
 	if (app->paused) { return; }
+	population_t *pop = &app->population;
 
-	calculate_actor_transforms(&app->actors);
+	calculate_actor_transforms(&pop->actors);
 
 	// Move limbs attached to actors
-	reposition_attached_limbs(&app->arms, &app->actors, &app->limbs);
-	reposition_attached_limbs(&app->legs, &app->actors, &app->limbs);
+	reposition_attached_limbs(&pop->arms, &pop->actors, &pop->limbs);
+	reposition_attached_limbs(&pop->legs, &pop->actors, &pop->limbs);
 
 	// Update kinematics
-	update_leg_end_effectors(dt, &app->actors, &app->legs, &app->limbs);
-	move_limbs_directly_to_end_effectors(&app->limbs);
+	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limbs);
+	move_limbs_directly_to_end_effectors(&pop->limbs);
 }
 
 

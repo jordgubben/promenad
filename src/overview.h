@@ -140,14 +140,19 @@ void attach_limb_to_actor(
 void reposition_attached_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
 
 
-// App
-typedef struct app_ {
-	bool paused;
-	struct Model *actor_model;
+//// Population (everything that changes)
+typedef struct population_ {
 	actor_table_t actors;
 	limb_table_t limbs;
 	limb_attachment_table_t arms, legs;
 	vec3_t common_end_effector;
+} population_t;
+
+// App
+typedef struct app_ {
+	bool paused;
+	struct Model *actor_model;
+	population_t population;
 } app_t;
 
 

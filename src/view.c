@@ -9,36 +9,38 @@
 //// Input ////
 
 void process_input(float dt, app_t *app) {
+	population_t *pop = &app->population;
+
 	// Toggle pause
 	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
 
 	// Move common end effector with arrow keys
 	if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
-		if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.z -= dt; }
-		if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.z += dt; }
+		if (IsKeyDown(KEY_RIGHT)) { pop->common_end_effector.z -= dt; }
+		if (IsKeyDown(KEY_LEFT)) { pop->common_end_effector.z += dt; }
 	} else {
-		if (IsKeyDown(KEY_RIGHT)) { app->common_end_effector.x += dt; }
-		if (IsKeyDown(KEY_LEFT)) { app->common_end_effector.x -= dt; }
+		if (IsKeyDown(KEY_RIGHT)) { pop->common_end_effector.x += dt; }
+		if (IsKeyDown(KEY_LEFT)) { pop->common_end_effector.x -= dt; }
 	}
 
-	if (IsKeyDown(KEY_UP)) { app->common_end_effector.y += dt; }
-	if (IsKeyDown(KEY_DOWN)) { app->common_end_effector.y -= dt; }
+	if (IsKeyDown(KEY_UP)) { pop->common_end_effector.y += dt; }
+	if (IsKeyDown(KEY_DOWN)) { pop->common_end_effector.y -= dt; }
 
 	// Tank controls
 	if (IsKeyDown(KEY_W)) {
-		app->actors.location[0].position = vec3_add(
-			app->actors.location[0].position,
-			vec3_mul(get_actor_forward_dir(get_actor_id(0, &app->actors), &app->actors), dt * 2)
+		pop->actors.location[0].position = vec3_add(
+			pop->actors.location[0].position,
+			vec3_mul(get_actor_forward_dir(get_actor_id(0, &pop->actors), &pop->actors), dt * 2)
 			);
 	}
 	if (IsKeyDown(KEY_S)) {
-		app->actors.location[0].position = vec3_sub(
-			app->actors.location[0].position,
-			vec3_mul(get_actor_forward_dir(get_actor_id(0, &app->actors), &app->actors), dt * 2)
+		pop->actors.location[0].position = vec3_sub(
+			pop->actors.location[0].position,
+			vec3_mul(get_actor_forward_dir(get_actor_id(0, &pop->actors), &pop->actors), dt * 2)
 			);
 	}
-	if (IsKeyDown(KEY_A)) { app->actors.location[0].orientation_y += dt * 0.25 * tau; }
-	if (IsKeyDown(KEY_D)) { app->actors.location[0].orientation_y -= dt * 0.25 * tau; }
+	if (IsKeyDown(KEY_A)) { pop->actors.location[0].orientation_y += dt * 0.25 * tau; }
+	if (IsKeyDown(KEY_D)) { pop->actors.location[0].orientation_y -= dt * 0.25 * tau; }
 }
 
 //// Rendering ////
@@ -50,20 +52,21 @@ void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s,
 Render all the things.
 **/
 void render_app(const struct Camera3D *camera,  const app_t *app) {
+	const population_t *pop = &app->population;
 
 	// Render something at origo
 	BeginMode3D(*camera);
 	{
-		render_actors(app->actor_model, &app->actors);
+		render_actors(app->actor_model, &pop->actors);
 
-		DrawSphere(app->common_end_effector.rl, 0.1f, GOLD);
+		DrawSphere(pop->common_end_effector.rl, 0.1f, GOLD);
 		{
-			vec3_t shadow = app->common_end_effector;
+			vec3_t shadow = pop->common_end_effector;
 			shadow.y = 0;
 			DrawSphere(shadow.rl, 0.1f, ORANGE);
 		}
 
-		render_limb_skeletons(app->common_end_effector, &app->limbs);
+		render_limb_skeletons(pop->common_end_effector, &pop->limbs);
 
 #if DRAW_COORDINATE_SYSTEM_HELPERS
 		DrawCube(vec3(5,0,0).rl, 1.f, .1f, .1f, RED);
@@ -75,8 +78,8 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 	}
 	EndMode3D();
 
-	draw_matrix_as_text("Actor 'to world' transform", app->actors.to_world[0], 50, 10, 15, BLACK);
-	draw_matrix_as_text("Actor 'to object' transform", app->actors.to_object[0], 250, 10, 15, BLACK);
+	draw_matrix_as_text("Actor 'to world' transform", pop->actors.to_world[0], 50, 10, 15, BLACK);
+	draw_matrix_as_text("Actor 'to object' transform", pop->actors.to_object[0], 250, 10, 15, BLACK);
 }
 
 /**
