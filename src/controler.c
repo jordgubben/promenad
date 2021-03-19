@@ -18,7 +18,13 @@ Update all the things.
 **/
 void update_app(float dt, app_t *app) {
 	if (app->paused) { return; }
-	population_t *pop = &app->population;
+
+	// Keep history
+	unsigned old_frame =  app->frame_count % max_pop_history_frames;
+	app->frame_count++;
+	unsigned new_frame = (app->frame_count % max_pop_history_frames);
+	app->population_history[new_frame] = app->population_history[old_frame];
+	population_t *pop = &app->population_history[new_frame];
 
 	calculate_actor_transforms(&pop->actors);
 

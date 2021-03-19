@@ -5,6 +5,8 @@
 #define IN_APP_ROOT
 #include "overview.h"
 
+static app_t app= { 0 };
+
 float minf(float a, float b) { return (a > b ? a : b); }
 
 int main(int argc, char** argv) {
@@ -30,7 +32,6 @@ int main(int argc, char** argv) {
 	UpdateCamera(&camera);
 
 	// App setup
-	app_t app= { 0 };
 	init_app(&app);
 
 	// Ah-Gogogoggogogogo!

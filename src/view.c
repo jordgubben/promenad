@@ -9,10 +9,13 @@
 //// Input ////
 
 void process_input(float dt, app_t *app) {
-	population_t *pop = &app->population;
+	population_t *pop = &app->population_history[app->frame_count % max_pop_history_frames];
 
 	// Toggle pause
 	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
+
+	// Rewind
+	if (IsKeyDown(KEY_R) && app->frame_count >= 2) { app->frame_count -= 2; }
 
 	// Move common end effector with arrow keys
 	if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
@@ -52,7 +55,7 @@ void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s,
 Render all the things.
 **/
 void render_app(const struct Camera3D *camera,  const app_t *app) {
-	const population_t *pop = &app->population;
+	const population_t *pop = &app->population_history[app->frame_count % max_pop_history_frames];
 
 	// Render something at origo
 	BeginMode3D(*camera);
@@ -78,8 +81,15 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 	}
 	EndMode3D();
 
-	draw_matrix_as_text("Actor 'to world' transform", pop->actors.to_world[0], 50, 10, 15, BLACK);
-	draw_matrix_as_text("Actor 'to object' transform", pop->actors.to_object[0], 250, 10, 15, BLACK);
+	draw_matrix_as_text("Actor 'to world' transform", pop->actors.to_world[0], 100, 10, 15, BLACK);
+	draw_matrix_as_text("Actor 'to object' transform", pop->actors.to_object[0], 300, 10, 15, BLACK);
+
+	// Frame count
+	{
+		char str[128];
+		snprintf(str, 128, "Frame:\n #%02u", app->frame_count);
+		DrawText(str, 0, 24, 20, DARKGREEN);
+	}
 }
 
 /**

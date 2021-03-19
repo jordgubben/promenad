@@ -39,7 +39,8 @@ Init all the things.
 void init_app(app_t * app) {
 	app->paused = false;
 
-	population_t *pop = &app->population;
+	app->frame_count = 0;
+	population_t *pop = &app->population_history[app->frame_count % max_pop_history_frames];
 	pop->common_end_effector = vec3(3, 2, 0);
 
 	init_limb_table(&pop->limbs);

@@ -149,10 +149,14 @@ typedef struct population_ {
 } population_t;
 
 // App
+enum {
+	max_pop_history_frames = 1024,
+};
 typedef struct app_ {
 	bool paused;
 	struct Model *actor_model;
-	population_t population;
+	population_t population_history[max_pop_history_frames];
+	unsigned frame_count;
 } app_t;
 
 
