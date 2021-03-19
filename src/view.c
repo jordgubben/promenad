@@ -103,6 +103,10 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		render_orientation_gizmo(root_pos, root_ori);
 		DrawSphere(root_pos.rl, 0.15, BLACK);
 
+		// Render individual end effectors
+		const vec3_t end_effector_pos = table->end_effector[l];
+		DrawSphere(end_effector_pos.rl, 0.05, GOLD);
+
 		// Render segments in their current positions
 		int segment = table->root_segment[l];
 		while (segment) {

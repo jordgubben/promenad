@@ -107,6 +107,7 @@ uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);
 vec3_t get_segment_joint_position(uint16_t seg, const limb_table_t *);
 size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
+void set_limb_end_effector(limb_id_t, vec3_t, limb_table_t *);
 uint16_t add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
 void apply_pole_constraint(uint16_t seg, limb_table_t *);
 void apply_hinge_constraint(uint16_t seg, float min_ang, float max_ang, limb_table_t *);

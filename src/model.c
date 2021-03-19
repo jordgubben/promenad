@@ -78,12 +78,14 @@ void init_app(app_t * app) {
 		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +3), &app->limbs);
 		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +4), &app->limbs);
 		attach_limb_to_actor(right_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
+		set_limb_end_effector(right_arm, vec3(2, shoulder_height, +1), &app->limbs);
 
 		// Left arm
 		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -3), &app->limbs);
 		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -4), &app->limbs);
 		attach_limb_to_actor(left_arm, actor, &app->limbs, &app->actors, &app->limb_attachments);
+		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &app->limbs);
 	}
 
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &app->actors);
@@ -240,6 +242,15 @@ size_t collect_limb_segments(limb_id_t limb, const limb_table_t *table, limb_seg
 
 	return max;
 }
+
+
+/**
+Set the end effector of the given limb.
+**/
+void set_limb_end_effector(limb_id_t limb, vec3_t pos, limb_table_t * table) {
+	table->end_effector[T_INDEX(*table, limb)] = pos;
+}
+
 
 /**
 Add a segment at the end of the given limb.

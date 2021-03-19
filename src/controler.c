@@ -18,12 +18,6 @@ void update_app(float dt, app_t *app) {
 
 	calculate_actor_transforms(&app->actors);
 
-	// Set common end_effector for all limbs (for now)
-	FOR_ROWS(l, app->limbs) {
-		limb_id_t limb = get_limb_id(l, &app->limbs);
-		app->limbs.end_effector[l] = app->common_end_effector;
-	}
-
 	reposition_attached_limbs(&app->limb_attachments, &app->actors, &app->limbs);
 	move_limbs_directly_to_end_effectors(&app->limbs);
 }
