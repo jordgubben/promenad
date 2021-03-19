@@ -4,7 +4,8 @@
 #define IN_MODEL
 #include "overview.h"
 
-#define EXAMPLE_ACTORS 0
+#define EXAMPLE_ACTORS 1
+#define EXAMPLE_ARM 0
 #define LIMB_FOREST 0
 
 //// Sparce table macros
@@ -85,6 +86,7 @@ void init_app(app_t * app) {
 	create_actor(vec3(0, 1, +3), +0.5 * pi, &app->actors);
 #endif
 
+#if EXAMPLE_ARM
 	// Large arm from origo
 	{
 		quat_t arm_ori = quat_from_axis_angle(vec3(0,0,1), pi/2);
@@ -102,6 +104,7 @@ void init_app(app_t * app) {
 		uint16_t s3 = add_segment_to_limb(arm, vec3(0,9,0), &app->limbs);
 		apply_hinge_constraint(s3, 0, pi/2, &app->limbs);
 	}
+#endif // EXAMPLE_ARM
 }
 
 
