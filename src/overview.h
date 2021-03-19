@@ -145,7 +145,7 @@ typedef struct app_ {
 	struct Model *actor_model;
 	actor_table_t actors;
 	limb_table_t limbs;
-	limb_attachment_table_t limb_attachments;
+	limb_attachment_table_t arms, legs;
 	vec3_t common_end_effector;
 } app_t;
 

@@ -18,7 +18,11 @@ void update_app(float dt, app_t *app) {
 
 	calculate_actor_transforms(&app->actors);
 
-	reposition_attached_limbs(&app->limb_attachments, &app->actors, &app->limbs);
+	// Move limbs attached to actors
+	reposition_attached_limbs(&app->arms, &app->actors, &app->limbs);
+	reposition_attached_limbs(&app->legs, &app->actors, &app->limbs);
+
+	// Update kinematics
 	move_limbs_directly_to_end_effectors(&app->limbs);
 }
 
