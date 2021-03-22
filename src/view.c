@@ -108,7 +108,7 @@ void render_actors(const Model* actor_model, const actor_table_t *table) {
 }
 
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
-	void render_segment_joint_orientations(vec3_t, limb_segment_t [], size_t);
+	void render_segment_joint_orientations(vec3_t, bone_t [], size_t);
 
 	FOR_ROWS(l, *table) {
 		limb_id_t limb = get_limb_id(l, table);
@@ -126,7 +126,7 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		// Render segments in their current positions
 		int segment = table->root_segment[l];
 		while (segment) {
-			limb_segment_t seg = table->segments[segment];
+			bone_t seg = table->segments[segment];
 			DrawLine3D(seg.joint_pos.rl, seg.tip_pos.rl, GRAY);
 			DrawSphere(seg.joint_pos.rl, 0.10, MAROON);
 			DrawSphere(seg.tip_pos.rl, 0.05, MAROON);
@@ -137,14 +137,14 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		}
 
 		// Render limb segments orientation gizmoz
-		limb_segment_t segments[32];
-		size_t num_segments = collect_limb_segments(limb, table, segments, 32);
+		bone_t segments[32];
+		size_t num_segments = collect_bones(limb, table, segments, 32);
 		render_segment_joint_orientations(root_pos, segments, num_segments);
 	}
 }
 
 
-void render_segment_joint_orientations(vec3_t origin_pos, limb_segment_t segments[], size_t num_segments) {
+void render_segment_joint_orientations(vec3_t origin_pos, bone_t segments[], size_t num_segments) {
 	// Draw joint spaces
 	FOR_IN(i, num_segments) {
 		vec3_t joint_pos = segments[i].joint_pos;

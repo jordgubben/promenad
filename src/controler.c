@@ -99,17 +99,17 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 	int limb_index = get_limb_index(limb, table);
 
 	// Move copy of limb segments
-	limb_segment_t segments[32];
-	size_t num_segments = collect_limb_segments(limb, table, segments, 32);
+	bone_t segments[32];
+	size_t num_segments = collect_bones(limb, table, segments, 32);
 	vec3_t root_pos = table->position[limb_index];
 	quat_t root_ori = table->orientation[limb_index];
-	reposition_limb_segments_with_fabrik(root_pos, root_ori, end_pos, segments, num_segments);
+	reposition_bones_with_fabrik(root_pos, root_ori, end_pos, segments, num_segments);
 
 	// Reapply changes (directly)
 	uint16_t seg_index = table->root_segment[limb_index];
-	FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
+	FOR_ITR(bone_t, seg_itr, segments, num_segments) {
 		// Overwrite
-		limb_segment_t *current_seg = &table->segments[seg_index];
+		bone_t *current_seg = &table->segments[seg_index];
 		current_seg->joint_pos = seg_itr->joint_pos;
 		current_seg->tip_pos = seg_itr->tip_pos;
 		current_seg->orientation =
@@ -132,18 +132,18 @@ void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *table) {
 		limb_id_t limb = get_limb_id(l, table);
 
 		// Move limb segments
-		limb_segment_t segments[32];
-		size_t num_segments = collect_limb_segments(limb, table, segments, 32);
+		bone_t segments[32];
+		size_t num_segments = collect_bones(limb, table, segments, 32);
 		vec3_t root_pos = table->position[l];
 		quat_t root_ori = table->orientation[l];
 		vec3_t end_effector = table->end_effector[l];
-		reposition_limb_segments_with_fabrik(root_pos, root_ori, end_effector, segments, num_segments);
+		reposition_bones_with_fabrik(root_pos, root_ori, end_effector, segments, num_segments);
 
 		// Reapply changes (gradually)
 		uint16_t seg_index = table->root_segment[l];
-		FOR_ITR(limb_segment_t, seg_itr, segments, num_segments) {
+		FOR_ITR(bone_t, seg_itr, segments, num_segments) {
 			// Difference
-			limb_segment_t *current_seg = &table->segments[seg_index];
+			bone_t *current_seg = &table->segments[seg_index];
 
 			// Move tip there in one second from now (🐢 ⬅️  🐰)
 			vec3_t tip_diff = vec3_between(current_seg->tip_pos, seg_itr->tip_pos);
@@ -166,23 +166,23 @@ void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *table) {
 	}
 }
 
-void reposition_limb_segments_with_fabrik(
+void reposition_bones_with_fabrik(
 		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,
-		limb_segment_t arr[], size_t num) {
-	void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num);
-	void apply_fabrik_inverse_pass(vec3_t, quat_t, const vec3_t end_pos, limb_segment_t arr[], size_t num);
+		bone_t arr[], size_t num) {
+	void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[], size_t num);
+	void apply_fabrik_inverse_pass(vec3_t, quat_t, const vec3_t end_pos, bone_t arr[], size_t num);
 
 	apply_fabrik_forward_pass(root_pos, end_pos, arr, num);
 	apply_fabrik_inverse_pass(root_pos, root_ori, end_pos, arr, num);
 }
 
-void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment_t arr[], size_t num) {
+void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[], size_t num) {
 	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Forward pass
 	vec3_t goal_pos = end_pos;
 	quat_t goal_ori = quat_identity;
-	limb_segment_constraint_e goal_constraint_type = jc_no_constraint;
+	bone_constraint_e goal_constraint_type = jc_no_constraint;
 	for (int i = num - 1; i >= 0 ; i--) {
 		vec3_t b = vec3_between(arr[i].joint_pos, goal_pos);
 
@@ -195,7 +195,7 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment
 				arr[i].joint_pos = vec3_sub(arr[i].joint_pos, projection);
 				b = vec3_between(arr[i].joint_pos, goal_pos);
 			} break;
-			case num_limb_segment_constraints: { assert(false); } break;
+			case num_bone_constraints: { assert(false); } break;
 		}
 
 		// Relative placement (after constrains)
@@ -224,7 +224,7 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, limb_segment
 
 void apply_fabrik_inverse_pass(
 		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,
-		limb_segment_t arr[], size_t num) {
+		bone_t arr[], size_t num) {
 	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Inverse pass
@@ -258,7 +258,7 @@ void apply_fabrik_inverse_pass(
 				vec3_t projection = vec3_mul(axis, vec3_dot(axis, n));
 				n = vec3_normal(vec3_sub(n, projection));
 			} break;
-			case num_limb_segment_constraints: { assert(false); } break;
+			case num_bone_constraints: { assert(false); } break;
 		}
 
 		// Rotate as little as posible

@@ -62,22 +62,22 @@ void render_actors(const struct Model *, const actor_table_t *);
 
 //// Limbs ////
 typedef struct limb_id_ { uint16_t id; } limb_id_t;
-typedef enum limb_segment_constraint_ {
+typedef enum bone_constraint_ {
 	jc_no_constraint = 0, //(length only)
 	jc_pole,
 	jc_hinge,
 
-	num_limb_segment_constraints // Not a constraint :P
-} limb_segment_constraint_e;
-typedef struct limb_segment_ {
+	num_bone_constraints // Not a constraint :P
+} bone_constraint_e;
+typedef struct bone_ {
 	struct {
-		limb_segment_constraint_e type;
+		bone_constraint_e type;
 		float min_ang, max_ang;
 	} constraint;
 	vec3_t joint_pos, tip_pos;
 	quat_t orientation;
 	float distance;
-} limb_segment_t;
+} bone_t;
 enum {
 	max_limb_table_rows = 128,
 	limb_table_id_range = 1024,
@@ -97,7 +97,7 @@ typedef struct limb_table_ {
 
 	// Segment pool
 	cl_node_t segment_nodes[max_limb_table_segnemts];
-	limb_segment_t segments[max_limb_table_segnemts];
+	bone_t segments[max_limb_table_segnemts];
 } limb_table_t;
 
 // Limb CRUD
@@ -107,7 +107,7 @@ limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
 uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);
 vec3_t get_segment_joint_position(uint16_t seg, const limb_table_t *);
-size_t collect_limb_segments(limb_id_t, const limb_table_t *, limb_segment_t out[], size_t max);
+size_t collect_bones(limb_id_t, const limb_table_t *, bone_t out[], size_t max);
 void set_limb_end_effector(limb_id_t, vec3_t, limb_table_t *);
 uint16_t add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
 void apply_pole_constraint(uint16_t seg, limb_table_t *);
@@ -117,9 +117,9 @@ void apply_hinge_constraint(uint16_t seg, float min_ang, float max_ang, limb_tab
 void move_limbs_directly_to_end_effectors(limb_table_t *table);
 void move_limb_directly_to(limb_id_t, vec3_t end, limb_table_t *);
 void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *);
-void reposition_limb_segments_with_fabrik(
+void reposition_bones_with_fabrik(
 	vec3_t root_pos, quat_t root_ori, vec3_t end,
-	limb_segment_t [], size_t num);
+	bone_t [], size_t num);
 
 // Render limbs
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);

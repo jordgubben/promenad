@@ -251,7 +251,7 @@ vec3_t get_segment_joint_position(uint16_t segment_index, const limb_table_t *ta
 /**
 Collect limb segments into an array (with max size).
 **/
-size_t collect_limb_segments(limb_id_t limb, const limb_table_t *table, limb_segment_t out[], size_t max) {
+size_t collect_bones(limb_id_t limb, const limb_table_t *table, bone_t out[], size_t max) {
 	int root_seg = table->root_segment[T_INDEX(*table, limb)];
 	if (!root_seg) { return 0; }
 
@@ -277,7 +277,7 @@ void set_limb_end_effector(limb_id_t limb, vec3_t pos, limb_table_t * table) {
 Add a segment at the end of the given limb.
 **/
 uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
-	limb_segment_t limb_segment_from_root_tip(vec3_t root, vec3_t tip);
+	bone_t bone_from_root_tip(vec3_t root, vec3_t tip);
 
 	int limb_index = T_INDEX(*table, limb);
 	int root_seg = table->root_segment[limb_index];
@@ -288,7 +288,7 @@ uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 
 		// Set properties
 		vec3_t limb_pos = table->position[limb_index];
-		table->segments[new_seg] = limb_segment_from_root_tip(limb_pos, pos);
+		table->segments[new_seg] = bone_from_root_tip(limb_pos, pos);
 		return new_seg;
 	} else {
 		// Insert at end
@@ -297,7 +297,7 @@ uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 
 		// Set properties
 		vec3_t last_seg_pos = table->segments[last_seg].tip_pos;
-		table->segments[new_seg] = limb_segment_from_root_tip(last_seg_pos, pos);
+		table->segments[new_seg] = bone_from_root_tip(last_seg_pos, pos);
 		return new_seg;
 	}
 }
@@ -318,9 +318,9 @@ void apply_hinge_constraint(uint16_t segment_index, float min_ang, float max_ang
 /*
 Create a limb segment that tstretches from one point to another.
 */
-limb_segment_t limb_segment_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
+bone_t bone_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
 	quat_t orientation = quat_from_vec3_pair(vec3(1,0,0), vec3_between(joint_pos, tip_pos));
-	limb_segment_t segment = {
+	bone_t segment = {
 		{jc_no_constraint, 0.f, 0.f},
 		joint_pos, tip_pos,
 		orientation, vec3_distance(joint_pos, tip_pos),
