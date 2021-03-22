@@ -94,6 +94,7 @@ typedef struct limb_table_ {
 	vec3_t position[max_limb_table_rows];
 	quat_t orientation[max_limb_table_rows];
 	uint16_t root_bone[max_limb_table_rows];
+	limb_id_t paired_with[max_limb_table_rows];
 
 	// Segment pool
 	cl_node_t bone_nodes[max_limb_table_segnemts];
@@ -110,6 +111,7 @@ vec3_t get_bone_joint_position(uint16_t seg, const limb_table_t *);
 size_t collect_bones(limb_id_t, const limb_table_t *, bone_t out[], size_t max);
 void set_limb_end_effector(limb_id_t, vec3_t, limb_table_t *);
 uint16_t add_bone_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
+void pair_limbs(limb_id_t, limb_id_t, limb_table_t *);
 void apply_pole_constraint(uint16_t seg, limb_table_t *);
 void apply_hinge_constraint(uint16_t seg, float min_ang, float max_ang, limb_table_t *);
 

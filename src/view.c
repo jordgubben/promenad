@@ -140,6 +140,13 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		bone_t bones[32];
 		size_t num_bones = collect_bones(limb, table, bones, 32);
 		render_bone_joint_orientations(root_pos, bones, num_bones);
+
+		// Render pairing
+		limb_id_t paired_limb = table->paired_with[l];
+		if (limb.id < paired_limb.id) {
+			vec3_t other_root_pos = get_limb_position(paired_limb, table);
+			DrawLine3D(root_pos.rl, other_root_pos.rl, BLACK);
+		}
 	}
 }
 

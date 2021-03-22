@@ -92,6 +92,9 @@ void init_app(app_t * app) {
 		attach_limb_to_actor(left_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
 		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &pop->limbs);
 
+		// Pair arms
+		pair_limbs(left_arm, right_arm, &pop->limbs);
+
 		// Right leg
 		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &pop->limbs);
 		add_bone_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &pop->limbs);
@@ -103,6 +106,9 @@ void init_app(app_t * app) {
 		add_bone_to_limb(left_leg, vec3(0, hip_height -1, -1 * hip_side), &pop->limbs);
 		add_bone_to_limb(left_leg, vec3(0, hip_height -2, -1 * hip_side), &pop->limbs);
 		attach_limb_to_actor(left_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
+
+		// Pair legs
+		pair_limbs(left_leg, right_leg, &pop->limbs);
 	}
 
 	create_actor(vec3(0, 1, -3), -0.5 * pi, &pop->actors);
@@ -217,6 +223,7 @@ limb_id_t create_limb(vec3_t pos, quat_t ori, limb_table_t *table) {
 	table->position[index] = pos;
 	table->orientation[index] = ori;
 	table->root_bone[index] = 0;
+	table->paired_with[index] = limb_id;
 
 	return limb_id;
 }
@@ -300,6 +307,15 @@ uint16_t add_bone_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 		table->bones[new_seg] = bone_from_root_tip(last_seg_pos, pos);
 		return new_seg;
 	}
+}
+
+
+/**
+Couple two limbs with each other.
+**/
+void pair_limbs(limb_id_t l1, limb_id_t l2, limb_table_t *table) {
+	table->paired_with[T_INDEX(*table, l1)] = l2;
+	table->paired_with[T_INDEX(*table, l2)] = l1;
 }
 
 void apply_pole_constraint(uint16_t bone_index, limb_table_t *table) {
