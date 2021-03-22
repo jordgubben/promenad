@@ -51,19 +51,19 @@ SCENARIO("Joint constraints") {
 
 	GIVEN("A two segment arm with pointing toward +x") {
 		limb_id_t arm = create_limb(vec3_origo, quat_identity, &limbs);
-		uint16_t s1 = add_segment_to_limb(arm, vec3(2,0,0), &limbs);
-		uint16_t s2 = add_segment_to_limb(arm, vec3(4,0,0), &limbs);
+		uint16_t s1 = add_bone_to_limb(arm, vec3(2,0,0), &limbs);
+		uint16_t s2 = add_bone_to_limb(arm, vec3(4,0,0), &limbs);
 
 		THEN("Joint posisitons are where we expect") {
-			CHECK( vec3(0,0,0) == vec3_round(get_segment_joint_position(s1, &limbs)));
-			CHECK( vec3(2,0,0) == vec3_round(get_segment_joint_position(s2, &limbs)));
+			CHECK( vec3(0,0,0) == vec3_round(get_bone_joint_position(s1, &limbs)));
+			CHECK( vec3(2,0,0) == vec3_round(get_bone_joint_position(s2, &limbs)));
 		}
 
 		WHEN("attempting to reach point directly above") {
 			move_limb_directly_to(arm, vec3(0,10,0), &limbs);
 			THEN("Joints reposition as expected") {
-				CHECK( vec3(0,0,0) == vec3_round(get_segment_joint_position(s1, &limbs)));
-				CHECK( vec3(0,2,0) == vec3_round(get_segment_joint_position(s2, &limbs)));
+				CHECK( vec3(0,0,0) == vec3_round(get_bone_joint_position(s1, &limbs)));
+				CHECK( vec3(0,2,0) == vec3_round(get_bone_joint_position(s2, &limbs)));
 			}
 		}
 
@@ -72,7 +72,7 @@ SCENARIO("Joint constraints") {
 			WHEN("attempting to reach point above") {
 				move_limb_directly_to(arm, vec3(4,4,0), &limbs);
 				THEN("Second joint stays in place (but may be rotated)") {
-					vec3_t p2 = get_segment_joint_position(s2, &limbs);
+					vec3_t p2 = get_bone_joint_position(s2, &limbs);
 					CHECK(vec3_round(p2) == vec3(2,0,0));
 				}
 			}

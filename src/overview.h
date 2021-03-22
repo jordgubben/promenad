@@ -93,11 +93,11 @@ typedef struct limb_table_ {
 	vec3_t end_effector[max_limb_table_rows];
 	vec3_t position[max_limb_table_rows];
 	quat_t orientation[max_limb_table_rows];
-	uint16_t root_segment[max_limb_table_rows];
+	uint16_t root_bone[max_limb_table_rows];
 
 	// Segment pool
-	cl_node_t segment_nodes[max_limb_table_segnemts];
-	bone_t segments[max_limb_table_segnemts];
+	cl_node_t bone_nodes[max_limb_table_segnemts];
+	bone_t bones[max_limb_table_segnemts];
 } limb_table_t;
 
 // Limb CRUD
@@ -106,10 +106,10 @@ limb_id_t create_limb(vec3_t pos, quat_t ori, limb_table_t *);
 limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
 uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);
-vec3_t get_segment_joint_position(uint16_t seg, const limb_table_t *);
+vec3_t get_bone_joint_position(uint16_t seg, const limb_table_t *);
 size_t collect_bones(limb_id_t, const limb_table_t *, bone_t out[], size_t max);
 void set_limb_end_effector(limb_id_t, vec3_t, limb_table_t *);
-uint16_t add_segment_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
+uint16_t add_bone_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
 void apply_pole_constraint(uint16_t seg, limb_table_t *);
 void apply_hinge_constraint(uint16_t seg, float min_ang, float max_ang, limb_table_t *);
 

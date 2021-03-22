@@ -98,18 +98,18 @@ void move_limbs_directly_to_end_effectors(limb_table_t *table) {
 void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) {
 	int limb_index = get_limb_index(limb, table);
 
-	// Move copy of limb segments
-	bone_t segments[32];
-	size_t num_segments = collect_bones(limb, table, segments, 32);
+	// Move copy of limb bones
+	bone_t bones[32];
+	size_t num_bones = collect_bones(limb, table, bones, 32);
 	vec3_t root_pos = table->position[limb_index];
 	quat_t root_ori = table->orientation[limb_index];
-	reposition_bones_with_fabrik(root_pos, root_ori, end_pos, segments, num_segments);
+	reposition_bones_with_fabrik(root_pos, root_ori, end_pos, bones, num_bones);
 
 	// Reapply changes (directly)
-	uint16_t seg_index = table->root_segment[limb_index];
-	FOR_ITR(bone_t, seg_itr, segments, num_segments) {
+	uint16_t seg_index = table->root_bone[limb_index];
+	FOR_ITR(bone_t, seg_itr, bones, num_bones) {
 		// Overwrite
-		bone_t *current_seg = &table->segments[seg_index];
+		bone_t *current_seg = &table->bones[seg_index];
 		current_seg->joint_pos = seg_itr->joint_pos;
 		current_seg->tip_pos = seg_itr->tip_pos;
 		current_seg->orientation =
@@ -117,13 +117,13 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 				vec3(1,0,0),
 				vec3_between(current_seg->joint_pos, current_seg->tip_pos));
 
-		// Continue to next segment
-		seg_index = table->segment_nodes[seg_index].next_index;
+		// Continue to next bone
+		seg_index = table->bone_nodes[seg_index].next_index;
 	}
 }
 
 /**
-Gradually move limb segments toward their desired positions.
+Gradually move limb bones toward their desired positions.
 
 (Deprecated or put on hold)
 **/
@@ -131,19 +131,19 @@ void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *table) {
 	FOR_ROWS(l, *table) {
 		limb_id_t limb = get_limb_id(l, table);
 
-		// Move limb segments
-		bone_t segments[32];
-		size_t num_segments = collect_bones(limb, table, segments, 32);
+		// Move limb bones
+		bone_t bones[32];
+		size_t num_bones = collect_bones(limb, table, bones, 32);
 		vec3_t root_pos = table->position[l];
 		quat_t root_ori = table->orientation[l];
 		vec3_t end_effector = table->end_effector[l];
-		reposition_bones_with_fabrik(root_pos, root_ori, end_effector, segments, num_segments);
+		reposition_bones_with_fabrik(root_pos, root_ori, end_effector, bones, num_bones);
 
 		// Reapply changes (gradually)
-		uint16_t seg_index = table->root_segment[l];
-		FOR_ITR(bone_t, seg_itr, segments, num_segments) {
+		uint16_t seg_index = table->root_bone[l];
+		FOR_ITR(bone_t, seg_itr, bones, num_bones) {
 			// Difference
-			bone_t *current_seg = &table->segments[seg_index];
+			bone_t *current_seg = &table->bones[seg_index];
 
 			// Move tip there in one second from now (🐢 ⬅️  🐰)
 			vec3_t tip_diff = vec3_between(current_seg->tip_pos, seg_itr->tip_pos);
@@ -160,7 +160,7 @@ void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *table) {
 				quat_from_vec3_pair(vec3(1,0,0), vec3_between(current_seg->joint_pos, current_seg->tip_pos));
 
 			// Continue to next segment
-			seg_index = table->segment_nodes[seg_index].next_index;
+			seg_index = table->bone_nodes[seg_index].next_index;
 		}
 
 	}
@@ -235,7 +235,7 @@ void apply_fabrik_inverse_pass(
 		// Place joint at the previous tip
 		arr[i].joint_pos = prev_tip_pos;
 
-		// Point bone towards next segment joint
+		// Point bone towards next bone joint
 		// (or the end effector if we are at the last joint)
 		vec3_t next_pos  = (i+1 < num ? arr[i+1].joint_pos : end_pos) ;
 		vec3_t n = vec3_normal(vec3_between(arr[i].joint_pos, next_pos));

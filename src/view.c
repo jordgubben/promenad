@@ -108,7 +108,7 @@ void render_actors(const Model* actor_model, const actor_table_t *table) {
 }
 
 void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
-	void render_segment_joint_orientations(vec3_t, bone_t [], size_t);
+	void render_bone_joint_orientations(vec3_t, bone_t [], size_t);
 
 	FOR_ROWS(l, *table) {
 		limb_id_t limb = get_limb_id(l, table);
@@ -123,32 +123,32 @@ void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
 		const vec3_t end_effector_pos = table->end_effector[l];
 		DrawSphere(end_effector_pos.rl, 0.05, GOLD);
 
-		// Render segments in their current positions
-		int segment = table->root_segment[l];
-		while (segment) {
-			bone_t seg = table->segments[segment];
+		// Render bones in their current positions
+		int bone = table->root_bone[l];
+		while (bone) {
+			bone_t seg = table->bones[bone];
 			DrawLine3D(seg.joint_pos.rl, seg.tip_pos.rl, GRAY);
 			DrawSphere(seg.joint_pos.rl, 0.10, MAROON);
 			DrawSphere(seg.tip_pos.rl, 0.05, MAROON);
 
-			// Next segment (if any)
-			segment = table->segment_nodes[segment].next_index;
-			if (segment == table->root_segment[l]) { segment = 0; }
+			// Next bone (if any)
+			bone = table->bone_nodes[bone].next_index;
+			if (bone == table->root_bone[l]) { bone = 0; }
 		}
 
-		// Render limb segments orientation gizmoz
-		bone_t segments[32];
-		size_t num_segments = collect_bones(limb, table, segments, 32);
-		render_segment_joint_orientations(root_pos, segments, num_segments);
+		// Render limb bones orientation gizmoz
+		bone_t bones[32];
+		size_t num_bones = collect_bones(limb, table, bones, 32);
+		render_bone_joint_orientations(root_pos, bones, num_bones);
 	}
 }
 
 
-void render_segment_joint_orientations(vec3_t origin_pos, bone_t segments[], size_t num_segments) {
+void render_bone_joint_orientations(vec3_t origin_pos, bone_t bones[], size_t num_bones) {
 	// Draw joint spaces
-	FOR_IN(i, num_segments) {
-		vec3_t joint_pos = segments[i].joint_pos;
-		quat_t joint_ori = segments[i].orientation;
+	FOR_IN(i, num_bones) {
+		vec3_t joint_pos = bones[i].joint_pos;
+		quat_t joint_ori = bones[i].orientation;
 		render_orientation_gizmo(joint_pos, joint_ori);
 	}
 }

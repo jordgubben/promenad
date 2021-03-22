@@ -54,12 +54,12 @@ void init_app(app_t * app) {
 
 			// First segment
 			pos.y += 1;
-			add_segment_to_limb(id, pos, &pop->limbs);
+			add_bone_to_limb(id, pos, &pop->limbs);
 
 			// Second segment
 			FOR_IN(i, abs(x) * abs(x)) {
 				pos.y += 0.5;
-				add_segment_to_limb(id, pos, &pop->limbs);
+				add_bone_to_limb(id, pos, &pop->limbs);
 			}
 		}
 	}
@@ -80,28 +80,28 @@ void init_app(app_t * app) {
 
 		// Right arm
 		limb_id_t right_arm = create_limb(vec3(0, shoulder_height, +1), quat_identity, &pop->limbs);
-		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +3), &pop->limbs);
-		add_segment_to_limb(right_arm, vec3(0, shoulder_height, +4), &pop->limbs);
+		add_bone_to_limb(right_arm, vec3(0, shoulder_height, +3), &pop->limbs);
+		add_bone_to_limb(right_arm, vec3(0, shoulder_height, +4), &pop->limbs);
 		attach_limb_to_actor(right_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
 		set_limb_end_effector(right_arm, vec3(2, shoulder_height, +1), &pop->limbs);
 
 		// Left arm
 		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &pop->limbs);
-		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -3), &pop->limbs);
-		add_segment_to_limb(left_arm, vec3(0, shoulder_height, -4), &pop->limbs);
+		add_bone_to_limb(left_arm, vec3(0, shoulder_height, -3), &pop->limbs);
+		add_bone_to_limb(left_arm, vec3(0, shoulder_height, -4), &pop->limbs);
 		attach_limb_to_actor(left_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
 		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &pop->limbs);
 
 		// Right leg
 		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &pop->limbs);
-		add_segment_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &pop->limbs);
-		add_segment_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &pop->limbs);
+		add_bone_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &pop->limbs);
+		add_bone_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &pop->limbs);
 		attach_limb_to_actor(right_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
 
 		// Left leg
 		limb_id_t left_leg = create_limb(vec3(0, hip_height, -1 * hip_side), quat_identity, &pop->limbs);
-		add_segment_to_limb(left_leg, vec3(0, hip_height -1, -1 * hip_side), &pop->limbs);
-		add_segment_to_limb(left_leg, vec3(0, hip_height -2, -1 * hip_side), &pop->limbs);
+		add_bone_to_limb(left_leg, vec3(0, hip_height -1, -1 * hip_side), &pop->limbs);
+		add_bone_to_limb(left_leg, vec3(0, hip_height -2, -1 * hip_side), &pop->limbs);
 		attach_limb_to_actor(left_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
 	}
 
@@ -116,15 +116,15 @@ void init_app(app_t * app) {
 		limb_id_t arm = create_limb(vec3_origo, arm_ori, &pop->limbs);
 
 		// Segment #1
-		uint16_t s1 = add_segment_to_limb(arm, vec3(0,3,0), &pop->limbs);
+		uint16_t s1 = add_bone_to_limb(arm, vec3(0,3,0), &pop->limbs);
 		apply_hinge_constraint(s1, 0, pi/2, &pop->limbs);
 
 		// Segment #2
-		uint16_t s2 = add_segment_to_limb(arm, vec3(0,6,0), &pop->limbs);
+		uint16_t s2 = add_bone_to_limb(arm, vec3(0,6,0), &pop->limbs);
 		apply_hinge_constraint(s2, 0, pi/2, &pop->limbs);
 
 		// Segment 3
-		uint16_t s3 = add_segment_to_limb(arm, vec3(0,9,0), &pop->limbs);
+		uint16_t s3 = add_bone_to_limb(arm, vec3(0,9,0), &pop->limbs);
 		apply_hinge_constraint(s3, 0, pi/2, &pop->limbs);
 	}
 #endif // EXAMPLE_ARM
@@ -198,7 +198,7 @@ void calculate_actor_transforms(actor_table_t *table) {
 Init the given limb table.
 **/
 void init_limb_table(limb_table_t *table) {
-	init_cl_pool(table->segment_nodes, max_limb_table_segnemts);
+	init_cl_pool(table->bone_nodes, max_limb_table_segnemts);
 }
 
 /**
@@ -216,7 +216,7 @@ limb_id_t create_limb(vec3_t pos, quat_t ori, limb_table_t *table) {
 	// Set row data
 	table->position[index] = pos;
 	table->orientation[index] = ori;
-	table->root_segment[index] = 0;
+	table->root_bone[index] = 0;
 
 	return limb_id;
 }
@@ -243,21 +243,21 @@ vec3_t get_limb_position(limb_id_t limb, const limb_table_t *table) {
 	return T_CELL(*table, limb, position);
 }
 
-vec3_t get_segment_joint_position(uint16_t segment_index, const limb_table_t *table) {
-	assert(segment_index < max_limb_table_segnemts);
-	return table->segments[segment_index].joint_pos;
+vec3_t get_bone_joint_position(uint16_t bone_index, const limb_table_t *table) {
+	assert(bone_index < max_limb_table_segnemts);
+	return table->bones[bone_index].joint_pos;
 }
 
 /**
-Collect limb segments into an array (with max size).
+Collect limb bones into an array (with max size).
 **/
 size_t collect_bones(limb_id_t limb, const limb_table_t *table, bone_t out[], size_t max) {
-	int root_seg = table->root_segment[T_INDEX(*table, limb)];
+	int root_seg = table->root_bone[T_INDEX(*table, limb)];
 	if (!root_seg) { return 0; }
 
 	for (int i = 0, seg = root_seg;  i < max ; i++) {
-		out[i] = table->segments[seg];
-		seg = table->segment_nodes[seg].next_index;
+		out[i] = table->bones[seg];
+		seg = table->bone_nodes[seg].next_index;
 		if (seg == root_seg) { return i + 1; }
 	}
 
@@ -276,56 +276,56 @@ void set_limb_end_effector(limb_id_t limb, vec3_t pos, limb_table_t * table) {
 /**
 Add a segment at the end of the given limb.
 **/
-uint16_t add_segment_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
+uint16_t add_bone_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 	bone_t bone_from_root_tip(vec3_t root, vec3_t tip);
 
 	int limb_index = T_INDEX(*table, limb);
-	int root_seg = table->root_segment[limb_index];
+	int root_seg = table->root_bone[limb_index];
 	if (root_seg == 0) {
 		// Add first node
-		int new_seg = take_free_cl_node(table->segment_nodes);
-		table->root_segment[limb_index] = new_seg;
+		int new_seg = take_free_cl_node(table->bone_nodes);
+		table->root_bone[limb_index] = new_seg;
 
 		// Set properties
 		vec3_t limb_pos = table->position[limb_index];
-		table->segments[new_seg] = bone_from_root_tip(limb_pos, pos);
+		table->bones[new_seg] = bone_from_root_tip(limb_pos, pos);
 		return new_seg;
 	} else {
 		// Insert at end
-		uint16_t last_seg = table->segment_nodes[root_seg].prev_index;
-		int new_seg = append_cl_node_after(last_seg, table->segment_nodes);
+		uint16_t last_seg = table->bone_nodes[root_seg].prev_index;
+		int new_seg = append_cl_node_after(last_seg, table->bone_nodes);
 
 		// Set properties
-		vec3_t last_seg_pos = table->segments[last_seg].tip_pos;
-		table->segments[new_seg] = bone_from_root_tip(last_seg_pos, pos);
+		vec3_t last_seg_pos = table->bones[last_seg].tip_pos;
+		table->bones[new_seg] = bone_from_root_tip(last_seg_pos, pos);
 		return new_seg;
 	}
 }
 
-void apply_pole_constraint(uint16_t segment_index, limb_table_t *table) {
-	assert(segment_index < max_limb_table_segnemts);
-	table->segments[segment_index].constraint.type = jc_pole;
+void apply_pole_constraint(uint16_t bone_index, limb_table_t *table) {
+	assert(bone_index < max_limb_table_segnemts);
+	table->bones[bone_index].constraint.type = jc_pole;
 }
 
 
-void apply_hinge_constraint(uint16_t segment_index, float min_ang, float max_ang, limb_table_t *table) {
-	assert(segment_index < max_limb_table_segnemts);
-	table->segments[segment_index].constraint.type = jc_hinge;
-	table->segments[segment_index].constraint.min_ang = min_ang;
-	table->segments[segment_index].constraint.max_ang = max_ang;
+void apply_hinge_constraint(uint16_t bone_index, float min_ang, float max_ang, limb_table_t *table) {
+	assert(bone_index < max_limb_table_segnemts);
+	table->bones[bone_index].constraint.type = jc_hinge;
+	table->bones[bone_index].constraint.min_ang = min_ang;
+	table->bones[bone_index].constraint.max_ang = max_ang;
 }
 
 /*
-Create a limb segment that tstretches from one point to another.
+Create a bone that tstretches from one point to another.
 */
 bone_t bone_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
 	quat_t orientation = quat_from_vec3_pair(vec3(1,0,0), vec3_between(joint_pos, tip_pos));
-	bone_t segment = {
+	bone_t bone = {
 		{jc_no_constraint, 0.f, 0.f},
 		joint_pos, tip_pos,
 		orientation, vec3_distance(joint_pos, tip_pos),
 		};
-	return segment;
+	return bone;
 }
 
 
