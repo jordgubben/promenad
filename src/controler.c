@@ -106,15 +106,23 @@ void update_leg_end_effectors(float dt,
 		limb_id_t limb = leg_attachments->limb[i];
 		int limb_index = get_limb_index(limb, limbs);
 
-		// End effector in actors object space
+		// Get transforms
+		// (We will use them quite a bit)
 		const mat4_t to_world = get_actor_to_world_transform(actor, actors);
 		const mat4_t to_obj = get_actor_to_object_transform(actor, actors);
+
+		// Root position in world and actors bject space
+		const vec3_t leg_root_wpos = limbs->position[limb_index];
+		const vec3_t leg_root_opos = mat4_mul_vec3(to_obj, leg_root_wpos, 1);
+
+		// End effector in world and actors object space
 		const vec3_t leg_ee_wpos = limbs->end_effector[limb_index];
 		vec3_t leg_ee_opos = mat4_mul_vec3(to_obj, leg_ee_wpos, 1);
 
 		// Move foot forward if behind actor
+		// (goal relative to root, i.e. hip joint)
 		if (leg_ee_opos.x < -1) {
-			vec3_t leg_goal_opos = vec3_add(leg_ee_opos, vec3(3,1,0));
+			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(2.5f,0,0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
 			put_limb_goal(limb, leg_goal_wpos, leg_forward_speed, leg_acceleration, goals);
 		}
