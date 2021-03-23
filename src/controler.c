@@ -12,7 +12,8 @@
 
 
 void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_t *current);
-void update_leg_end_effectors(float dt, const actor_table_t *, const limb_attachment_table_t *, limb_table_t *);
+void update_leg_end_effectors(float dt,
+	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
 
 /**
 Update all the things.
@@ -35,7 +36,7 @@ void update_app(float dt, app_t *app) {
 
 	// Update kinematics
 	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
-	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limbs);
+	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limb_goals, &pop->limbs);
 	move_limbs_directly_to_end_effectors(&pop->limbs);
 	delete_accomplished_limb_goals(&pop->limbs, &pop->limb_goals);
 }
@@ -92,8 +93,10 @@ void accelrate_toward_goal_velocity(vec3_t  goal_vel, float max_speed_change, ve
 void update_leg_end_effectors(float dt,
 		const actor_table_t *actors,
 		const limb_attachment_table_t *leg_attachments,
+		limb_goal_table_t *goals,
 		limb_table_t *limbs) {
 
+	const float leg_acceleration = 100.f;
 	const float leg_forward_speed = 4.f;
 	const float leg_lift_speed = 0.5;
 	const float leg_drop_speed = 1.5;
@@ -103,19 +106,17 @@ void update_leg_end_effectors(float dt,
 		limb_id_t limb = leg_attachments->limb[i];
 		int limb_index = get_limb_index(limb, limbs);
 
-		// End effector in actors objec space
-		mat4_t to_obj = get_actor_to_object_transform(actor, actors);
+		// End effector in actors object space
+		const mat4_t to_world = get_actor_to_world_transform(actor, actors);
+		const mat4_t to_obj = get_actor_to_object_transform(actor, actors);
 		const vec3_t leg_ee_wpos = limbs->end_effector[limb_index];
 		vec3_t leg_ee_opos = mat4_mul_vec3(to_obj, leg_ee_wpos, 1);
 
-		// Move foot forward if lifted
-		if (leg_ee_wpos.y > 0) {
-			leg_ee_opos.x += dt * leg_forward_speed;
-		}
-
-		// Lift foot if behind actor
-		if (leg_ee_opos.x < -1 && leg_ee_opos.y < -2) {
-			leg_ee_opos.y += dt * leg_lift_speed;
+		// Move foot forward if behind actor
+		if (leg_ee_opos.x < -1) {
+			vec3_t leg_goal_opos = vec3_add(leg_ee_opos, vec3(3,1,0));
+			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
+			put_limb_goal(limb, leg_goal_wpos, leg_forward_speed, leg_acceleration, goals);
 		}
 
 		// Drop foot if in front of actor
@@ -127,7 +128,6 @@ void update_leg_end_effectors(float dt,
 		leg_ee_opos.z = leg_attachments->relative_position[i].z;
 
 		// Transform back to worls space
-		mat4_t to_world = get_actor_to_world_transform(actor, actors);
 		limbs->end_effector[limb_index] = mat4_mul_vec3(to_world, leg_ee_opos, 1);
 	}
 }
