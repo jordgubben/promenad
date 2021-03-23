@@ -98,7 +98,7 @@ void update_leg_end_effectors(float dt,
 
 	// Speeds
 	const float leg_acceleration = 50.f;
-	const float leg_forward_speed = 8.f;
+	const float leg_forward_speed = 4.f;
 	const float leg_drop_speed = 1.5;
 
 	// Limits
