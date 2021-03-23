@@ -110,9 +110,6 @@ void init_app(app_t * app) {
 		// Pair legs
 		pair_limbs(left_leg, right_leg, &pop->limbs);
 	}
-
-	create_actor(vec3(0, 1, -3), -0.5 * pi, &pop->actors);
-	create_actor(vec3(0, 1, +3), +0.5 * pi, &pop->actors);
 #endif
 
 #if EXAMPLE_ARM
