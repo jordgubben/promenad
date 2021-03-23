@@ -31,7 +31,7 @@ void process_input(float dt, app_t *app) {
 	// Set goal for first limb
 	if (IsKeyPressed(KEY_SPACE)) {
 		limb_id_t id = { 0 };
-		put_limb_goal(id, app->world_cursor, &pop->limb_goals);
+		put_limb_goal(id, app->world_cursor, 1, 5, &pop->limb_goals);
 	}
 
 	// Tank controls

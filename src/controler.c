@@ -47,19 +47,21 @@ void update_app(float dt, app_t *app) {
 Move limb end effectors towards their goals.
 **/
 void move_limbs_toward_goals(float dt, limb_goal_table_t *goals, limb_table_t *limbs) {
-	const float ee_max_speed = 0.1;
-	const float ee_acceleration = 1;
 
-	float max_speed_change = ee_acceleration * dt;
 	FOR_ROWS(goal_index, *goals) {
-		// Get the data
+		// Get limb data
 		limb_id_t limb = goals->dense_id[goal_index];
 		int limb_index = get_limb_index(limb, limbs);
 		vec3_t ee_pos = limbs->end_effector[limb_index];
+
+		// Get goal data
 		vec3_t goal_pos = goals->goal_position[goal_index];
+		float max_speed = goals->max_speed[goal_index];
+		float acceleration = goals->max_acceleration[goal_index];
+		float max_speed_change = acceleration * dt;
 
 		// Move end effectors
-		vec3_t target_vel = vec3_mul(vec3_direction(ee_pos, goal_pos), ee_max_speed);
+		vec3_t target_vel = vec3_mul(vec3_direction(ee_pos, goal_pos), max_speed);
 		accelrate_toward_goal_velocity(target_vel, max_speed_change, &goals->velocity[goal_index]);
 		limbs->end_effector[limb_index] =
 			vec3_add(limbs->end_effector[limb_index], vec3_mul(goals->velocity[goal_index], dt));

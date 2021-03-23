@@ -153,10 +153,12 @@ typedef struct limb_goal_table_ {
 	// Column data
 	vec3_t goal_position[max_limb_goal_table_rows];
 	vec3_t velocity[max_limb_goal_table_rows];
+	float max_speed[max_limb_goal_table_rows];
+	float max_acceleration[max_limb_goal_table_rows];
 } limb_goal_table_t;
 
 // Limb goal CRUD
-void put_limb_goal(limb_id_t, vec3_t, limb_goal_table_t *);
+void put_limb_goal(limb_id_t, vec3_t, float speed, float acc, limb_goal_table_t *);
 bool has_limb_goal(limb_id_t, const limb_goal_table_t *);
 void move_limbs_toward_goals(float dt, limb_goal_table_t *, limb_table_t *);
 void delete_achived_limb_goals(const limb_table_t *, limb_goal_table_t *);

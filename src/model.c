@@ -134,7 +134,7 @@ void init_app(app_t * app) {
 		apply_hinge_constraint(s3, 0, pi/2, &pop->limbs);
 
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
-		put_limb_goal(arm, vec3(0,5,0), &pop->limb_goals);
+		put_limb_goal(arm, vec3(0,5,0), 1, 10, &pop->limb_goals);
 	}
 #endif // EXAMPLE_ARM
 }
@@ -387,7 +387,7 @@ void reposition_attached_limbs(
 
 //// Limb goals
 
-void put_limb_goal(limb_id_t limb, vec3_t pos, limb_goal_table_t *table) {
+void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, limb_goal_table_t *table) {
 	// Figgure out where to put the data
 	int index;
 	if (T_HAS_ID(*table, limb)) {
@@ -405,6 +405,8 @@ void put_limb_goal(limb_id_t limb, vec3_t pos, limb_goal_table_t *table) {
 	// Set row data
 	table->goal_position[index] = pos;
 	table->velocity[index] = vec3(0,0,0);
+	table->max_speed[index] = max_speed;
+	table->max_acceleration[index] = max_acc;
 }
 
 //// Cyclic list ////
