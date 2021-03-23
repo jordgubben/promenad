@@ -106,6 +106,14 @@ void update_leg_end_effectors(float dt,
 		limb_id_t limb = leg_attachments->limb[i];
 		int limb_index = get_limb_index(limb, limbs);
 
+		// If paired with other leg
+		if (limbs->paired_with[limb_index].id != limb.id) {
+			// ..then skip this limb if it's parner is already going somewhere
+			if (has_limb_goal(limbs->paired_with[limb_index], goals)) {
+				continue;
+			}
+		}
+
 		// Get transforms
 		// (We will use them quite a bit)
 		const mat4_t to_world = get_actor_to_world_transform(actor, actors);

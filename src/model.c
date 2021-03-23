@@ -421,6 +421,14 @@ void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, l
 
 
 /**
+Does this limb have a goal?
+**/
+bool has_limb_goal(limb_id_t limb, const limb_goal_table_t *table) {
+	return T_HAS_ID(*table, limb);
+}
+
+
+/**
 Delete all goals there the limb is close enough to it's intended destination.
 **/
 void delete_accomplished_limb_goals(const limb_table_t *limbs, limb_goal_table_t *goals) {
