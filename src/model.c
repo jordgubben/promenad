@@ -291,11 +291,18 @@ void set_limb_end_effector(limb_id_t limb, vec3_t pos, limb_table_t * table) {
 
 /**
 Add a segment at the end of the given limb.
+
+Bonus: Place limb end effector at the tip of the new limb segment.
 **/
 uint16_t add_bone_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 	bone_t bone_from_root_tip(vec3_t root, vec3_t tip);
 
 	int limb_index = T_INDEX(*table, limb);
+
+	// Update end effector
+	table->end_effector[limb_index] = pos;
+
+	// Add limb
 	int root_seg = table->root_bone[limb_index];
 	if (root_seg == 0) {
 		// Add first node
