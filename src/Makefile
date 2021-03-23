@@ -18,7 +18,7 @@ CPP_OBJECTS= $(patsubst %.cpp,$(TMP_DIR)/_%.opp, $(CPP_SOURCES))
 
 
 # Default build target
-all: $(BIN_DIR)/promenad $(BIN_DIR)/tests tags
+all: tags $(BIN_DIR)/promenad $(BIN_DIR)/tests
 
 ## Run things
 
