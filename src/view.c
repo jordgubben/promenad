@@ -28,6 +28,12 @@ void process_input(float dt, app_t *app) {
 	if (IsKeyDown(KEY_UP)) { app->world_cursor.y += dt; }
 	if (IsKeyDown(KEY_DOWN)) { app->world_cursor.y -= dt; }
 
+	// Set goal for first limb
+	if (IsKeyPressed(KEY_SPACE)) {
+		limb_id_t id = { 0 };
+		put_limb_goal(id, app->world_cursor, &pop->limb_goals);
+	}
+
 	// Tank controls
 	if (IsKeyDown(KEY_W)) {
 		pop->actors.location[0].position = vec3_add(
