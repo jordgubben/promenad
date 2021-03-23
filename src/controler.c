@@ -117,7 +117,7 @@ void update_leg_end_effectors(float dt,
 
 		// End effector in world and actors object space
 		const vec3_t leg_ee_wpos = limbs->end_effector[limb_index];
-		vec3_t leg_ee_opos = mat4_mul_vec3(to_obj, leg_ee_wpos, 1);
+		const vec3_t leg_ee_opos = mat4_mul_vec3(to_obj, leg_ee_wpos, 1);
 
 		// Move foot forward if behind actor
 		// (goal relative to root, i.e. hip joint)
@@ -134,12 +134,6 @@ void update_leg_end_effectors(float dt,
 			leg_goal_wpos.y = 0;
 			put_limb_goal(limb, leg_goal_wpos, leg_drop_speed, leg_acceleration, goals);
 		}
-
-		// Snap foot placement in front of actor
-		leg_ee_opos.z = leg_attachments->relative_position[i].z;
-
-		// Transform back to worls space
-		limbs->end_effector[limb_index] = mat4_mul_vec3(to_world, leg_ee_opos, 1);
 	}
 }
 
