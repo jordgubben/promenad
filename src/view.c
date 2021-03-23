@@ -81,8 +81,11 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 	}
 	EndMode3D();
 
-	draw_matrix_as_text("Actor 'to world' transform", pop->actors.to_world[0], 100, 10, 15, BLACK);
-	draw_matrix_as_text("Actor 'to object' transform", pop->actors.to_object[0], 300, 10, 15, BLACK);
+	// Actor debug
+	if (pop->actors.num_rows > 0) {
+		draw_matrix_as_text("Actor 'to world' transform", pop->actors.to_world[0], 100, 10, 15, BLACK);
+		draw_matrix_as_text("Actor 'to object' transform", pop->actors.to_object[0], 300, 10, 15, BLACK);
+	}
 
 	// Frame count
 	{
