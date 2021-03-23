@@ -119,9 +119,12 @@ void update_leg_end_effectors(float dt,
 			put_limb_goal(limb, leg_goal_wpos, leg_forward_speed, leg_acceleration, goals);
 		}
 
-		// Drop foot if in front of actor
+		// Drop foot if in front of actor (and in air)
 		if (leg_ee_opos.x > +1 && leg_ee_wpos.y > 0 ) {
-			leg_ee_opos.y -= dt * leg_drop_speed;
+			vec3_t leg_goal_opos = leg_ee_opos;
+			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
+			leg_goal_wpos.y = 0;
+			put_limb_goal(limb, leg_goal_wpos, leg_drop_speed, leg_acceleration, goals);
 		}
 
 		// Snap foot placement in front of actor
