@@ -4,8 +4,8 @@
 #define IN_MODEL
 #include "overview.h"
 
-#define EXAMPLE_ACTORS 1
-#define EXAMPLE_ARM 0
+#define EXAMPLE_ACTORS 0
+#define EXAMPLE_ARM 1
 #define LIMB_FOREST 0
 
 //// Sparce table macros
@@ -132,6 +132,8 @@ void init_app(app_t * app) {
 		// Segment 3
 		uint16_t s3 = add_bone_to_limb(arm, vec3(0,9,0), &pop->limbs);
 		apply_hinge_constraint(s3, 0, pi/2, &pop->limbs);
+
+		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
 	}
 #endif // EXAMPLE_ARM
 }
