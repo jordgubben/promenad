@@ -124,7 +124,7 @@ void reposition_bones_with_fabrik(
 	bone_t [], size_t num);
 
 // Render limbs
-void render_limb_skeletons(vec3_t end_effector, const limb_table_t *);
+void render_limb_skeletons(const limb_table_t *);
 
 //// Limb attachments
 enum {max_limb_attachment_table_rows = max_limb_table_rows };
@@ -147,7 +147,6 @@ typedef struct population_ {
 	actor_table_t actors;
 	limb_table_t limbs;
 	limb_attachment_table_t arms, legs;
-	vec3_t common_end_effector;
 } population_t;
 
 // App
@@ -158,6 +157,7 @@ typedef struct app_ {
 	bool paused;
 	struct Model *actor_model;
 	population_t population_history[max_pop_history_frames];
+	vec3_t world_cursor;
 	unsigned frame_count;
 } app_t;
 

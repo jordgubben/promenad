@@ -17,17 +17,16 @@ void process_input(float dt, app_t *app) {
 	// Rewind
 	if (IsKeyDown(KEY_R) && app->frame_count >= 2) { app->frame_count -= 2; }
 
-	// Move common end effector with arrow keys
+	// Move global cursor with arrow keys
 	if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
-		if (IsKeyDown(KEY_RIGHT)) { pop->common_end_effector.z -= dt; }
-		if (IsKeyDown(KEY_LEFT)) { pop->common_end_effector.z += dt; }
+		if (IsKeyDown(KEY_RIGHT)) { app->world_cursor.z -= dt; }
+		if (IsKeyDown(KEY_LEFT)) { app->world_cursor.z += dt; }
 	} else {
-		if (IsKeyDown(KEY_RIGHT)) { pop->common_end_effector.x += dt; }
-		if (IsKeyDown(KEY_LEFT)) { pop->common_end_effector.x -= dt; }
+		if (IsKeyDown(KEY_RIGHT)) { app->world_cursor.x += dt; }
+		if (IsKeyDown(KEY_LEFT)) { app->world_cursor.x -= dt; }
 	}
-
-	if (IsKeyDown(KEY_UP)) { pop->common_end_effector.y += dt; }
-	if (IsKeyDown(KEY_DOWN)) { pop->common_end_effector.y -= dt; }
+	if (IsKeyDown(KEY_UP)) { app->world_cursor.y += dt; }
+	if (IsKeyDown(KEY_DOWN)) { app->world_cursor.y -= dt; }
 
 	// Tank controls
 	if (IsKeyDown(KEY_W)) {
@@ -62,14 +61,14 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 	{
 		render_actors(app->actor_model, &pop->actors);
 
-		DrawSphere(pop->common_end_effector.rl, 0.1f, GOLD);
+		DrawSphere(app->world_cursor.rl, 0.1f, GOLD);
 		{
-			vec3_t shadow = pop->common_end_effector;
+			vec3_t shadow = app->world_cursor;
 			shadow.y = 0;
 			DrawSphere(shadow.rl, 0.1f, ORANGE);
 		}
 
-		render_limb_skeletons(pop->common_end_effector, &pop->limbs);
+		render_limb_skeletons(&pop->limbs);
 
 #if DRAW_COORDINATE_SYSTEM_HELPERS
 		DrawCube(vec3(5,0,0).rl, 1.f, .1f, .1f, RED);
@@ -107,7 +106,7 @@ void render_actors(const Model* actor_model, const actor_table_t *table) {
 	}
 }
 
-void render_limb_skeletons(vec3_t end_effector, const limb_table_t *table) {
+void render_limb_skeletons(const limb_table_t *table) {
 	void render_bone_joint_orientations(vec3_t, bone_t [], size_t);
 
 	FOR_ROWS(l, *table) {
