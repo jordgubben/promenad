@@ -69,6 +69,7 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 		}
 
 		render_limb_skeletons(&pop->limbs);
+		render_limb_goals(&pop->limb_goals, &pop->limbs);
 
 #if DRAW_COORDINATE_SYSTEM_HELPERS
 		DrawCube(vec3(5,0,0).rl, 1.f, .1f, .1f, RED);
@@ -147,6 +148,22 @@ void render_limb_skeletons(const limb_table_t *table) {
 			DrawLine3D(root_pos.rl, other_root_pos.rl, BLACK);
 		}
 	}
+}
+
+
+void render_limb_goals(const limb_goal_table_t *goals, const limb_table_t *limbs) {
+	FOR_ROWS(goal_index, *goals) {
+		// Get the data
+		limb_id_t limb = goals->dense_id[goal_index];
+		int limb_index = get_limb_index(limb, limbs);
+		vec3_t ee_pos = limbs->end_effector[limb_index];
+		vec3_t goal_pos = goals->goal_position[goal_index];
+
+		// Render it
+		DrawLine3D(ee_pos.rl, goal_pos.rl, LIME);
+		DrawSphere(goal_pos.rl, 0.1, LIME);
+	}
+
 }
 
 

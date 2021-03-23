@@ -145,10 +145,14 @@ void reposition_attached_limbs(const limb_attachment_table_t *, const actor_tabl
 //// Limb goal
 enum {max_limb_goal_table_rows = max_limb_table_rows };
 typedef struct limb_goal_table_ {
-	limb_id_t limb[max_limb_goal_table_rows];
+	// Table meta
+	uint16_t sparse_id[max_limb_goal_table_rows];
+	limb_id_t dense_id[max_limb_table_rows];
+	uint16_t num_rows;
+
+	// Column data
 	vec3_t goal_position[max_limb_goal_table_rows];
 	vec3_t velocity[max_limb_goal_table_rows];
-	uint16_t num_rows;
 } limb_goal_table_t;
 
 // Limb goal CRUD
@@ -159,7 +163,7 @@ void delete_achived_limb_goals(const limb_table_t *, limb_goal_table_t *);
 void delete_limb_goal(limb_id_t, limb_goal_table_t *);
 
 // Limb goal rendering
-void show_limb_goals(const limb_goal_table_t *, const limb_table_t *);
+void render_limb_goals(const limb_goal_table_t *, const limb_table_t *);
 
 
 //// Population (everything that changes)
@@ -167,6 +171,7 @@ typedef struct population_ {
 	actor_table_t actors;
 	limb_table_t limbs;
 	limb_attachment_table_t arms, legs;
+	limb_goal_table_t limb_goals;
 } population_t;
 
 // App

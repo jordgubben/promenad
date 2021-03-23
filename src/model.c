@@ -134,6 +134,7 @@ void init_app(app_t * app) {
 		apply_hinge_constraint(s3, 0, pi/2, &pop->limbs);
 
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
+		put_limb_goal(arm, vec3(0,5,0), &pop->limb_goals);
 	}
 #endif // EXAMPLE_ARM
 }
@@ -381,6 +382,29 @@ void reposition_attached_limbs(
 		p = mat4_mul_vec4(actors->to_world[actor_index], vec4_from_vec3(p, 1)).vec3;
 		limbs->position[limb_index] = p;
 	}
+}
+
+
+//// Limb goals
+
+void put_limb_goal(limb_id_t limb, vec3_t pos, limb_goal_table_t *table) {
+	// Figgure out where to put the data
+	int index;
+	if (T_HAS_ID(*table, limb)) {
+		index = T_INDEX(*table, limb);
+	} else {
+		// Check tha there is room
+		assert(table->num_rows < max_limb_goal_table_rows);
+
+		// Add new row to sparse set
+		index = table->num_rows++;
+		table->sparse_id[limb.id] = index;
+		table->dense_id[index] = limb;
+	}
+
+	// Set row data
+	table->goal_position[index] = pos;
+	table->velocity[index] = vec3(0,0,0);
 }
 
 //// Cyclic list ////
