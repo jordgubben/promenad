@@ -11,6 +11,7 @@
 #endif
 
 
+void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_t *current);
 void update_leg_end_effectors(float dt, const actor_table_t *, const limb_attachment_table_t *, limb_table_t *);
 
 /**
@@ -33,12 +34,57 @@ void update_app(float dt, app_t *app) {
 	reposition_attached_limbs(&pop->legs, &pop->actors, &pop->limbs);
 
 	// Update kinematics
+	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
 	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limbs);
 	move_limbs_directly_to_end_effectors(&pop->limbs);
 }
 
 
 //// Actor animation ////
+
+
+/**
+Move limb end effectors towards their goals.
+**/
+void move_limbs_toward_goals(float dt, limb_goal_table_t *goals, limb_table_t *limbs) {
+	const float ee_max_speed = 0.1;
+	const float ee_acceleration = 1;
+
+	float max_speed_change = ee_acceleration * dt;
+	FOR_ROWS(goal_index, *goals) {
+		// Get the data
+		limb_id_t limb = goals->dense_id[goal_index];
+		int limb_index = get_limb_index(limb, limbs);
+		vec3_t ee_pos = limbs->end_effector[limb_index];
+		vec3_t goal_pos = goals->goal_position[goal_index];
+
+		// Move end effectors
+		vec3_t target_vel = vec3_mul(vec3_direction(ee_pos, goal_pos), ee_max_speed);
+		accelrate_toward_goal_velocity(target_vel, max_speed_change, &goals->velocity[goal_index]);
+		limbs->end_effector[limb_index] =
+			vec3_add(limbs->end_effector[limb_index], vec3_mul(goals->velocity[goal_index], dt));
+	}
+
+}
+
+
+/*
+Accelrate towards the given goal velocity, limited by the given max speed change.
+*/
+void accelrate_toward_goal_velocity(vec3_t  goal_vel, float max_speed_change, vec3_t *current_vel) {
+	vec3_t diff_vel = vec3_direction(*current_vel, goal_vel);
+	float diff_speed = vec3_length(diff_vel);
+
+	// Snap to goal velocity or nudge toward it
+	if (diff_speed <= max_speed_change) {
+		*current_vel = goal_vel;
+	} else {
+		current_vel->x += max_speed_change * (diff_vel.x / diff_speed);
+		current_vel->y += max_speed_change * (diff_vel.y / diff_speed);
+		current_vel->z += max_speed_change * (diff_vel.z / diff_speed);
+	}
+}
+
 
 void update_leg_end_effectors(float dt,
 		const actor_table_t *actors,

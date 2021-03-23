@@ -91,6 +91,15 @@ static inline vec3_t vec3_normal(vec3_t v) {
 	assert_vec3(n);
 	return n;
 }
+
+/**
+The direction from one point to another.
+**/
+static inline vec3_t vec3_direction(vec3_t p1, vec3_t p2) {
+	return vec3_normal(vec3_between(p1, p2));
+}
+
+
 /**
 Distance between two points.
 **/
