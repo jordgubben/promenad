@@ -96,10 +96,14 @@ void update_leg_end_effectors(float dt,
 		limb_goal_table_t *goals,
 		limb_table_t *limbs) {
 
-	const float leg_acceleration = 100.f;
-	const float leg_forward_speed = 4.f;
-	const float leg_lift_speed = 0.5;
+	// Speeds
+	const float leg_acceleration = 50.f;
+	const float leg_forward_speed = 8.f;
 	const float leg_drop_speed = 1.5;
+
+	// Limits
+	const float front_limit_x = +1.5f;
+	const float back_limit_x = -0.25f;
 
 	FOR_ROWS(i, *leg_attachments) {
 		actor_id_t actor = leg_attachments->owner[i];
@@ -129,14 +133,14 @@ void update_leg_end_effectors(float dt,
 
 		// Move foot forward if behind actor
 		// (goal relative to root, i.e. hip joint)
-		if (leg_ee_opos.x < -1) {
-			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(2.5f,0,0));
+		if (leg_ee_opos.x < back_limit_x) {
+			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(2.5f,-1,0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
 			put_limb_goal(limb, leg_goal_wpos, leg_forward_speed, leg_acceleration, goals);
 		}
 
 		// Drop foot if in front of actor (and in air)
-		if (leg_ee_opos.x > +1 && leg_ee_wpos.y > 0 ) {
+		if (leg_ee_opos.x > front_limit_x && leg_ee_wpos.y > 0 ) {
 			vec3_t leg_goal_opos = leg_ee_opos;
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
 			leg_goal_wpos.y = 0;
