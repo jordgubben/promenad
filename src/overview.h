@@ -108,6 +108,7 @@ limb_id_t get_limb_id(uint16_t index, const limb_table_t *);
 uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);
 vec3_t get_bone_joint_position(uint16_t seg, const limb_table_t *);
+vec3_t get_limb_end_effector_position(limb_id_t, const limb_table_t *);
 size_t collect_bones(limb_id_t, const limb_table_t *, bone_t out[], size_t max);
 void set_limb_end_effector(limb_id_t, vec3_t, limb_table_t *);
 uint16_t add_bone_to_limb(limb_id_t, vec3_t pos, limb_table_t *);
@@ -155,14 +156,16 @@ typedef struct limb_goal_table_ {
 	vec3_t velocity[max_limb_goal_table_rows];
 	float max_speed[max_limb_goal_table_rows];
 	float max_acceleration[max_limb_goal_table_rows];
+	float threshold[max_limb_goal_table_rows];
 } limb_goal_table_t;
 
 // Limb goal CRUD
 void put_limb_goal(limb_id_t, vec3_t, float speed, float acc, limb_goal_table_t *);
 bool has_limb_goal(limb_id_t, const limb_goal_table_t *);
 void move_limbs_toward_goals(float dt, limb_goal_table_t *, limb_table_t *);
-void delete_achived_limb_goals(const limb_table_t *, limb_goal_table_t *);
+void delete_accomplished_limb_goals(const limb_table_t *, limb_goal_table_t *);
 void delete_limb_goal(limb_id_t, limb_goal_table_t *);
+void delete_limb_goal_at_index(unsigned, limb_goal_table_t *);
 
 // Limb goal rendering
 void render_limb_goals(const limb_goal_table_t *, const limb_table_t *);

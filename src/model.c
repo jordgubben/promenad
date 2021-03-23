@@ -258,6 +258,15 @@ vec3_t get_bone_joint_position(uint16_t bone_index, const limb_table_t *table) {
 	return table->bones[bone_index].joint_pos;
 }
 
+
+/**
+Get the world space end effector position for the given limb,
+**/
+vec3_t get_limb_end_effector_position(limb_id_t limb, const limb_table_t *table) {
+	return T_CELL(*table, limb, end_effector);
+}
+
+
 /**
 Collect limb bones into an array (with max size).
 **/
@@ -407,7 +416,48 @@ void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, l
 	table->velocity[index] = vec3(0,0,0);
 	table->max_speed[index] = max_speed;
 	table->max_acceleration[index] = max_acc;
+	table->threshold[index] = 0.1;
 }
+
+
+/**
+Delete all goals there the limb is close enough to it's intended destination.
+**/
+void delete_accomplished_limb_goals(const limb_table_t *limbs, limb_goal_table_t *goals) {
+	FOR_ROWS(goal_index, * goals) {
+		// Get limb data
+		limb_id_t limb = goals->dense_id[goal_index];
+		vec3_t ee_pos = get_limb_end_effector_position(limb, limbs);
+
+		// Get goal data
+		vec3_t goal_pos = goals->goal_position[goal_index];
+		float threshold = goals->threshold[goal_index];
+
+		// Remove if close enough
+		float distance = vec3_distance(ee_pos, goal_pos);
+		if (distance < threshold) {
+			delete_limb_goal_at_index(goal_index--, goals);
+		}
+	}
+}
+
+
+void delete_limb_goal_at_index(unsigned index, limb_goal_table_t *table) {
+	assert(index < table->num_rows);
+
+	// Remove data
+	unsigned m = --table->num_rows;
+	table->dense_id[index] = table->dense_id[m];
+	table->goal_position[index] = table->goal_position[m];
+	table->velocity[index] = table->velocity[m];
+	table->max_speed[index] = table->max_speed[m];
+	table->max_acceleration[index] = table->max_acceleration[m];
+	table->threshold[index] = table->threshold[m];
+
+	// Update sparse set
+	table->sparse_id[table->dense_id[index].id] = index;
+}
+
 
 //// Cyclic list ////
 

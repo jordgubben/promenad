@@ -167,12 +167,12 @@ void render_limb_goals(const limb_goal_table_t *goals, const limb_table_t *limbs
 		int limb_index = get_limb_index(limb, limbs);
 		vec3_t ee_pos = limbs->end_effector[limb_index];
 		vec3_t goal_pos = goals->goal_position[goal_index];
+		float threshold = goals->threshold[goal_index];
 
 		// Render it
 		DrawLine3D(ee_pos.rl, goal_pos.rl, LIME);
-		DrawSphere(goal_pos.rl, 0.1, LIME);
+		DrawSphere(goal_pos.rl, threshold, LIME);
 	}
-
 }
 
 

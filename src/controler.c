@@ -37,6 +37,7 @@ void update_app(float dt, app_t *app) {
 	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
 	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limbs);
 	move_limbs_directly_to_end_effectors(&pop->limbs);
+	delete_accomplished_limb_goals(&pop->limbs, &pop->limb_goals);
 }
 
 
