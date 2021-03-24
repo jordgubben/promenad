@@ -95,7 +95,9 @@ void init_app(app_mode_e mode, app_t * app) {
 		// Right leg
 		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &pop->limbs);
 		add_bone_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &pop->limbs);
-		add_bone_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &pop->limbs);
+		uint16_t right_knee =
+			add_bone_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &pop->limbs);
+		apply_hinge_constraint(right_knee, -0.9 * pi, 0, &pop->limbs);
 		attach_limb_to_actor(right_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
 
 		// Left leg
