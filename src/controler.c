@@ -9,13 +9,15 @@
 #define TRACE_VEC3(v) printf("%s():%u \t| " #v " = (%f, %f, %f)\n", __func__, __LINE__, (v).x, (v).y, (v).z)
 #else
 #define TRACE_FLOAT(_) // _
-#define TRACE_VEC3(_) (_ = _)
+#define TRACE_VEC3(_) // _
 #endif
 
 
 void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_t *current);
 void update_leg_end_effectors(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
+
+vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 /**
 Update all the things.
@@ -245,7 +247,6 @@ void reposition_bones_with_fabrik(
 }
 
 void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[], size_t num) {
-	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	bone_t next_bone = {{jc_no_constraint}, end_pos, end_pos, quat_identity, 0.f};
 	bone_constraint_e goal_constraint_type = jc_no_constraint;
@@ -379,6 +380,19 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 	// Rotate as little as posible
 	vec3_t dir = quat_rotate_vec3(this_bone->orientation, vec3(1,0,0));
 	this_bone->orientation = quat_mul(quat_from_vec3_pair(dir, n), this_bone->orientation);
+
+
+	TRACE_VEC3(this_bone->joint_pos);
+	TRACE_VEC3(get_bone_tip(*this_bone));
+}
+
+/**
+Get world position of the given bones tip.
+
+TODO: Gradually remove `tip_pos` field in favour of this.
+**/
+vec3_t get_bone_tip(bone_t bone) {
+	return calc_tip_pos(bone.joint_pos, bone.orientation, bone.distance);
 }
 
 vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length) {
