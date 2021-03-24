@@ -4,9 +4,6 @@
 #define IN_MODEL
 #include "overview.h"
 
-#define EXAMPLE_ACTORS 0
-#define EXAMPLE_ARM 1
-#define LIMB_FOREST 0
 
 //// Sparce table macros
 #define T(t,r,c) (t).c[r]
@@ -36,8 +33,9 @@ unsigned short append_cl_node_after(unsigned short anchor, cl_node_t []);
 /**
 Init all the things.
 **/
-void init_app(app_t * app) {
+void init_app(app_mode_e mode, app_t * app) {
 	app->paused = false;
+	app->mode = mode;
 
 	app->frame_count = 0;
 	app->world_cursor = vec3(3, 2, 0);
@@ -45,33 +43,32 @@ void init_app(app_t * app) {
 
 	init_limb_table(&pop->limbs);
 
-#if LIMB_FOREST
 	// Create a bunch of limbs with their roots in a grid
-	FOR_RANGE(x, -5,5) {
-		FOR_RANGE(z, -1, 2) {
-			vec3_t pos = {1*x, 0, 3*z};
-			limb_id_t id = create_limb(pos, &pop->limbs);
+	if (mode == am_limb_forest) {
+		FOR_RANGE(x, -5,5) {
+			FOR_RANGE(z, -1, 2) {
+				vec3_t pos = {1*x, 0, 3*z};
+				limb_id_t id = create_limb(pos, quat_identity, &pop->limbs);
 
-			// First segment
-			pos.y += 1;
-			add_bone_to_limb(id, pos, &pop->limbs);
-
-			// Second segment
-			FOR_IN(i, abs(x) * abs(x)) {
-				pos.y += 0.5;
+				// First segment
+				pos.y += 1;
 				add_bone_to_limb(id, pos, &pop->limbs);
+
+				// Second segment
+				FOR_IN(i, abs(x) * abs(x)) {
+					pos.y += 0.5;
+					add_bone_to_limb(id, pos, &pop->limbs);
+				}
 			}
 		}
 	}
-#endif
 
 	// Create actor model
 	app->actor_model = malloc(sizeof(Model));
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
-#if EXAMPLE_ACTORS
 	// Setup actors
-	{
+	if (mode == am_single_actor) {
 		actor_id_t actor = create_actor(vec3(0,3,0), 0, &pop->actors);
 
 		float shoulder_height = 3.5f;
@@ -110,11 +107,9 @@ void init_app(app_t * app) {
 		// Pair legs
 		pair_limbs(left_leg, right_leg, &pop->limbs);
 	}
-#endif
 
-#if EXAMPLE_ARM
 	// Large arm from origo
-	{
+	if (mode == am_robot_arm) {
 		quat_t arm_ori = quat_from_axis_angle(vec3(0,0,1), pi/2);
 		limb_id_t arm = create_limb(vec3_origo, arm_ori, &pop->limbs);
 
@@ -133,7 +128,6 @@ void init_app(app_t * app) {
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
 		put_limb_goal(arm, vec3(0,5,0), 1, 10, &pop->limb_goals);
 	}
-#endif // EXAMPLE_ARM
 }
 
 

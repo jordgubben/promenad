@@ -181,10 +181,18 @@ typedef struct population_ {
 } population_t;
 
 // App
+typedef enum app_mode_ {
+	am_limb_forest,
+	am_single_actor,
+	am_robot_arm,
+
+	num_app_modes // Not a mode :P
+} app_mode_e;
 enum {
 	max_pop_history_frames = 1024,
 };
 typedef struct app_ {
+	app_mode_e mode;
 	bool paused;
 	struct Model *actor_model;
 	population_t population_history[max_pop_history_frames];
@@ -193,7 +201,7 @@ typedef struct app_ {
 } app_t;
 
 
-void init_app(app_t *);
+void init_app(app_mode_e, app_t *);
 void term_app(app_t *);
 void process_input(float dt, app_t*);
 void update_app(float dt, app_t *);
