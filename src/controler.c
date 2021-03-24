@@ -5,8 +5,10 @@
 
 #ifdef LOG_CONTROLER
 #include <stdio.h>
+#define TRACE_FLOAT(f) printf("%s():%u \t| " #f " = %f\n", __func__, __LINE__, (f));
 #define TRACE_VEC3(v) printf("%s():%u \t| " #v " = (%f, %f, %f)\n", __func__, __LINE__, (v).x, (v).y, (v).z)
 #else
+#define TRACE_FLOAT(_) // _
 #define TRACE_VEC3(_) (_ = _)
 #endif
 
@@ -320,9 +322,38 @@ void apply_fabrik_inverse_pass(
 				}
 			} break;
 			case jc_hinge: {
-				vec3_t axis = quat_rotate_vec3(prev_ori, vec3(0,0,1));
-				vec3_t projection = vec3_mul(axis, vec3_dot(axis, n));
-				n = vec3_normal(vec3_sub(n, projection));
+				// Local axies
+				vec3_t local_forward = quat_rotate_vec3(prev_ori, vec3(1,0,0));
+				vec3_t local_up = quat_rotate_vec3(prev_ori, vec3(0,1,0));
+				TRACE_VEC3(local_forward);
+				TRACE_VEC3(local_up);
+
+				// Projection on local axies
+				float bone_forward = vec3_dot(n, local_forward);
+				float bone_up = vec3_dot(n, local_up);
+				TRACE_FLOAT(bone_forward);
+				TRACE_FLOAT(bone_up);
+
+				// Angle?
+				// atan(0, +1) = 0
+				float angle = atan2(bone_up, bone_forward);
+				angle = (angle > pi ? angle - tau : angle);
+				TRACE_FLOAT(angle);
+				TRACE_FLOAT(180 * angle / pi);
+
+				// Clamp angle to constraint
+				TRACE_FLOAT(arr[i].constraint.max_ang);
+				TRACE_FLOAT(arr[i].constraint.min_ang);
+				if (angle > arr[i].constraint.max_ang) { angle = arr[i].constraint.max_ang; }
+				if (angle < arr[i].constraint.min_ang) { angle = arr[i].constraint.min_ang; }
+				TRACE_FLOAT(angle);
+				TRACE_FLOAT(180 * angle / pi);
+
+				// New normal from angle 
+				n = vec3_add(
+					vec3_mul(local_forward, cos(angle)),
+					vec3_mul(local_up, sin(angle)));
+				TRACE_VEC3(n);
 			} break;
 			case num_bone_constraints: { assert(false); } break;
 		}

@@ -120,15 +120,15 @@ void init_app(app_t * app) {
 
 		// Segment #1
 		uint16_t s1 = add_bone_to_limb(arm, vec3(0,3,0), &pop->limbs);
-		apply_hinge_constraint(s1, 0, pi/2, &pop->limbs);
+		apply_hinge_constraint(s1, -pi/2, +pi/2, &pop->limbs);
 
 		// Segment #2
 		uint16_t s2 = add_bone_to_limb(arm, vec3(0,6,0), &pop->limbs);
-		apply_hinge_constraint(s2, 0, pi/2, &pop->limbs);
+		apply_hinge_constraint(s2, -pi/3, +pi/3, &pop->limbs);
 
 		// Segment 3
 		uint16_t s3 = add_bone_to_limb(arm, vec3(0,9,0), &pop->limbs);
-		apply_hinge_constraint(s3, 0, pi/2, &pop->limbs);
+		apply_hinge_constraint(s3, 0, pi, &pop->limbs);
 
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
 		put_limb_goal(arm, vec3(0,5,0), 1, 10, &pop->limb_goals);
