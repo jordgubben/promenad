@@ -54,13 +54,21 @@ SCENARIO("Joint constraints") {
 		uint16_t s1 = add_bone_to_limb(arm, vec3(10,0,0), &limbs);
 
 		AND_GIVEN("It's constrained by a hinge joint with a 45 degree limit") {
-			apply_hinge_constraint(s1, 0, pi/4, &limbs);
+			apply_hinge_constraint(s1, -pi/4, pi/4, &limbs);
 
-			WHEN("Attempting to move to the cooresponding distance on the y-axis") {
-				move_limb_directly_to(arm, vec3(0,10,0), &limbs);
+			WHEN("Attempting to move to the cooresponding distance on the positive y-axis") {
+				move_limb_directly_to(arm, vec3(0,+10,0), &limbs);
 
 				THEN("the bone is constrained to an 45 deg angle") {
-					CHECK( vec3(7,7,0) == vec3_round(get_bone_tip_position(s1, &limbs)));
+					CHECK( vec3(+7,+7,0) == vec3_round(get_bone_tip_position(s1, &limbs)));
+				}
+			}
+
+			WHEN("Attempting to move to the cooresponding distance on the positive y-axis") {
+				move_limb_directly_to(arm, vec3(0,-10,0), &limbs);
+
+				THEN("the bone is constrained to an 45 deg angle") {
+					CHECK( vec3(+7,-7,0) == vec3_round(get_bone_tip_position(s1, &limbs)));
 				}
 			}
 		}
