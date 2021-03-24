@@ -127,6 +127,7 @@ void reposition_bones_with_fabrik(
 
 #if defined(IN_CONTROLER) || defined(IN_TEST)
 void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone);
+void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone);
 #endif
 
 // Render limbs
