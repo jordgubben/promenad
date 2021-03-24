@@ -302,11 +302,10 @@ void apply_fabrik_inverse_pass(
 
 	// Inverse pass
 	// (Pretend root is a limb segment without length)
-	vec3_t prev_tip_pos = root_pos;
-	quat_t prev_ori = root_ori;
+	bone_t prev_bone = {{jc_no_constraint}, root_pos, root_pos, root_ori, 0};
 	for (int i = 0; i < num; i++) {
 		// Place joint at the previous tip
-		arr[i].joint_pos = prev_tip_pos;
+		arr[i].joint_pos = prev_bone.tip_pos;
 
 		// Point bone towards next bone joint
 		// (or the end effector if we are at the last joint)
@@ -317,7 +316,7 @@ void apply_fabrik_inverse_pass(
 		switch (arr[i].constraint.type) {
 			case jc_no_constraint: {} break;
 			case jc_pole: {
-				vec3_t prev_dir = quat_rotate_vec3(prev_ori, vec3(1,0,0));
+				vec3_t prev_dir = quat_rotate_vec3(prev_bone.orientation, vec3(1,0,0));
 				if (vec3_dot(prev_dir, n) < 1) {
 					TRACE_VEC3(n);
 					TRACE_VEC3(prev_dir);
@@ -328,8 +327,8 @@ void apply_fabrik_inverse_pass(
 			} break;
 			case jc_hinge: {
 				// Local axies
-				vec3_t local_forward = quat_rotate_vec3(prev_ori, vec3(1,0,0));
-				vec3_t local_up = quat_rotate_vec3(prev_ori, vec3(0,1,0));
+				vec3_t local_forward = quat_rotate_vec3(prev_bone.orientation, vec3(1,0,0));
+				vec3_t local_up = quat_rotate_vec3(prev_bone.orientation, vec3(0,1,0));
 				TRACE_VEC3(local_forward);
 				TRACE_VEC3(local_up);
 
@@ -371,8 +370,7 @@ void apply_fabrik_inverse_pass(
 		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, arr[i].distance);
 
 		// Continue to the next one
-		prev_tip_pos = arr[i].tip_pos;
-		prev_ori = arr[i].orientation;
+		prev_bone = arr[i];
 	}
 }
 
