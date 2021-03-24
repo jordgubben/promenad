@@ -250,11 +250,26 @@ vec3_t get_limb_position(limb_id_t limb, const limb_table_t *table) {
 	return T_CELL(*table, limb, position);
 }
 
+
+/**
+Get the world position of the bones joint.
+**/
 vec3_t get_bone_joint_position(uint16_t bone_index, const limb_table_t *table) {
 	assert(bone_index < max_limb_table_segnemts);
 	return table->bones[bone_index].joint_pos;
 }
 
+
+/**
+Get the world position of the bones tip.
+**/
+vec3_t get_bone_tip_position(uint16_t bone_index, const limb_table_t *table) {
+	assert(bone_index < max_limb_table_segnemts);
+	vec3_t joint_pos = table->bones[bone_index].joint_pos;
+	quat_t joint_ori = table->bones[bone_index].orientation;
+	float length = table->bones[bone_index].distance;
+	return vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(length, 0,0)));
+}
 
 /**
 Get the world space end effector position for the given limb,
