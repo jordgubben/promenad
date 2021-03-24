@@ -4,8 +4,8 @@
 #define IN_MODEL
 #include "overview.h"
 
-#define EXAMPLE_ACTORS 1
-#define EXAMPLE_ARM 0
+#define EXAMPLE_ACTORS 0
+#define EXAMPLE_ARM 1
 #define LIMB_FOREST 0
 
 //// Sparce table macros
