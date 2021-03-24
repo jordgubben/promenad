@@ -248,25 +248,13 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Forward pass
-	vec3_t goal_pos = end_pos;
-	quat_t goal_ori = quat_identity;
+	bone_t next_bone = {{jc_no_constraint}, end_pos, end_pos, quat_identity, 0.f};
 	bone_constraint_e goal_constraint_type = jc_no_constraint;
 	for (int i = num - 1; i >= 0 ; i--) {
-		vec3_t b = vec3_between(arr[i].joint_pos, goal_pos);
-
-		// Constrain to child
-		switch (goal_constraint_type) {
-			case jc_no_constraint: {} break;
-			case jc_hinge: {
-				vec3_t axis = quat_rotate_vec3(goal_ori, vec3(0,0,1));
-				vec3_t projection = vec3_mul(b, vec3_dot(axis, b));
-				arr[i].joint_pos = vec3_sub(arr[i].joint_pos, projection);
-				b = vec3_between(arr[i].joint_pos, goal_pos);
-			} break;
-			case num_bone_constraints: { assert(false); } break;
-		}
+		constrain_to_next_bone(&next_bone, &arr[i]);
 
 		// Relative placement (after constrains)
+		vec3_t b = vec3_between(arr[i].joint_pos, next_bone.joint_pos);
 		float d = vec3_length(b);
 		vec3_t n = vec3_normal(b);
 		float length = arr[i].distance;
@@ -284,11 +272,28 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, length);
 
 		// Continue to the next one
-		goal_pos = arr[i].joint_pos;
-		goal_ori = arr[i].orientation;
-		goal_constraint_type = arr[i].constraint.type;
+		next_bone = arr[i];
 	}
 }
+
+/**
+Constrain this bone relative to the next one (or the end effector semi bone).
+**/
+void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
+	vec3_t b = vec3_between(this_bone->joint_pos, next_bone->joint_pos);
+	switch (next_bone->constraint.type) {
+		case jc_no_constraint: {} break;
+		case jc_pole: { /* TODO */ } break;
+		case jc_hinge: {
+			const vec3_t axis = quat_rotate_vec3(next_bone->orientation, vec3(0,0,1));
+			const vec3_t projection = vec3_mul(b, vec3_dot(axis, b));
+			// TODO: Fix bone length
+			this_bone->joint_pos = vec3_sub(this_bone->joint_pos, projection);
+		} break;
+		case num_bone_constraints: { assert(false); } break;
+	}
+}
+
 
 void apply_fabrik_inverse_pass(
 		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,

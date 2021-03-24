@@ -125,6 +125,10 @@ void reposition_bones_with_fabrik(
 	vec3_t root_pos, quat_t root_ori, vec3_t end,
 	bone_t [], size_t num);
 
+#if defined(IN_CONTROLER) || defined(IN_TEST)
+void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone);
+#endif
+
 // Render limbs
 void render_limb_skeletons(const limb_table_t *);
 
