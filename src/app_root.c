@@ -23,8 +23,8 @@ int main(int argc, char** argv) {
 
 	// Define the camera to look into our 3d world
 	Camera3D camera = { 0 };
-	camera.position = (Vector3){ 10.0f, 10.0f, 10.0f };
-	camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };
+	camera.position = (Vector3){ 5.0f, 5.0f, 15.0f };
+	camera.target = (Vector3){ 5.0f, 0.0f, 0.0f };
 	camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
 	camera.fovy = 45.0f;
 	camera.type = CAMERA_PERSPECTIVE;
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 	UpdateCamera(&camera);
 
 	// App setup
-	init_app(am_robot_arm, &app);
+	init_app(am_single_actor, &app);
 
 	// Ah-Gogogoggogogogo!
 	while(!WindowShouldClose()) {
