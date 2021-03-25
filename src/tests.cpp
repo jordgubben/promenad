@@ -51,34 +51,35 @@ SCENARIO("Joint constraints") {
 
 	GIVEN("Two bones at a 90 deg angle") {
 		vec3_t p1 = vec3(10,10,0), p2 = vec3(10,20,0), p3 = vec3(20,20,0);
-		bone_t bone_a = bone_from_root_tip(p1,p2), bone_b = bone_from_root_tip(p2,p3);
+		bone_t bone_a = {{jc_no_constraint}, p1, p2, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
+		bone_t bone_b = {{jc_no_constraint}, p2, p3, quat_identity, 10};
 
-		AND_GIVEN("A hinge joint limits it between 0 and 45 degrees") {
+		AND_GIVEN("A hinge joint limits it between -45 and 45 degrees") {
 			bone_b.constraint.type = jc_hinge;
-			bone_b.constraint.min_ang = 0;
-			bone_b.constraint.min_ang = +pi/4;
+			bone_b.constraint.min_ang = -pi/4;
+			bone_b.constraint.max_ang = +pi/4;
 
-			WHEN("The second bon is constrained by the first") {
+			WHEN("The second bone is constrained by the first") {
 				constrain_to_prev_bone(&bone_a, &bone_b);
 
-				THEN("The second bone is tilted to 4 degree angle") {
+				THEN("The second bone is tilted to 45 degree angle") {
 					CHECK(bone_a.tip_pos == bone_b.joint_pos);
-					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(3, 27, 0));
+					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(17, 27, 0));
 				}
 			}
 		}
 
-		AND_GIVEN("A hinge joint limits it between -90 and 45 degrees") {
+		AND_GIVEN("A hinge joint limits it between 0 and 90 degrees") {
 			bone_b.constraint.type = jc_hinge;
-			bone_b.constraint.min_ang = -pi/2;
-			bone_b.constraint.min_ang = -pi/4;
+			bone_b.constraint.min_ang = 0;
+			bone_b.constraint.max_ang = pi/2;
 
 			WHEN("The second bon is constrained by the first") {
 				constrain_to_prev_bone(&bone_a, &bone_b);
 
-				THEN("The second bone is tilted to 4 degree angle") {
+				THEN("The second bone is strighted out parallell wit the first") {
 					CHECK(bone_a.tip_pos == bone_b.joint_pos);
-					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(17, 27, 0));
+					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(10, 30, 0));
 				}
 			}
 		}

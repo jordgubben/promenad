@@ -381,7 +381,6 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 	vec3_t dir = quat_rotate_vec3(this_bone->orientation, vec3(1,0,0));
 	this_bone->orientation = quat_mul(quat_from_vec3_pair(dir, n), this_bone->orientation);
 
-
 	TRACE_VEC3(this_bone->joint_pos);
 	TRACE_VEC3(get_bone_tip(*this_bone));
 }
