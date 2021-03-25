@@ -59,6 +59,15 @@ SCENARIO("Joint constraints") {
 			bone_b.constraint.min_ang = -pi/4;
 			bone_b.constraint.max_ang = +pi/4;
 
+			WHEN("The first bone is constrained by the second") {
+				constrain_to_next_bone(&bone_b, &bone_a);
+
+				THEN("The first bone is tilted to 4 degree angle") {
+					CHECK(bone_a.tip_pos == bone_b.joint_pos);
+					CHECK(vec3_round(bone_a.joint_pos) == vec3(3, 13, 0));
+				}
+			}
+
 			WHEN("The second bone is constrained by the first") {
 				constrain_to_prev_bone(&bone_a, &bone_b);
 
@@ -74,7 +83,16 @@ SCENARIO("Joint constraints") {
 			bone_b.constraint.min_ang = 0;
 			bone_b.constraint.max_ang = pi/2;
 
-			WHEN("The second bon is constrained by the first") {
+			WHEN("The first bone is constrained by the second") {
+				constrain_to_next_bone(&bone_b, &bone_a);
+
+				THEN("The first bone is more or less unchanged") {
+					CHECK(bone_a.tip_pos == bone_b.joint_pos);
+					CHECK(vec3_round(bone_a.joint_pos) == p1);
+				}
+			}
+
+			WHEN("The second bone is constrained by the first") {
 				constrain_to_prev_bone(&bone_a, &bone_b);
 
 				THEN("The second bone is strighted out parallell wit the first") {

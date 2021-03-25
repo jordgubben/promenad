@@ -281,14 +281,50 @@ Constrain this bone relative to the next one (or the end effector semi bone).
 **/
 void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 	vec3_t b = vec3_between(this_bone->joint_pos, next_bone->joint_pos);
+	TRACE_VEC3(b);
+
 	switch (next_bone->constraint.type) {
 		case jc_no_constraint: {} break;
 		case jc_pole: { /* TODO */ } break;
 		case jc_hinge: {
-			const vec3_t axis = quat_rotate_vec3(next_bone->orientation, vec3(0,0,1));
-			const vec3_t projection = vec3_mul(b, vec3_dot(axis, b));
-			// TODO: Fix bone length
-			this_bone->joint_pos = vec3_sub(this_bone->joint_pos, projection);
+			// Local axies
+			vec3_t next_forward = quat_rotate_vec3(next_bone->orientation, vec3(1,0,0));
+			vec3_t next_up = quat_rotate_vec3(next_bone->orientation, vec3(0,1,0));
+			TRACE_VEC3(next_forward);
+			TRACE_VEC3(next_up);
+
+			// Projection on local axies
+			vec3_t n = vec3_normal(b);
+			float bone_forward = vec3_dot(n, next_forward);
+			float bone_up = vec3_dot(n, next_up);
+			TRACE_FLOAT(bone_forward);
+			TRACE_FLOAT(bone_up);
+
+			// Angle?
+			// atan(0, +1) = 0
+			float angle = atan2(bone_up, bone_forward);
+			angle = (angle > pi ? angle - tau : angle);
+			TRACE_FLOAT(angle);
+			TRACE_FLOAT(180 * angle / pi);
+
+			// Clamp angle to constraint
+			TRACE_FLOAT(next_bone->constraint.max_ang);
+			TRACE_FLOAT(next_bone->constraint.min_ang);
+			if (angle > next_bone->constraint.max_ang) { angle = next_bone->constraint.max_ang; }
+			if (angle < next_bone->constraint.min_ang) { angle = next_bone->constraint.min_ang; }
+			TRACE_FLOAT(angle);
+			TRACE_FLOAT(180 * angle / pi);
+
+			// New joint position from angle
+			n = vec3_add(
+				vec3_mul(next_forward, cos(angle)),
+				vec3_mul(next_up, sin(angle)));
+			TRACE_VEC3(n);
+
+			this_bone->joint_pos = vec3_sub(
+				next_bone->joint_pos,
+				vec3_mul(n, this_bone->distance));
+			TRACE_VEC3(this_bone->joint_pos);
 		} break;
 		case num_bone_constraints: { assert(false); } break;
 	}
@@ -357,22 +393,16 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 			// atan(0, +1) = 0
 			float angle = atan2(bone_up, bone_forward);
 			angle = (angle > pi ? angle - tau : angle);
-			TRACE_FLOAT(angle);
 			TRACE_FLOAT(180 * angle / pi);
 
 			// Clamp angle to constraint
-			TRACE_FLOAT(this_bone->constraint.max_ang);
-			TRACE_FLOAT(this_bone->constraint.min_ang);
 			if (angle > this_bone->constraint.max_ang) { angle = this_bone->constraint.max_ang; }
 			if (angle < this_bone->constraint.min_ang) { angle = this_bone->constraint.min_ang; }
-			TRACE_FLOAT(angle);
-			TRACE_FLOAT(180 * angle / pi);
 
 			// New normal from angle
 			n = vec3_add(
 				vec3_mul(local_forward, cos(angle)),
 				vec3_mul(local_up, sin(angle)));
-			TRACE_VEC3(n);
 		} break;
 		case num_bone_constraints: { assert(false); } break;
 	}

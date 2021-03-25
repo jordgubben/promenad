@@ -125,7 +125,7 @@ void init_app(app_mode_e mode, app_t * app) {
 
 		// Segment 3
 		uint16_t s3 = add_bone_to_limb(arm, vec3(0,9,0), &pop->limbs);
-		apply_hinge_constraint(s3, 0, pi, &pop->limbs);
+		apply_hinge_constraint(s3, -pi, +pi, &pop->limbs);
 
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
 		put_limb_goal(arm, vec3(0,5,0), 1, 10, &pop->limb_goals);
