@@ -284,7 +284,7 @@ vec3_t get_limb_tip_position(limb_id_t limb, const limb_table_t *table) {
 	// Get the root bone node
 	uint16_t root_bone_index = table->root_bone[limb_index];
 	assert(root_bone_index);
-	cl_node_t *root_bone_node = &table->bone_nodes[root_bone_index];
+	const cl_node_t *root_bone_node = &table->bone_nodes[root_bone_index];
 
 	// Get the tip position
 	// (The node "before" the root is the last in a cyclic list)

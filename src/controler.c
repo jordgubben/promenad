@@ -1,10 +1,10 @@
 #include <assert.h>
+#include <stdio.h>
 
 #define IN_CONTROLER
 #include "overview.h"
 
 #ifdef LOG_CONTROLER
-#include <stdio.h>
 #define TRACE_FLOAT(f) printf("%s():%u \t| " #f " = %f\n", __func__, __LINE__, (f));
 #define TRACE_VEC3(v) printf("%s():%u \t| " #v " = (%f, %f, %f)\n", __func__, __LINE__, (v).x, (v).y, (v).z)
 #else
