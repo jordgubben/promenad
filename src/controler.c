@@ -118,13 +118,12 @@ void update_leg_end_effectors(float dt,
 		limb_table_t *limbs) {
 
 	// Speeds
-	const float leg_acceleration = 50.f;
+	const float leg_acceleration = 15.f;
 	const float leg_forward_speed = 4.f;
 	const float leg_drop_speed = 1.5;
 
 	// Limits
-	const float front_limit_x = +0.75f;
-	const float back_limit_x = -0.25f;
+	const float back_limit_x = -0.0f;
 
 	FOR_ROWS(i, *leg_attachments) {
 		actor_id_t actor = leg_attachments->owner[i];
@@ -139,6 +138,9 @@ void update_leg_end_effectors(float dt,
 			}
 		}
 
+		// Finnish what you..
+		if (has_limb_goal(limb, goals)) { continue; }
+
 		// Get transforms
 		// (We will use them quite a bit)
 		const mat4_t to_world = get_actor_to_world_transform(actor, actors);
@@ -152,22 +154,26 @@ void update_leg_end_effectors(float dt,
 		const vec3_t foot_wpos = get_limb_tip_position(limb, limbs);
 		const vec3_t foot_opos = mat4_mul_vec3(to_obj, foot_wpos, 1);
 
-		// Move foot forward if behind actor
-		// (goal relative to root, i.e. hip joint)
-		if (foot_opos.x < back_limit_x) {
+		// Move foot forward only if behind actor
+		if (foot_opos.x > back_limit_x) { continue; }
+
+		// Start where the foot's actually at right now
+		limbs->end_effector[limb_index] = get_limb_tip_position(limb, limbs);
+
+		// First lift foot forward
+		{
 			printf("Move foot [#%u|%u] forward!\n", limb.id, limb_index);
-			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(+2.5f, -1,0));
+			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(0.75f, -1,0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
 			put_limb_goal(limb, leg_goal_wpos, leg_forward_speed, leg_acceleration, goals);
 		}
 
-		// Drop foot if in front of actor (and in air)
-		if (foot_opos.x > front_limit_x && foot_wpos.y > 0 ) {
-			printf("Move foot [#%u|%u] down!\n", limb.id, limb_index);
-			vec3_t leg_goal_opos = foot_opos;
+		// Then drop foot once in front of actor
+		{
+			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(+1.5f, 0,0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
 			leg_goal_wpos.y = 0;
-			put_limb_goal(limb, leg_goal_wpos, leg_drop_speed, leg_acceleration, goals);
+			push_limb_goal(limb, leg_goal_wpos, leg_drop_speed, leg_acceleration, goals);
 		}
 	}
 }
