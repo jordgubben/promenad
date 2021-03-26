@@ -426,9 +426,15 @@ void reposition_attached_limbs(
 	FOR_ROWS(la, *attachments) {
 		int actor_index = T_INDEX(*actors, attachments->owner[la]);
 		int limb_index = T_INDEX(*limbs, attachments->limb[la]);
+
+		// Reposition limb
 		vec3_t p = attachments->relative_position[la];
 		p = mat4_mul_vec4(actors->to_world[actor_index], vec4_from_vec3(p, 1)).vec3;
 		limbs->position[limb_index] = p;
+
+		// Reorient limb
+		float ori_y = actors->location[actor_index].orientation_y;
+		limbs->orientation[limb_index] = quat_from_axis_angle(vec3_positive_y, ori_y);
 	}
 }
 
