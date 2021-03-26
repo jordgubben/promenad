@@ -32,6 +32,12 @@ void update_app(float dt, app_t *app) {
 	app->population_history[new_frame] = app->population_history[old_frame];
 	population_t *pop = &app->population_history[new_frame];
 
+	// Update world
+	update_population(dt, pop);
+}
+
+void update_population(float dt, population_t *pop) {
+
 	calculate_actor_transforms(&pop->actors);
 
 	// Move limbs attached to actors

@@ -187,6 +187,8 @@ typedef struct population_ {
 	limb_goal_table_t limb_goals;
 } population_t;
 
+void update_population(float dt, population_t *pop);
+
 // App
 typedef enum app_mode_ {
 	am_limb_forest,

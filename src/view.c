@@ -39,7 +39,7 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 		DrawCube(vec3(0,0,5).rl, .1f, .1f, 1.f, BLUE);
 #endif // DRAW_COORDINATE_SYSTEM_HELPERS
 
-		DrawGrid(10, 1.f);
+		DrawGrid(20, 1.f);
 	}
 	EndMode3D();
 
