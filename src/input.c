@@ -4,8 +4,7 @@
 #define IN_INPUT
 #include "overview.h"
 
-static const float actor_speed = 0.5;
-
+const float actor_walking_speed = 0.5;
 
 //// Input ////
 
@@ -40,14 +39,14 @@ void process_input(float dt, app_t *app) {
 		pop->actors.location[0].position = vec3_add(
 			pop->actors.location[0].position,
 			vec3_mul(get_actor_forward_dir(get_actor_id(0, &pop->actors), &pop->actors),
-				dt * actor_speed)
+				dt * actor_walking_speed)
 			);
 	}
 	if (IsKeyDown(KEY_S)) {
 		pop->actors.location[0].position = vec3_sub(
 			pop->actors.location[0].position,
 			vec3_mul(get_actor_forward_dir(get_actor_id(0, &pop->actors), &pop->actors),
-				dt * actor_speed)
+				dt * actor_walking_speed)
 			);
 	}
 	if (IsKeyDown(KEY_A)) { pop->actors.location[0].orientation_y += dt * 0.25 * tau; }

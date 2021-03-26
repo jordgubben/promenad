@@ -48,6 +48,7 @@ typedef struct actor_table_ {
 	mat4_t to_world[max_actor_table_rows];
 	mat4_t to_object[max_actor_table_rows];
 } actor_table_t;
+extern const float actor_walking_speed;
 
 // Actor CRUD
 actor_id_t create_actor(vec3_t, float, actor_table_t *);
