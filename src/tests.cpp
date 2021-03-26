@@ -106,6 +106,7 @@ SCENARIO("Joint constraints") {
 	GIVEN("An arm with a single bone pointing toward +x") {
 		limb_id_t arm = create_limb(vec3_origo, quat_identity, &limbs);
 		uint16_t s1 = add_bone_to_limb(arm, vec3(10,0,0), &limbs);
+		CHECK(get_limb_end_effector_position(arm, &limbs) == get_limb_tip_position(arm, &limbs));
 
 		AND_GIVEN("It's constrained by a hinge joint with a 45 degree limit") {
 			apply_hinge_constraint(s1, -pi/4, pi/4, &limbs);
@@ -132,6 +133,7 @@ SCENARIO("Joint constraints") {
 		limb_id_t arm = create_limb(vec3_origo, quat_identity, &limbs);
 		uint16_t s1 = add_bone_to_limb(arm, vec3(2,0,0), &limbs);
 		uint16_t s2 = add_bone_to_limb(arm, vec3(4,0,0), &limbs);
+		CHECK(get_limb_end_effector_position(arm, &limbs) == get_limb_tip_position(arm, &limbs));
 
 		THEN("Joint posisitons are where we expect") {
 			CHECK( vec3(0,0,0) == vec3_round(get_bone_joint_position(s1, &limbs)));

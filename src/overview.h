@@ -109,6 +109,7 @@ uint16_t get_limb_index(limb_id_t, const limb_table_t *);
 vec3_t get_limb_position(limb_id_t, const limb_table_t *);
 vec3_t get_bone_joint_position(uint16_t seg, const limb_table_t *);
 vec3_t get_bone_tip_position(uint16_t seg, const limb_table_t *);
+vec3_t get_limb_tip_position(limb_id_t, const limb_table_t *);
 vec3_t get_limb_end_effector_position(limb_id_t, const limb_table_t *);
 size_t collect_bones(limb_id_t, const limb_table_t *, bone_t out[], size_t max);
 void set_limb_end_effector(limb_id_t, vec3_t, limb_table_t *);

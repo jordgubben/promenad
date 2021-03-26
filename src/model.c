@@ -274,6 +274,23 @@ vec3_t get_bone_tip_position(uint16_t bone_index, const limb_table_t *table) {
 	return vec3_add(joint_pos, quat_rotate_vec3(joint_ori, vec3(length, 0,0)));
 }
 
+
+/**
+Get the position of the given limbs outermost bone tip.
+**/
+vec3_t get_limb_tip_position(limb_id_t limb, const limb_table_t *table) {
+	int limb_index = T_INDEX(*table, limb);
+
+	// Get the root bone node
+	uint16_t root_bone_index = table->root_bone[limb_index];
+	assert(root_bone_index);
+	cl_node_t *root_bone_node = &table->bone_nodes[root_bone_index];
+
+	// Get the tip position
+	// (The node "before" the root is the last in a cyclic list)
+	return get_bone_tip_position(root_bone_node->prev_index, table);
+}
+
 /**
 Get the world space end effector position for the given limb,
 **/
