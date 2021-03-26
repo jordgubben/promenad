@@ -203,6 +203,7 @@ enum {
 typedef struct app_ {
 	app_mode_e mode;
 	bool paused;
+	float buffered_time;
 	struct Model *actor_model;
 	population_t population_history[max_pop_history_frames];
 	vec3_t world_cursor;

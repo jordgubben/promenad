@@ -13,6 +13,8 @@
 #endif
 
 
+static const float step_time = 1.f/60.f;
+
 void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_t *current);
 void update_leg_end_effectors(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
@@ -25,6 +27,14 @@ Update all the things.
 void update_app(float dt, app_t *app) {
 	if (app->paused) { return; }
 
+	// Simulate in a fixed time step
+	app->buffered_time += dt;
+	if (app->buffered_time < step_time) {
+		return;
+	} else {
+		app->buffered_time -= step_time;
+	}
+
 	// Keep history
 	unsigned old_frame =  app->frame_count % max_pop_history_frames;
 	app->frame_count++;
@@ -33,7 +43,7 @@ void update_app(float dt, app_t *app) {
 	population_t *pop = &app->population_history[new_frame];
 
 	// Update world
-	update_population(dt, pop);
+	update_population(step_time, pop);
 }
 
 void update_population(float dt, population_t *pop) {
