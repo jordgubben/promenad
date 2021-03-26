@@ -96,7 +96,7 @@ void move_limbs_toward_goals(float dt, limb_goal_table_t *goals, limb_table_t *l
 Accelrate towards the given goal velocity, limited by the given max speed change.
 */
 void accelrate_toward_goal_velocity(vec3_t  goal_vel, float max_speed_change, vec3_t *current_vel) {
-	vec3_t diff_vel = vec3_direction(*current_vel, goal_vel);
+	vec3_t diff_vel = vec3_between(*current_vel, goal_vel);
 	float diff_speed = vec3_length(diff_vel);
 
 	// Snap to goal velocity or nudge toward it
