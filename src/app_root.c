@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 	UpdateCamera(&camera);
 
 	// App setup
-	init_app(am_single_actor, &app);
+	init_app(am_robot_arm, &app);
 
 	// Ah-Gogogoggogogogo!
 	while(!WindowShouldClose()) {
