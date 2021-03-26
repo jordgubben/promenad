@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
 	PRINT_SIZE_OF(app_t);
 
 	// Get things up and running
-	InitWindow(640, 480, "Hello, Promenad!");
+	InitWindow(1024, 768, "Hello, Promenad!");
 	SetTargetFPS(144);
 
 	// Define the camera to look into our 3d world
