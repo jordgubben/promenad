@@ -468,6 +468,18 @@ void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, l
 	table->threshold[index] = 0.1;
 }
 
+/**
+Add another point to a goal (or create the goal if does not exist already).
+**/
+void push_limb_goal(limb_id_t limb, vec3_t pos, float speed, float acc, limb_goal_table_t *table) {
+	if (has_limb_goal(limb, table)) {
+		int goal_index = T_INDEX(*table, limb);
+		assert(table->curve_length[goal_index] < max_limb_goal_curve_points);
+		table->curve_points[goal_index][table->curve_length[goal_index]++] = pos;
+	} else {
+		put_limb_goal(limb, pos, speed, acc, table);
+	}
+}
 
 /**
 Does this limb have a goal?
@@ -491,9 +503,13 @@ void delete_accomplished_limb_goals(const limb_table_t *limbs, limb_goal_table_t
 		vec3_t goal_pos = goals->curve_points[goal_index][curve_index];
 		float threshold = goals->threshold[goal_index];
 
-		// Remove if close enough
+		// Advance only if close enough
 		float distance = vec3_distance(ee_pos, goal_pos);
-		if (distance < threshold) {
+		if (distance > threshold) { continue; }
+		goals->curve_index[goal_index]++;
+
+		// Remove if at the end of the curve
+		if (goals->curve_index[goal_index] >= goals->curve_length[goal_index]) {
 			delete_limb_goal_at_index(goal_index--, goals);
 		}
 	}
