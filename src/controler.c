@@ -148,12 +148,12 @@ void update_leg_end_effectors(float dt,
 		const vec3_t leg_root_opos = mat4_mul_vec3(to_obj, leg_root_wpos, 1);
 
 		// End effector in world and actors object space
-		const vec3_t leg_ee_wpos = limbs->end_effector[limb_index];
-		const vec3_t leg_ee_opos = mat4_mul_vec3(to_obj, leg_ee_wpos, 1);
+		const vec3_t foot_wpos = get_limb_tip_position(limb, limbs);
+		const vec3_t foot_opos = mat4_mul_vec3(to_obj, foot_wpos, 1);
 
 		// Move foot forward if behind actor
 		// (goal relative to root, i.e. hip joint)
-		if (leg_ee_opos.x < back_limit_x) {
+		if (foot_opos.x < back_limit_x) {
 			printf("Move foot [#%u|%u] forward!\n", limb.id, limb_index);
 			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(+2.5f, -1,0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
@@ -161,9 +161,9 @@ void update_leg_end_effectors(float dt,
 		}
 
 		// Drop foot if in front of actor (and in air)
-		if (leg_ee_opos.x > front_limit_x && leg_ee_wpos.y > 0 ) {
+		if (foot_opos.x > front_limit_x && foot_wpos.y > 0 ) {
 			printf("Move foot [#%u|%u] down!\n", limb.id, limb_index);
-			vec3_t leg_goal_opos = leg_ee_opos;
+			vec3_t leg_goal_opos = foot_opos;
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
 			leg_goal_wpos.y = 0;
 			put_limb_goal(limb, leg_goal_wpos, leg_drop_speed, leg_acceleration, goals);
