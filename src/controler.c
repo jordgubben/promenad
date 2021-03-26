@@ -122,7 +122,7 @@ void update_leg_end_effectors(float dt,
 	const float leg_drop_speed = 1.5;
 
 	// Limits
-	const float front_limit_x = +1.5f;
+	const float front_limit_x = +0.75f;
 	const float back_limit_x = -0.25f;
 
 	FOR_ROWS(i, *leg_attachments) {
