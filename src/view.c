@@ -121,13 +121,16 @@ void render_limb_goals(const limb_goal_table_t *goals, const limb_table_t *limbs
 		// Get the data
 		limb_id_t limb = goals->dense_id[goal_index];
 		int limb_index = get_limb_index(limb, limbs);
-		vec3_t ee_pos = limbs->end_effector[limb_index];
-		vec3_t goal_pos = goals->goal_position[goal_index];
+		vec3_t prev_pos = limbs->end_effector[limb_index];
 		float threshold = goals->threshold[goal_index];
 
-		// Render it
-		DrawLine3D(ee_pos.rl, goal_pos.rl, LIME);
-		DrawSphere(goal_pos.rl, threshold, LIME);
+		// Render the remaining curve
+		FOR_RANGE(i, goals->curve_index[goal_index], goals->curve_length[goal_index]) {
+			vec3_t curve_pos = goals->curve_points[goal_index][i];
+			DrawLine3D(prev_pos.rl, curve_pos.rl, LIME);
+			DrawSphere(curve_pos.rl, threshold, LIME);
+			prev_pos = curve_pos;
+		}
 	}
 }
 

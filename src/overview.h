@@ -152,8 +152,9 @@ void attach_limb_to_actor(
 void reposition_attached_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
 
 
-//// Limb goal
+//// Limb path
 enum {max_limb_goal_table_rows = max_limb_table_rows };
+enum {max_limb_goal_curve_points = 4 };
 typedef struct limb_goal_table_ {
 	// Table meta
 	uint16_t sparse_id[max_limb_goal_table_rows];
@@ -161,7 +162,9 @@ typedef struct limb_goal_table_ {
 	uint16_t num_rows;
 
 	// Column data
-	vec3_t goal_position[max_limb_goal_table_rows];
+	vec3_t curve_points[max_limb_goal_table_rows][max_limb_goal_curve_points];
+	int8_t curve_index[max_limb_goal_table_rows];
+	int8_t curve_length[max_limb_goal_table_rows];
 	vec3_t velocity[max_limb_goal_table_rows];
 	float max_speed[max_limb_goal_table_rows];
 	float max_acceleration[max_limb_goal_table_rows];

@@ -77,7 +77,8 @@ void move_limbs_toward_goals(float dt, limb_goal_table_t *goals, limb_table_t *l
 		vec3_t ee_pos = limbs->end_effector[limb_index];
 
 		// Get goal data
-		vec3_t goal_pos = goals->goal_position[goal_index];
+		int8_t curve_index = goals->curve_index[goal_index];
+		vec3_t goal_pos = goals->curve_points[goal_index][curve_index];
 		float max_speed = goals->max_speed[goal_index];
 		float acceleration = goals->max_acceleration[goal_index];
 		float max_speed_change = acceleration * dt;

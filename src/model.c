@@ -460,7 +460,9 @@ void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, l
 	}
 
 	// Set row data
-	table->goal_position[index] = pos;
+	table->curve_index[index] = 0;
+	table->curve_length[index] = 1;
+	table->curve_points[index][table->curve_index[index]] = pos;
 	table->max_speed[index] = max_speed;
 	table->max_acceleration[index] = max_acc;
 	table->threshold[index] = 0.1;
@@ -485,7 +487,8 @@ void delete_accomplished_limb_goals(const limb_table_t *limbs, limb_goal_table_t
 		vec3_t ee_pos = get_limb_end_effector_position(limb, limbs);
 
 		// Get goal data
-		vec3_t goal_pos = goals->goal_position[goal_index];
+		int8_t curve_index = goals->curve_index[goal_index];
+		vec3_t goal_pos = goals->curve_points[goal_index][curve_index];
 		float threshold = goals->threshold[goal_index];
 
 		// Remove if close enough
@@ -500,10 +503,14 @@ void delete_accomplished_limb_goals(const limb_table_t *limbs, limb_goal_table_t
 void delete_limb_goal_at_index(unsigned index, limb_goal_table_t *table) {
 	assert(index < table->num_rows);
 
-	// Remove data
+	// Remove data by copying another row
 	unsigned m = --table->num_rows;
 	table->dense_id[index] = table->dense_id[m];
-	table->goal_position[index] = table->goal_position[m];
+	for (int i = 0; i < table->curve_length[m]; i++) {
+		table->curve_points[index][i] = table->curve_points[m][i];
+	}
+	table->curve_index[index] = table->curve_index[m];
+	table->curve_length[index] = table->curve_length[m];
 	table->velocity[index] = table->velocity[m];
 	table->max_speed[index] = table->max_speed[m];
 	table->max_acceleration[index] = table->max_acceleration[m];
