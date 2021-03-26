@@ -95,17 +95,23 @@ void init_app(app_mode_e mode, app_t * app) {
 
 		// Right leg
 		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &pop->limbs);
-		add_bone_to_limb(right_leg, vec3(0, hip_height -1, +1 * hip_side), &pop->limbs);
-		uint16_t right_knee =
-			add_bone_to_limb(right_leg, vec3(0, hip_height -2, +1 * hip_side), &pop->limbs);
-		apply_hinge_constraint(right_knee, -0.9 * pi, 0, &pop->limbs);
 		attach_limb_to_actor(right_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
+		uint16_t right_hip =
+			add_bone_to_limb(right_leg, vec3(0.1, hip_height/2, +1 * hip_side), &pop->limbs);
+		apply_hinge_constraint(right_hip, -0.6 * pi, 0.4 * pi, &pop->limbs);
+		uint16_t right_knee =
+			add_bone_to_limb(right_leg, vec3(0, 0, +1 * hip_side), &pop->limbs);
+		apply_hinge_constraint(right_knee, -0.9 * pi, 0 * pi, &pop->limbs);
 
 		// Left leg
 		limb_id_t left_leg = create_limb(vec3(0, hip_height, -1 * hip_side), quat_identity, &pop->limbs);
-		add_bone_to_limb(left_leg, vec3(0, hip_height -1, -1 * hip_side), &pop->limbs);
-		add_bone_to_limb(left_leg, vec3(0, hip_height -2, -1 * hip_side), &pop->limbs);
 		attach_limb_to_actor(left_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
+		uint16_t left_hip =
+			add_bone_to_limb(left_leg, vec3(0.1, hip_height/2, -1 * hip_side), &pop->limbs);
+		apply_hinge_constraint(left_hip, -0.6 * pi, 0.4 * pi, &pop->limbs);
+		uint16_t left_knee =
+			add_bone_to_limb(left_leg, vec3(0, 0, -1 * hip_side), &pop->limbs);
+		apply_hinge_constraint(left_knee, -0.9 * pi, 0 * pi, &pop->limbs);
 
 		// Pair legs
 		pair_limbs(left_leg, right_leg, &pop->limbs);
@@ -412,6 +418,12 @@ void reposition_attached_limbs(
 
 //// Limb goals
 
+
+/**
+Give the limb end effector a new goal.
+
+Maintains velocity if it replaces an older goal.
+**/
 void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, limb_goal_table_t *table) {
 	// Figgure out where to put the data
 	int index;
@@ -425,11 +437,13 @@ void put_limb_goal(limb_id_t limb, vec3_t pos, float max_speed, float max_acc, l
 		index = table->num_rows++;
 		table->sparse_id[limb.id] = index;
 		table->dense_id[index] = limb;
+
+		// Reset velocity
+		table->velocity[index] = vec3(0,0,0);
 	}
 
 	// Set row data
 	table->goal_position[index] = pos;
-	table->velocity[index] = vec3(0,0,0);
 	table->max_speed[index] = max_speed;
 	table->max_acceleration[index] = max_acc;
 	table->threshold[index] = 0.1;
