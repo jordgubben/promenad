@@ -103,6 +103,37 @@ SCENARIO("Joint constraints") {
 		}
 	}
 
+	GIVEN("Given two parallell bones with a twist") {
+		printf("!\n");
+		vec3_t p1 = vec3(0,10,0), p2 = vec3(0,20,0), p3 = vec3(0,30,0);
+		bone_t bone_a = {{jc_no_constraint}, p1, p2, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
+		bone_t bone_b = {{jc_no_constraint}, p2, p3, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
+		bone_b.orientation = quat_mul(quat_from_axis_angle(vec3_positive_y, pi/2), bone_b.orientation);
+		CHECK(get_bone_tip(bone_a) == vec3(0,20,0));
+		CHECK(get_bone_tip(bone_b) == vec3(0,30,0));
+
+		AND_GIVEN("they are constrained with a hinge joint") {
+			bone_b.constraint.type = jc_hinge;
+			bone_b.constraint.min_ang = -pi/2;
+			bone_b.constraint.max_ang = +pi/2;
+
+			WHEN("first bone constrains the second") {
+				constrain_to_prev_bone(&bone_a, &bone_b);
+				THEN("Second bone is oriented like the first") {
+					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_x)) == vec3_positive_y);
+					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_y)) == vec3_negative_x);
+					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_z)) == vec3_positive_z);
+				}
+
+				THEN("Tip positions are maintained") {
+					CHECK(vec3_round(get_bone_tip(bone_a)) == vec3(0,20,0));
+					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(0,30,0));
+				}
+			}
+		}
+	}
+
+
 	GIVEN("An arm with a single bone pointing toward +x") {
 		limb_id_t arm = create_limb(vec3_origo, quat_identity, &limbs);
 		uint16_t s1 = add_bone_to_limb(arm, vec3(10,0,0), &limbs);
