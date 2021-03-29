@@ -104,13 +104,20 @@ SCENARIO("Joint constraints") {
 	}
 
 	GIVEN("Given two parallell bones with a twist") {
-		printf("!\n");
 		vec3_t p1 = vec3(0,10,0), p2 = vec3(0,20,0), p3 = vec3(0,30,0);
 		bone_t bone_a = {{jc_no_constraint}, p1, p2, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
 		bone_t bone_b = {{jc_no_constraint}, p2, p3, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
 		bone_b.orientation = quat_mul(quat_from_axis_angle(vec3_positive_y, pi/2), bone_b.orientation);
 		CHECK(get_bone_tip(bone_a) == vec3(0,20,0));
 		CHECK(get_bone_tip(bone_b) == vec3(0,30,0));
+
+		THEN("The second bone still transforms to something sane") {
+			vec3_t local_x = quat_rotate_vec3(bone_b.orientation, vec3_positive_x);
+			vec3_t local_y = quat_rotate_vec3(bone_b.orientation, vec3_positive_y);
+			vec3_t local_z = quat_rotate_vec3(bone_b.orientation, vec3_positive_z);
+
+			CHECK(vec3_round(vec3_cross(local_x, local_y)) == vec3_round(local_z));
+		}
 
 		AND_GIVEN("they are constrained with a hinge joint") {
 			bone_b.constraint.type = jc_hinge;
@@ -123,6 +130,20 @@ SCENARIO("Joint constraints") {
 					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_x)) == vec3_positive_y);
 					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_y)) == vec3_negative_x);
 					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_z)) == vec3_positive_z);
+				}
+
+				THEN("Tip positions are maintained") {
+					CHECK(vec3_round(get_bone_tip(bone_a)) == vec3(0,20,0));
+					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(0,30,0));
+				}
+			}
+
+			WHEN("second bone constrains the first") {
+				constrain_to_next_bone(&bone_b, &bone_a);
+				THEN("the first bone is oriented like the second") {
+					CHECK(vec3_round(quat_rotate_vec3(bone_a.orientation, vec3_positive_x)) == vec3_positive_y);
+					CHECK(vec3_round(quat_rotate_vec3(bone_a.orientation, vec3_positive_y)) == vec3_positive_z);
+					CHECK(vec3_round(quat_rotate_vec3(bone_a.orientation, vec3_positive_z)) == vec3_positive_x);
 				}
 
 				THEN("Tip positions are maintained") {

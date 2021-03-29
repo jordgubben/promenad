@@ -317,11 +317,22 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 			// Local axies
 			vec3_t next_forward = quat_rotate_vec3(next_bone->orientation, vec3(1,0,0));
 			vec3_t next_up = quat_rotate_vec3(next_bone->orientation, vec3(0,1,0));
+			vec3_t next_side = quat_rotate_vec3(next_bone->orientation, vec3(0,0,1));
 			TRACE_VEC3(next_forward);
 			TRACE_VEC3(next_up);
+			TRACE_VEC3(next_side);
+
+			// Align hinge axis with next bone
+			this_bone->orientation = quat_mul(
+				quat_from_vec3_pair(
+					quat_rotate_vec3(this_bone->orientation, vec3_positive_z),
+					next_side),
+				this_bone->orientation
+				);
+			vec3_t n = quat_rotate_vec3(this_bone->orientation, vec3_positive_x);
+			TRACE_VEC3(n);
 
 			// Projection on local axies
-			vec3_t n = vec3_normal(b);
 			float bone_forward = vec3_dot(n, next_forward);
 			float bone_up = vec3_dot(n, next_up);
 			TRACE_FLOAT(bone_forward);
