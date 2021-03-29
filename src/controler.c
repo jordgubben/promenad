@@ -14,6 +14,7 @@
 
 
 static const float step_time = 1.f/60.f;
+static const int num_fabrik_passes = 3;
 
 void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_t *current);
 void update_leg_end_effectors(float dt,
@@ -196,11 +197,14 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 	int limb_index = get_limb_index(limb, table);
 
 	// Move copy of limb bones
+	// (iterate multiple times for better stability)
 	bone_t bones[32];
 	size_t num_bones = collect_bones(limb, table, bones, 32);
 	vec3_t root_pos = table->position[limb_index];
 	quat_t root_ori = table->orientation[limb_index];
-	reposition_bones_with_fabrik(root_pos, root_ori, end_pos, bones, num_bones);
+	FOR_IN(i, num_fabrik_passes) {
+		reposition_bones_with_fabrik(root_pos, root_ori, end_pos, bones, num_bones);
+	}
 
 	// Reapply changes (directly)
 	uint16_t seg_index = table->root_bone[limb_index];
