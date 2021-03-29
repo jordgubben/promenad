@@ -20,6 +20,10 @@ void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_
 void update_leg_end_effectors(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
 
+vec3_t get_bone_forward(const bone_t *b) { return quat_rotate_vec3(b->orientation, vec3_positive_x); }
+vec3_t get_bone_up(const bone_t *b) { return quat_rotate_vec3(b->orientation, vec3_positive_y); }
+vec3_t get_bone_right(const bone_t *b) { return quat_rotate_vec3(b->orientation, vec3_positive_z); }
+
 vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 /**
@@ -296,7 +300,7 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 		arr[i].joint_pos = vec3_add(arr[i].joint_pos, vec3_mul(n, change));
 
 		// Rotate as little as possible
-		vec3_t dir = quat_rotate_vec3(arr[i].orientation, vec3(1,0,0));
+		vec3_t dir = get_bone_forward(&arr[i]);
 		arr[i].orientation = quat_mul(quat_from_vec3_pair(dir, n), arr[i].orientation);
 
 		// Calculate tip (secondary value)
@@ -319,21 +323,19 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 		case jc_pole: { /* TODO */ } break;
 		case jc_hinge: {
 			// Local axies
-			vec3_t next_forward = quat_rotate_vec3(next_bone->orientation, vec3(1,0,0));
-			vec3_t next_up = quat_rotate_vec3(next_bone->orientation, vec3(0,1,0));
-			vec3_t next_side = quat_rotate_vec3(next_bone->orientation, vec3(0,0,1));
+			vec3_t next_forward = get_bone_forward(next_bone);
+			vec3_t next_up = get_bone_up(next_bone);
+			vec3_t next_side = get_bone_right(next_bone);
 			TRACE_VEC3(next_forward);
 			TRACE_VEC3(next_up);
 			TRACE_VEC3(next_side);
 
 			// Align hinge axis with next bone
 			this_bone->orientation = quat_mul(
-				quat_from_vec3_pair(
-					quat_rotate_vec3(this_bone->orientation, vec3_positive_z),
-					next_side),
+				quat_from_vec3_pair(get_bone_right(this_bone), next_side),
 				this_bone->orientation
 				);
-			vec3_t n = quat_rotate_vec3(this_bone->orientation, vec3_positive_x);
+			vec3_t n = get_bone_forward(this_bone);
 			TRACE_VEC3(n);
 
 			// Projection on local axies
@@ -389,7 +391,7 @@ void apply_fabrik_inverse_pass(
 		// (or the end effector if we are at the last joint)
 		vec3_t next_pos  = (i+1 < num ? arr[i+1].joint_pos : end_pos) ;
 		vec3_t new_dir = vec3_normal(vec3_between(arr[i].joint_pos, next_pos));
-		vec3_t bone_dir = quat_rotate_vec3(arr[i].orientation, vec3(1,0,0));
+		vec3_t bone_dir = get_bone_forward(&arr[i]);
 		arr[i].orientation = quat_mul(quat_from_vec3_pair(bone_dir, new_dir), arr[i].orientation);
 
 		constrain_to_prev_bone(&prev_bone, &arr[i]);
@@ -404,12 +406,12 @@ void apply_fabrik_inverse_pass(
 
 
 void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
-	vec3_t n = quat_rotate_vec3(this_bone->orientation, vec3_positive_x);
+	vec3_t n = get_bone_forward(this_bone);
 
 	switch (this_bone->constraint.type) {
 		case jc_no_constraint: {} break;
 		case jc_pole: {
-			vec3_t prev_dir = quat_rotate_vec3(prev_bone->orientation, vec3(1,0,0));
+			vec3_t prev_dir = get_bone_forward(prev_bone);
 			if (vec3_dot(prev_dir, n) < 1) {
 				TRACE_VEC3(n);
 				TRACE_VEC3(prev_dir);
@@ -420,21 +422,19 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 		} break;
 		case jc_hinge: {
 			// Local axies
-			vec3_t local_forward = quat_rotate_vec3(prev_bone->orientation, vec3(1,0,0));
-			vec3_t local_up = quat_rotate_vec3(prev_bone->orientation, vec3(0,1,0));
-			vec3_t local_side = quat_rotate_vec3(prev_bone->orientation, vec3_positive_z);
+			vec3_t local_forward = get_bone_forward(prev_bone);
+			vec3_t local_up = get_bone_up(prev_bone);
+			vec3_t local_side = get_bone_right(prev_bone);
 			TRACE_VEC3(local_forward);
 			TRACE_VEC3(local_up);
 			TRACE_VEC3(local_side);
 
 			// Align hinge axis with previous bone
 			this_bone->orientation = quat_mul(
-				quat_from_vec3_pair(
-					quat_rotate_vec3(this_bone->orientation, vec3_positive_z),
-					local_side),
+				quat_from_vec3_pair(get_bone_right(this_bone), local_side),
 				this_bone->orientation
 				);
-			n = quat_rotate_vec3(this_bone->orientation, vec3_positive_x);
+			n = get_bone_forward(this_bone);
 			TRACE_VEC3(n);
 
 			// Projection on local axies
@@ -462,7 +462,7 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 	}
 
 	// Rotate as little as posible
-	vec3_t dir = quat_rotate_vec3(this_bone->orientation, vec3(1,0,0));
+	vec3_t dir = get_bone_forward(this_bone);
 	this_bone->orientation = quat_mul(quat_from_vec3_pair(dir, n), this_bone->orientation);
 
 	TRACE_VEC3(this_bone->joint_pos);
@@ -479,7 +479,7 @@ vec3_t get_bone_tip(bone_t bone) {
 }
 
 vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length) {
-	vec3_t n = quat_rotate_vec3(ori, vec3(1,0,0));
+	vec3_t n = quat_rotate_vec3(ori, vec3_positive_x);
 	return vec3_add(joint_pos, vec3_mul(n, length));
 }
 
