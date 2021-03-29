@@ -264,7 +264,7 @@ vec3_t get_bone_joint_position(uint16_t bone_index, const limb_table_t *table) {
 
 
 /**
-Get the world position of the bones tip.
+Get the (calculated) world position of the bones tip.
 **/
 vec3_t get_bone_tip_position(uint16_t bone_index, const limb_table_t *table) {
 	assert(bone_index < max_limb_table_segnemts);

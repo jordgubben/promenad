@@ -92,9 +92,10 @@ void render_limb_skeletons(const limb_table_t *table) {
 		int bone = table->root_bone[l];
 		while (bone) {
 			bone_t seg = table->bones[bone];
-			DrawLine3D(seg.joint_pos.rl, seg.tip_pos.rl, GRAY);
+			vec3_t tip_pos = get_bone_tip_position(bone, table);
+			DrawLine3D(seg.joint_pos.rl, tip_pos.rl, GRAY);
 			DrawSphere(seg.joint_pos.rl, 0.10, MAROON);
-			DrawSphere(seg.tip_pos.rl, 0.05, MAROON);
+			DrawSphere(tip_pos.rl, 0.05, MAROON);
 
 			// Next bone (if any)
 			bone = table->bone_nodes[bone].next_index;
