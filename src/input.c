@@ -14,8 +14,22 @@ void process_input(float dt, app_t *app) {
 	// Toggle pause
 	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
 
-	// Rewind
-	if (IsKeyDown(KEY_R) && app->frame_count >= 2) { app->frame_count -= 2; }
+	// Control playback
+	if (app->paused) {
+
+		// Step backwards
+		if (IsKeyPressed(KEY_R) && app->frame_count >0) {
+			app->frame_count--;
+		}
+
+		// Step forwards
+		if (IsKeyPressed(KEY_F)) {
+			app->frame_count++;
+		}
+
+	} else if (IsKeyDown(KEY_R) && app->frame_count >= 2) {
+		app->frame_count -= 2;
+	}
 
 	// Move global cursor with arrow keys
 	if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
