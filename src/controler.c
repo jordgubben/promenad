@@ -217,10 +217,7 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 		bone_t *current_seg = &table->bones[seg_index];
 		current_seg->joint_pos = seg_itr->joint_pos;
 		current_seg->tip_pos = seg_itr->tip_pos;
-		current_seg->orientation =
-			quat_from_vec3_pair(
-				vec3(1,0,0),
-				vec3_between(current_seg->joint_pos, current_seg->tip_pos));
+		current_seg->orientation = seg_itr->orientation;
 
 		// Continue to next bone
 		seg_index = table->bone_nodes[seg_index].next_index;
