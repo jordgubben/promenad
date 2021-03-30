@@ -5,6 +5,7 @@
 #define IN_APP_ROOT
 #include "overview.h"
 
+static const float step_time = 1.f/60.f;
 static app_t app= { 0 };
 
 float minf(float a, float b) { return (a > b ? a : b); }
@@ -54,4 +55,49 @@ int main(int argc, char** argv) {
 	term_app(&app);
 	CloseWindow();
 	return 0;
+}
+
+
+/**
+Update all the things.
+**/
+void update_app(float dt, app_t *app) {
+	if (app->paused) { return; }
+
+	// Simulate in a fixed time step
+	app->buffered_time += dt;
+	if (app->buffered_time < step_time) {
+		return;
+	} else {
+		app->buffered_time -= step_time;
+	}
+
+	// Keep history
+	unsigned old_frame =  app->frame_count % max_pop_history_frames;
+	app->frame_count++;
+	unsigned new_frame = (app->frame_count % max_pop_history_frames);
+	app->population_history[new_frame] = app->population_history[old_frame];
+	population_t *pop = &app->population_history[new_frame];
+
+	// Update world
+	update_population(step_time, pop);
+}
+
+
+/**
+Update the dynamically changing part of the simulation.
+**/
+void update_population(float dt, population_t *pop) {
+
+	calculate_actor_transforms(&pop->actors);
+
+	// Move limbs attached to actors
+	reposition_attached_limbs(&pop->arms, &pop->actors, &pop->limbs);
+	reposition_attached_limbs(&pop->legs, &pop->actors, &pop->limbs);
+
+	// Update kinematics
+	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
+	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limb_goals, &pop->limbs);
+	move_limbs_directly_to_end_effectors(&pop->limbs);
+	delete_accomplished_limb_goals(&pop->limbs, &pop->limb_goals);
 }

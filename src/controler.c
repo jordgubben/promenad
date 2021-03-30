@@ -13,58 +13,15 @@
 #endif
 
 
-static const float step_time = 1.f/60.f;
 static const int num_fabrik_passes = 3;
 
 void accelrate_toward_goal_velocity(vec3_t target, float max_speed_change, vec3_t *current);
-void update_leg_end_effectors(float dt,
-	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
 
 vec3_t get_bone_forward(const bone_t *b) { return quat_rotate_vec3(b->orientation, vec3_positive_x); }
 vec3_t get_bone_up(const bone_t *b) { return quat_rotate_vec3(b->orientation, vec3_positive_y); }
 vec3_t get_bone_right(const bone_t *b) { return quat_rotate_vec3(b->orientation, vec3_positive_z); }
 
 vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
-
-/**
-Update all the things.
-**/
-void update_app(float dt, app_t *app) {
-	if (app->paused) { return; }
-
-	// Simulate in a fixed time step
-	app->buffered_time += dt;
-	if (app->buffered_time < step_time) {
-		return;
-	} else {
-		app->buffered_time -= step_time;
-	}
-
-	// Keep history
-	unsigned old_frame =  app->frame_count % max_pop_history_frames;
-	app->frame_count++;
-	unsigned new_frame = (app->frame_count % max_pop_history_frames);
-	app->population_history[new_frame] = app->population_history[old_frame];
-	population_t *pop = &app->population_history[new_frame];
-
-	// Update world
-	update_population(step_time, pop);
-}
-
-void update_population(float dt, population_t *pop) {
-
-	calculate_actor_transforms(&pop->actors);
-
-	// Move limbs attached to actors
-	reposition_attached_limbs(&pop->arms, &pop->actors, &pop->limbs);
-	reposition_attached_limbs(&pop->legs, &pop->actors, &pop->limbs);
-
-	// Update kinematics
-	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
-	update_leg_end_effectors(dt, &pop->actors, &pop->legs, &pop->limb_goals, &pop->limbs);
-	move_limbs_directly_to_end_effectors(&pop->limbs);
-	delete_accomplished_limb_goals(&pop->limbs, &pop->limb_goals);
-}
 
 
 //// Actor animation ////
