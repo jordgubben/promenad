@@ -122,7 +122,6 @@ void apply_hinge_constraint(uint16_t seg, float min_ang, float max_ang, limb_tab
 // Limb kinematics
 void move_limbs_directly_to_end_effectors(limb_table_t *table);
 void move_limb_directly_to(limb_id_t, vec3_t end, limb_table_t *);
-void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *);
 void reposition_bones_with_fabrik(
 	vec3_t root_pos, quat_t root_ori, vec3_t end,
 	bone_t [], size_t num);

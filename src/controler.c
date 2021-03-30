@@ -225,49 +225,8 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 }
 
 /**
-Gradually move limb bones toward their desired positions.
-
-(Deprecated or put on hold)
+Apply FABRIK (Forward and Backwards Reaching Inverse Kinnematics) to given array of bones.
 **/
-void move_limbs_gradually_towards_end_effectors(float dt, limb_table_t *table) {
-	FOR_ROWS(l, *table) {
-		limb_id_t limb = get_limb_id(l, table);
-
-		// Move limb bones
-		bone_t bones[32];
-		size_t num_bones = collect_bones(limb, table, bones, 32);
-		vec3_t root_pos = table->position[l];
-		quat_t root_ori = table->orientation[l];
-		vec3_t end_effector = table->end_effector[l];
-		reposition_bones_with_fabrik(root_pos, root_ori, end_effector, bones, num_bones);
-
-		// Reapply changes (gradually)
-		uint16_t seg_index = table->root_bone[l];
-		FOR_ITR(bone_t, seg_itr, bones, num_bones) {
-			// Difference
-			bone_t *current_seg = &table->bones[seg_index];
-
-			// Move tip there in one second from now (🐢 ⬅️  🐰)
-			vec3_t tip_diff = vec3_between(current_seg->tip_pos, seg_itr->tip_pos);
-			vec3_t tip_change = vec3_mul(tip_diff, dt);
-			current_seg->tip_pos = vec3_add(current_seg->tip_pos, tip_change);
-
-			// Move joint there in one second from now (🐢 ⬅️  🐰)
-			vec3_t joint_diff = vec3_between(current_seg->joint_pos, seg_itr->joint_pos);
-			vec3_t joint_change = vec3_mul(joint_diff, dt);
-			current_seg->joint_pos = vec3_add(current_seg->joint_pos, joint_change);
-
-			// Adjust orientation
-			current_seg->orientation =
-				quat_from_vec3_pair(vec3(1,0,0), vec3_between(current_seg->joint_pos, current_seg->tip_pos));
-
-			// Continue to next segment
-			seg_index = table->bone_nodes[seg_index].next_index;
-		}
-
-	}
-}
-
 void reposition_bones_with_fabrik(
 		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,
 		bone_t arr[], size_t num) {
