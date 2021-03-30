@@ -197,7 +197,6 @@ void reposition_bones_with_fabrik(
 void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[], size_t num) {
 
 	bone_t next_bone = {{jc_no_constraint}, end_pos, end_pos, quat_identity, 0.f};
-	bone_constraint_e goal_constraint_type = jc_no_constraint;
 	for (int i = num - 1; i >= 0 ; i--) {
 		constrain_to_next_bone(&next_bone, &arr[i]);
 
@@ -225,11 +224,10 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 }
 
 /**
-Constrain this bone relative to the next one (or the end effector semi bone).
+Constrain this bone relative to the next one (or the end effector semi-bone).
 **/
 void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 	vec3_t b = vec3_between(this_bone->joint_pos, next_bone->joint_pos);
-	TRACE_VEC3(b);
 
 	switch (next_bone->constraint.type) {
 		case jc_no_constraint: {} break;
@@ -239,9 +237,6 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 			vec3_t next_forward = get_bone_forward(next_bone);
 			vec3_t next_up = get_bone_up(next_bone);
 			vec3_t next_side = get_bone_right(next_bone);
-			TRACE_VEC3(next_forward);
-			TRACE_VEC3(next_up);
-			TRACE_VEC3(next_side);
 
 			// Align hinge axis with next bone
 			this_bone->orientation = quat_mul(
@@ -249,7 +244,6 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 				this_bone->orientation
 				);
 			vec3_t n = get_bone_forward(this_bone);
-			TRACE_VEC3(n);
 
 			// Projection on local axies
 			float bone_forward = vec3_dot(n, next_forward);
@@ -261,22 +255,17 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 			// atan(0, +1) = 0
 			float angle = atan2(bone_up, bone_forward);
 			angle = (angle > pi ? angle - tau : angle);
-			TRACE_FLOAT(angle);
 			TRACE_FLOAT(180 * angle / pi);
 
 			// Clamp angle to constraint
-			TRACE_FLOAT(next_bone->constraint.max_ang);
-			TRACE_FLOAT(next_bone->constraint.min_ang);
 			if (angle > next_bone->constraint.max_ang) { angle = next_bone->constraint.max_ang; }
 			if (angle < next_bone->constraint.min_ang) { angle = next_bone->constraint.min_ang; }
-			TRACE_FLOAT(angle);
 			TRACE_FLOAT(180 * angle / pi);
 
 			// New joint position from angle
 			n = vec3_add(
 				vec3_mul(next_forward, cos(angle)),
 				vec3_mul(next_up, sin(angle)));
-			TRACE_VEC3(n);
 
 			this_bone->joint_pos = vec3_sub(
 				next_bone->joint_pos,
@@ -326,8 +315,6 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 		case jc_pole: {
 			vec3_t prev_dir = get_bone_forward(prev_bone);
 			if (vec3_dot(prev_dir, n) < 1) {
-				TRACE_VEC3(n);
-				TRACE_VEC3(prev_dir);
 				quat_t r = quat_from_vec3_pair(n, prev_dir);
 				this_bone->orientation = quat_mul(r, this_bone->orientation);
 				n = prev_dir;
@@ -338,9 +325,6 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 			vec3_t local_forward = get_bone_forward(prev_bone);
 			vec3_t local_up = get_bone_up(prev_bone);
 			vec3_t local_side = get_bone_right(prev_bone);
-			TRACE_VEC3(local_forward);
-			TRACE_VEC3(local_up);
-			TRACE_VEC3(local_side);
 
 			// Align hinge axis with previous bone
 			this_bone->orientation = quat_mul(
@@ -348,7 +332,6 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 				this_bone->orientation
 				);
 			n = get_bone_forward(this_bone);
-			TRACE_VEC3(n);
 
 			// Projection on local axies
 			float bone_forward = vec3_dot(n, local_forward);
@@ -365,6 +348,7 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 			// Clamp angle to constraint
 			if (angle > this_bone->constraint.max_ang) { angle = this_bone->constraint.max_ang; }
 			if (angle < this_bone->constraint.min_ang) { angle = this_bone->constraint.min_ang; }
+			TRACE_FLOAT(180 * angle / pi);
 
 			// New normal from angle
 			n = vec3_add(
@@ -377,9 +361,6 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 	// Rotate as little as posible
 	vec3_t dir = get_bone_forward(this_bone);
 	this_bone->orientation = quat_mul(quat_from_vec3_pair(dir, n), this_bone->orientation);
-
-	TRACE_VEC3(this_bone->joint_pos);
-	TRACE_VEC3(get_bone_tip(*this_bone));
 }
 
 /**
