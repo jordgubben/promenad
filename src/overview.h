@@ -184,7 +184,7 @@ void delete_limb_goal_at_index(unsigned, limb_goal_table_t *);
 void render_limb_goals(const limb_goal_table_t *, const limb_table_t *);
 
 // Animate actors
-void update_leg_end_effectors(float dt,
+void animate_walking_actor_legs(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
 
 //// Population (everything that changes)

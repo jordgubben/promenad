@@ -73,7 +73,10 @@ void accelrate_toward_goal_velocity(vec3_t  goal_vel, float max_speed_change, ve
 }
 
 
-void update_leg_end_effectors(float dt,
+/**
+Move legs forward one at the time.
+**/
+void animate_walking_actor_legs(float dt,
 		const actor_table_t *actors,
 		const limb_attachment_table_t *leg_attachments,
 		limb_goal_table_t *goals,
