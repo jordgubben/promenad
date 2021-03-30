@@ -201,7 +201,6 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 
 	bone_t next_bone = {{jc_no_constraint}, end_pos, end_pos, quat_identity, 0.f};
 	for (int i = num - 1; i >= 0 ; i--) {
-		constrain_to_next_bone(&next_bone, &arr[i]);
 
 		// Relative placement (after constrains)
 		vec3_t b = vec3_between(arr[i].joint_pos, next_bone.joint_pos);
@@ -217,6 +216,8 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 		// Rotate as little as possible
 		vec3_t dir = get_bone_forward(&arr[i]);
 		arr[i].orientation = quat_mul(quat_from_vec3_pair(dir, n), arr[i].orientation);
+
+		constrain_to_next_bone(&next_bone, &arr[i]);
 
 		// Calculate tip (secondary value)
 		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, length);
