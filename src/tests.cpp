@@ -62,8 +62,8 @@ SCENARIO("Joint constraints") {
 			WHEN("The first bone is constrained by the second") {
 				constrain_to_next_bone(&bone_b, &bone_a);
 
-				THEN("The first bone is tilted to 4 degree angle") {
-					CHECK(bone_a.tip_pos == bone_b.joint_pos);
+				THEN("The first bone is tilted to 45 degree angle") {
+					CHECK(vec3_round(get_bone_tip(bone_a)) == bone_b.joint_pos);
 					CHECK(vec3_round(bone_a.joint_pos) == vec3(3, 13, 0));
 				}
 			}
@@ -72,7 +72,7 @@ SCENARIO("Joint constraints") {
 				constrain_to_prev_bone(&bone_a, &bone_b);
 
 				THEN("The second bone is tilted to 45 degree angle") {
-					CHECK(bone_a.tip_pos == bone_b.joint_pos);
+					CHECK(get_bone_tip(bone_a) == bone_b.joint_pos);
 					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(17, 27, 0));
 				}
 			}
@@ -87,7 +87,7 @@ SCENARIO("Joint constraints") {
 				constrain_to_next_bone(&bone_b, &bone_a);
 
 				THEN("The first bone is more or less unchanged") {
-					CHECK(bone_a.tip_pos == bone_b.joint_pos);
+					CHECK(get_bone_tip(bone_a) == bone_b.joint_pos);
 					CHECK(vec3_round(bone_a.joint_pos) == p1);
 				}
 			}
@@ -96,7 +96,7 @@ SCENARIO("Joint constraints") {
 				constrain_to_prev_bone(&bone_a, &bone_b);
 
 				THEN("The second bone is strighted out parallell wit the first") {
-					CHECK(bone_a.tip_pos == bone_b.joint_pos);
+					CHECK(get_bone_tip(bone_a) == bone_b.joint_pos);
 					CHECK(vec3_round(get_bone_tip(bone_b)) == vec3(10, 30, 0));
 				}
 			}
@@ -141,9 +141,15 @@ SCENARIO("Joint constraints") {
 			WHEN("second bone constrains the first") {
 				constrain_to_next_bone(&bone_b, &bone_a);
 				THEN("the first bone is oriented like the second") {
+					// First bone
 					CHECK(vec3_round(quat_rotate_vec3(bone_a.orientation, vec3_positive_x)) == vec3_positive_y);
 					CHECK(vec3_round(quat_rotate_vec3(bone_a.orientation, vec3_positive_y)) == vec3_positive_z);
 					CHECK(vec3_round(quat_rotate_vec3(bone_a.orientation, vec3_positive_z)) == vec3_positive_x);
+
+					// Second bone
+					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_x)) == vec3_positive_y);
+					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_y)) == vec3_positive_z);
+					CHECK(vec3_round(quat_rotate_vec3(bone_b.orientation, vec3_positive_z)) == vec3_positive_x);
 				}
 
 				THEN("Tip positions are maintained") {

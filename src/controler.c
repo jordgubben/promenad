@@ -266,14 +266,13 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 			if (angle < next_bone->constraint.min_ang) { angle = next_bone->constraint.min_ang; }
 			TRACE_FLOAT(180 * angle / pi);
 
-			// New joint position from angle
-			n = vec3_add(
-				vec3_mul(next_forward, cos(angle)),
-				vec3_mul(next_up, sin(angle)));
+			// Reset orientation
+			quat_t new_rot = quat_from_axis_angle(next_side, angle);
+			this_bone->orientation = quat_mul(new_rot, next_bone->orientation);
 
-			this_bone->joint_pos = vec3_sub(
-				next_bone->joint_pos,
-				vec3_mul(n, this_bone->distance));
+			// Move this bones tip to the next ones joint
+			vec3_t move = vec3_between(get_bone_tip(*this_bone), next_bone->joint_pos);
+			this_bone->joint_pos = vec3_add(this_bone->joint_pos, move);
 			TRACE_VEC3(this_bone->joint_pos);
 		} break;
 		case num_bone_constraints: { assert(false); } break;
