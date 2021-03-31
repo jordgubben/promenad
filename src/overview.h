@@ -75,7 +75,7 @@ typedef struct bone_ {
 		bone_constraint_e type;
 		float min_ang, max_ang;
 	} constraint;
-	vec3_t joint_pos, tip_pos;
+	vec3_t joint_pos;
 	quat_t orientation;
 	float distance;
 } bone_t;

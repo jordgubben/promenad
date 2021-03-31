@@ -175,7 +175,6 @@ void move_limb_directly_to(limb_id_t limb, vec3_t end_pos, limb_table_t *table) 
 		// Overwrite
 		bone_t *current_seg = &table->bones[seg_index];
 		current_seg->joint_pos = seg_itr->joint_pos;
-		current_seg->tip_pos = seg_itr->tip_pos;
 		current_seg->orientation = seg_itr->orientation;
 
 		// Continue to next bone
@@ -198,7 +197,7 @@ void reposition_bones_with_fabrik(
 
 void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[], size_t num) {
 
-	bone_t next_bone = {{jc_no_constraint}, end_pos, end_pos, quat_identity, 0.f};
+	bone_t next_bone = {{jc_no_constraint}, end_pos, quat_identity, 0.f};
 	for (int i = num - 1; i >= 0 ; i--) {
 
 		// Relative placement (after constrains)
@@ -217,9 +216,6 @@ void apply_fabrik_forward_pass(vec3_t origin, const vec3_t end_pos, bone_t arr[]
 		arr[i].orientation = quat_mul(quat_from_vec3_pair(dir, n), arr[i].orientation);
 
 		constrain_to_next_bone(&next_bone, &arr[i]);
-
-		// Calculate tip (secondary value)
-		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, length);
 
 		// Continue to the next one
 		next_bone = arr[i];
@@ -282,11 +278,10 @@ void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone) {
 void apply_fabrik_inverse_pass(
 		vec3_t root_pos, quat_t root_ori, const vec3_t end_pos,
 		bone_t arr[], size_t num) {
-	vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 	// Inverse pass
 	// (Pretend root is a limb segment without length)
-	bone_t prev_bone = {{jc_no_constraint}, root_pos, root_pos, root_ori, 0};
+	bone_t prev_bone = {{jc_no_constraint}, root_pos, root_ori, 0};
 	for (int i = 0; i < num; i++) {
 		// Place joint at the previous tip
 		arr[i].joint_pos = get_bone_tip(prev_bone);
@@ -299,9 +294,6 @@ void apply_fabrik_inverse_pass(
 		arr[i].orientation = quat_mul(quat_from_vec3_pair(bone_dir, new_dir), arr[i].orientation);
 
 		constrain_to_prev_bone(&prev_bone, &arr[i]);
-
-		// Calculate tip (secondary value)
-		arr[i].tip_pos = calc_tip_pos(arr[i].joint_pos, arr[i].orientation, arr[i].distance);
 
 		// Continue to the next one
 		prev_bone = arr[i];
@@ -362,8 +354,6 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 
 /**
 Get world position of the given bones tip.
-
-TODO: Gradually remove `tip_pos` field in favour of this.
 **/
 vec3_t get_bone_tip(bone_t bone) {
 	return calc_tip_pos(bone.joint_pos, bone.orientation, bone.distance);

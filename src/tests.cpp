@@ -51,8 +51,13 @@ SCENARIO("Joint constraints") {
 
 	GIVEN("Two bones at a 90 deg angle") {
 		vec3_t p1 = vec3(10,10,0), p2 = vec3(10,20,0), p3 = vec3(20,20,0);
-		bone_t bone_a = {{jc_no_constraint}, p1, p2, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
-		bone_t bone_b = {{jc_no_constraint}, p2, p3, quat_identity, 10};
+		bone_t bone_a = {{jc_no_constraint}, p1, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
+		bone_t bone_b = {{jc_no_constraint}, p2, quat_identity, 10};
+
+		THEN("Tips are where we expect") {
+			CHECK(vec3_round(get_bone_tip(bone_a)) == p2);
+			CHECK(vec3_round(get_bone_tip(bone_b)) == p3);
+		}
 
 		AND_GIVEN("A hinge joint limits it between -45 and 45 degrees") {
 			bone_b.constraint.type = jc_hinge;
@@ -105,11 +110,14 @@ SCENARIO("Joint constraints") {
 
 	GIVEN("Given two parallell bones with a twist") {
 		vec3_t p1 = vec3(0,10,0), p2 = vec3(0,20,0), p3 = vec3(0,30,0);
-		bone_t bone_a = {{jc_no_constraint}, p1, p2, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
-		bone_t bone_b = {{jc_no_constraint}, p2, p3, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
+		bone_t bone_a = {{jc_no_constraint}, p1, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
+		bone_t bone_b = {{jc_no_constraint}, p2, quat_from_axis_angle(vec3_positive_z, pi/2), 10};
 		bone_b.orientation = quat_mul(quat_from_axis_angle(vec3_positive_y, pi/2), bone_b.orientation);
-		CHECK(get_bone_tip(bone_a) == vec3(0,20,0));
-		CHECK(get_bone_tip(bone_b) == vec3(0,30,0));
+
+		THEN("Tips are where we expect them") {
+			CHECK(get_bone_tip(bone_a) == vec3(0,20,0));
+			CHECK(get_bone_tip(bone_b) == vec3(0,30,0));
+		}
 
 		THEN("The second bone still transforms to something sane") {
 			vec3_t local_x = quat_rotate_vec3(bone_b.orientation, vec3_positive_x);

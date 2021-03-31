@@ -389,8 +389,7 @@ bone_t bone_from_root_tip(vec3_t joint_pos, vec3_t tip_pos) {
 	quat_t orientation = quat_from_vec3_pair(vec3(1,0,0), vec3_between(joint_pos, tip_pos));
 	bone_t bone = {
 		{jc_no_constraint, 0.f, 0.f},
-		joint_pos, tip_pos,
-		orientation, vec3_distance(joint_pos, tip_pos),
+		joint_pos, orientation, vec3_distance(joint_pos, tip_pos),
 		};
 	return bone;
 }
