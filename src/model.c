@@ -354,7 +354,7 @@ uint16_t add_bone_to_limb(limb_id_t limb, vec3_t pos, limb_table_t *table) {
 		int new_seg = append_cl_node_after(last_seg, table->bone_nodes);
 
 		// Set properties
-		vec3_t last_seg_pos = table->bones[last_seg].tip_pos;
+		vec3_t last_seg_pos = get_bone_tip(table->bones[last_seg]);
 		table->bones[new_seg] = bone_from_root_tip(last_seg_pos, pos);
 		return new_seg;
 	}

@@ -125,12 +125,12 @@ void move_limb_directly_to(limb_id_t, vec3_t end, limb_table_t *);
 void reposition_bones_with_fabrik(
 	vec3_t root_pos, quat_t root_ori, vec3_t end,
 	bone_t [], size_t num);
+vec3_t get_bone_tip(bone_t);
 
 #if defined(IN_CONTROLER) || defined(IN_TESTS)
 void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone);
 void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone);
 bone_t bone_from_root_tip(vec3_t root, vec3_t tip);
-vec3_t get_bone_tip(bone_t);
 #endif
 
 // Render limbs
