@@ -81,6 +81,7 @@ void init_app(app_mode_e mode, app_t * app) {
 		add_bone_to_limb(right_arm, vec3(0, shoulder_height, +3), &pop->limbs);
 		add_bone_to_limb(right_arm, vec3(0, shoulder_height, +4), &pop->limbs);
 		attach_limb_to_actor(right_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
+		create_limb_swing(right_arm, &pop->limbs, &pop->limb_swings);
 		set_limb_end_effector(right_arm, vec3(2, shoulder_height, +1), &pop->limbs);
 
 		// Left arm
@@ -88,6 +89,7 @@ void init_app(app_mode_e mode, app_t * app) {
 		add_bone_to_limb(left_arm, vec3(0, shoulder_height, -3), &pop->limbs);
 		add_bone_to_limb(left_arm, vec3(0, shoulder_height, -4), &pop->limbs);
 		attach_limb_to_actor(left_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
+		create_limb_swing(left_arm, &pop->limbs, &pop->limb_swings);
 		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &pop->limbs);
 
 		// Pair arms
@@ -539,6 +541,31 @@ void delete_limb_goal_at_index(unsigned index, limb_goal_table_t *table) {
 
 	// Update sparse set
 	table->sparse_id[table->dense_id[index].id] = index;
+}
+
+
+//// Limb swing CRUD ////
+/**
+Create a swing behaviour for the given limb.
+
+TODO: Make this actually swing the limb like a pendelum.
+**/
+void create_limb_swing(limb_id_t limb, const limb_table_t *limbs, limb_swing_table_t *table) {
+	int index;
+	if (T_HAS_ID(*table, limb)) {
+		index = T_INDEX(*table, limb);
+	} else {
+		// Check that there is room
+		assert(table->num_rows < max_limb_swing_table_rows);
+
+		// Add new row to sparse set
+		index = table->num_rows++;
+		table->sparse_id[limb.id] = index;
+		table->dense_id[index] = limb;
+	}
+
+	table->prev_position[index] = get_limb_tip_position(limb, limbs);
+	table->gravity[index] = vec3(0, 10, 0);
 }
 
 

@@ -183,7 +183,23 @@ void delete_limb_goal_at_index(unsigned, limb_goal_table_t *);
 // Limb goal rendering
 void render_limb_goals(const limb_goal_table_t *, const limb_table_t *);
 
-// Animate actors
+//// Limb swing
+enum { max_limb_swing_table_rows = max_limb_table_rows };
+typedef struct limb_swing_table_ {
+	// Table meta
+	uint16_t sparse_id[limb_table_id_range];
+	limb_id_t dense_id[max_limb_swing_table_rows];
+	uint16_t num_rows;
+
+	// Column data
+	vec3_t prev_position[max_limb_swing_table_rows];
+	vec3_t gravity[max_limb_swing_table_rows];
+} limb_swing_table_t;
+
+// Limb swing CRUD
+void create_limb_swing(limb_id_t, const limb_table_t *, limb_swing_table_t *);
+
+//// Animate actors
 void animate_walking_actor_legs(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
 
@@ -193,6 +209,7 @@ typedef struct population_ {
 	limb_table_t limbs;
 	limb_attachment_table_t arms, legs;
 	limb_goal_table_t limb_goals;
+	limb_swing_table_t limb_swings;
 } population_t;
 
 void update_population(float dt, population_t *pop);
