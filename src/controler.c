@@ -51,7 +51,6 @@ void move_limbs_toward_goals(float dt, limb_goal_table_t *goals, limb_table_t *l
 		limbs->end_effector[limb_index] =
 			vec3_add(limbs->end_effector[limb_index], vec3_mul(goals->velocity[goal_index], dt));
 	}
-
 }
 
 
@@ -311,16 +310,15 @@ void apply_fabrik_inverse_pass(
 
 
 void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
-	vec3_t n = get_bone_forward(this_bone);
 
 	switch (this_bone->constraint.type) {
 		case jc_no_constraint: {} break;
 		case jc_pole: {
+			vec3_t this_dir = get_bone_forward(this_bone);
 			vec3_t prev_dir = get_bone_forward(prev_bone);
-			if (vec3_dot(prev_dir, n) < 1) {
-				quat_t r = quat_from_vec3_pair(n, prev_dir);
+			if (vec3_dot(prev_dir, this_dir) < 1) {
+				quat_t r = quat_from_vec3_pair(this_dir, prev_dir);
 				this_bone->orientation = quat_mul(r, this_bone->orientation);
-				n = prev_dir;
 			}
 		} break;
 		case jc_hinge: {
@@ -334,9 +332,9 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 				quat_from_vec3_pair(get_bone_right(this_bone), local_side),
 				this_bone->orientation
 				);
-			n = get_bone_forward(this_bone);
 
 			// Projection on local axies
+			vec3_t n = get_bone_forward(this_bone);
 			float bone_forward = vec3_dot(n, local_forward);
 			float bone_up = vec3_dot(n, local_up);
 			TRACE_FLOAT(bone_forward);
@@ -353,17 +351,13 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 			if (angle < this_bone->constraint.min_ang) { angle = this_bone->constraint.min_ang; }
 			TRACE_FLOAT(180 * angle / pi);
 
-			// New normal from angle
-			n = vec3_add(
-				vec3_mul(local_forward, cos(angle)),
-				vec3_mul(local_up, sin(angle)));
+			// Reset orientation
+			quat_t new_rot = quat_from_axis_angle(local_side, angle);
+			this_bone->orientation = quat_mul(new_rot, prev_bone->orientation);
 		} break;
 		case num_bone_constraints: { assert(false); } break;
 	}
 
-	// Rotate as little as posible
-	vec3_t dir = get_bone_forward(this_bone);
-	this_bone->orientation = quat_mul(quat_from_vec3_pair(dir, n), this_bone->orientation);
 }
 
 /**
