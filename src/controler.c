@@ -291,7 +291,7 @@ void apply_fabrik_inverse_pass(
 	bone_t prev_bone = {{jc_no_constraint}, root_pos, root_pos, root_ori, 0};
 	for (int i = 0; i < num; i++) {
 		// Place joint at the previous tip
-		arr[i].joint_pos = prev_bone.tip_pos;
+		arr[i].joint_pos = get_bone_tip(prev_bone);
 
 		// Point bone towards next bone joint
 		// (or the end effector if we are at the last joint)
