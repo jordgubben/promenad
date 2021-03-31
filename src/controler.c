@@ -88,7 +88,7 @@ void animate_walking_actor_legs(float dt,
 
 	// Step curve positions (relative to root joint)
 	const float up_x = 0.75;
-	const float up_y = -1.0;
+	const float step_height = 0.5;
 	const float contact_x = 1.5f;
 
 	FOR_ROWS(i, *leg_attachments) {
@@ -129,8 +129,9 @@ void animate_walking_actor_legs(float dt,
 		// First lift foot forward
 		{
 			printf("Move foot [#%u|%u] forward!\n", limb.id, limb_index);
-			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(up_x, up_y,0));
+			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(up_x, 0, 0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
+			leg_goal_wpos.y = step_height;
 			put_limb_goal(limb, leg_goal_wpos, leg_forward_speed, leg_acceleration, goals);
 		}
 
