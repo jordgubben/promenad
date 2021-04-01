@@ -24,12 +24,22 @@ typedef struct cl_node {
 	unsigned short next_index, prev_index;
 } cl_node_t;
 
+
 typedef struct location_ {
 	vec3_t position;
 	float orientation_y;
 } location_t;
 mat4_t to_world_from_location(location_t l);
 mat4_t to_object_from_location(location_t l);
+
+
+typedef struct movement_ {
+	vec3_t velocity;
+	float rotation_y;
+} movement_t;
+
+void move_locations(float dt, const movement_t [], size_t, location_t []);
+
 
 //// Actor ////
 typedef struct actor_id_ { uint16_t id; } actor_id_t;
@@ -45,6 +55,7 @@ typedef struct actor_table_ {
 
 	// Column(s)
 	location_t location[max_actor_table_rows];
+	movement_t movement[max_actor_table_rows];
 	mat4_t to_world[max_actor_table_rows];
 	mat4_t to_object[max_actor_table_rows];
 } actor_table_t;
@@ -57,6 +68,9 @@ vec3_t get_actor_forward_dir(actor_id_t, const actor_table_t *);
 mat4_t get_actor_to_object_transform(actor_id_t, const actor_table_t *);
 mat4_t get_actor_to_world_transform(actor_id_t, const actor_table_t *);
 void calculate_actor_transforms(actor_table_t *);
+
+// Actor movement
+void move_actors(float dt, actor_table_t *);
 
 // Actor render
 void render_actors(const struct Model *, const actor_table_t *);

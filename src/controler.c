@@ -24,6 +24,27 @@ vec3_t get_bone_right(const bone_t *b) { return quat_rotate_vec3(b->orientation,
 vec3_t calc_tip_pos(vec3_t joint_pos, quat_t ori, float length);
 
 
+//// Actor movement ////
+
+/**
+Update all actor locations based on their movement and delta time.
+**/
+void move_actors(float dt, actor_table_t *table) {
+	move_locations(dt, table->movement, table->num_rows, table->location);
+}
+
+
+/**
+Move all locations based on current movement and delta time.
+**/
+void move_locations(float dt, const movement_t m[], size_t num, location_t l[]) {
+	FOR_IN(i, num) {
+		add_vec3(vec3_mul(m[i].velocity, dt), &l[i].position);
+		l[i].orientation_y += dt * m[i].rotation_y;
+	}
+}
+
+
 //// Actor animation ////
 
 

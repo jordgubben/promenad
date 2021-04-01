@@ -94,6 +94,8 @@ Update the dynamically changing part of the simulation.
 **/
 void update_population(float dt, population_t *pop) {
 
+	// Move whole actors
+	move_actors(dt, &pop->actors);
 	calculate_actor_transforms(&pop->actors);
 
 	// Move limbs attached to actors

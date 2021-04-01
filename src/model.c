@@ -167,9 +167,10 @@ actor_id_t create_actor(vec3_t pos, float rot, actor_table_t *table) {
 	table->sparse_id[actor_id.id] = index;
 	table->dense_id[index] = actor_id;
 
-	// Set row datao
+	// Set row data
 	location_t loc = {pos, rot};
 	table->location[index] = loc;
+	table->movement[index] = (movement_t){vec3(0,0,0), 0};
 	table->to_world[index] = to_world_from_location(loc);
 	table->to_object[index] = to_object_from_location(loc);
 
