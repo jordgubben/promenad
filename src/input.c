@@ -55,20 +55,17 @@ void process_input(float dt, app_t *app) {
 	}
 
 	// Tank controls
+	int actor_index = 0;
+	actor_id_t actor = get_actor_id(actor_index, &pop->actors);
+	vec3_t actor_forward = get_actor_forward_dir(actor, &pop->actors);
 	if (IsKeyDown(KEY_W)) {
-		pop->actors.location[0].position = vec3_add(
-			pop->actors.location[0].position,
-			vec3_mul(get_actor_forward_dir(get_actor_id(0, &pop->actors), &pop->actors),
-				dt * actor_walking_speed)
-			);
+		pop->actors.movement[actor_index].velocity = vec3_mul(actor_forward, +1.f * actor_walking_speed);
+	} else if (IsKeyDown(KEY_S)) {
+		pop->actors.movement[actor_index].velocity = vec3_mul(actor_forward, -1.f * actor_walking_speed);
+	} else {
+		pop->actors.movement[actor_index].velocity = vec3(0,0,0);
 	}
-	if (IsKeyDown(KEY_S)) {
-		pop->actors.location[0].position = vec3_sub(
-			pop->actors.location[0].position,
-			vec3_mul(get_actor_forward_dir(get_actor_id(0, &pop->actors), &pop->actors),
-				dt * actor_walking_speed)
-			);
-	}
+
 	if (IsKeyDown(KEY_A)) { pop->actors.location[0].orientation_y += dt * 0.25 * tau; }
 	if (IsKeyDown(KEY_D)) { pop->actors.location[0].orientation_y -= dt * 0.25 * tau; }
 }
