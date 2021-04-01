@@ -353,6 +353,35 @@ void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone) {
 
 }
 
+
+//// Limb momentum ////
+
+/**
+Perpetuate motion from the previous simulation step.
+**/
+void perpetuate_limb_momentums(float dt, limb_swing_table_t *momentums, limb_table_t *limbs) {
+
+	FOR_ROWS(momentum_index, *momentums) {
+		limb_id_t limb = momentums->dense_id[momentum_index];
+		int limb_index = get_limb_index(limb, limbs);
+
+		// Get data
+		vec3_t prev_pos = momentums->prev_position[momentum_index];
+		vec3_t curr_pos = get_limb_tip_position(limb, limbs);
+
+		// Move things (assuming fixed time step)
+		vec3_t last_move = vec3_between(prev_pos, curr_pos);
+		vec3_t next_pos = vec3_add(curr_pos, last_move);
+		// TODO: Gravity (?)
+		limbs->end_effector[limb_index] = next_pos;
+
+		// Save position for next pass
+		momentums->prev_position[momentum_index] = curr_pos;
+	}
+}
+
+//// Misc. ////
+
 /**
 Get world position of the given bones tip.
 **/

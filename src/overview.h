@@ -199,6 +199,9 @@ typedef struct limb_swing_table_ {
 // Limb swing CRUD
 void create_limb_swing(limb_id_t, const limb_table_t *, limb_swing_table_t *);
 
+// Limb swing kinematics
+void perpetuate_limb_momentums(float dt, limb_swing_table_t *, limb_table_t *);
+
 //// Animate actors
 void animate_walking_actor_legs(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
