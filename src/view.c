@@ -88,6 +88,10 @@ void render_limb_skeletons(const limb_table_t *table) {
 		const vec3_t end_effector_pos = table->end_effector[l];
 		DrawSphere(end_effector_pos.rl, 0.05, GOLD);
 
+		// Render distance from limb tip to end effector
+		const vec3_t limb_tip_pos = get_limb_tip_position(limb, table);
+		DrawLine3D(end_effector_pos.rl, limb_tip_pos.rl, PURPLE);
+
 		// Render bones in their current positions
 		int bone = table->root_bone[l];
 		while (bone) {
