@@ -104,7 +104,7 @@ void animate_walking_actor_legs(float dt,
 
 	// Speeds
 	const float leg_acceleration = 30 * actor_walking_speed;
-	const float leg_forward_speed = 8 * actor_walking_speed;
+	const float leg_forward_speed = 1.75 * actor_walking_speed;
 	const float leg_drop_speed = 3 * actor_walking_speed;
 
 	// Step curve positions (relative to root joint)
