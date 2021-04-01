@@ -229,6 +229,7 @@ typedef struct population_ {
 	limb_swing_table_t limb_swings;
 } population_t;
 
+actor_id_t create_person(vec3_t pos, float rot_y, population_t *);
 void update_population(float dt, population_t *pop);
 
 // App

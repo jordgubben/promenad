@@ -71,52 +71,7 @@ void init_app(app_mode_e mode, app_t * app) {
 
 	// Setup actors
 	if (mode == am_single_actor) {
-		actor_id_t actor = create_actor(vec3(0,3,0), 0, &pop->actors);
-
-		float shoulder_height = 3.5f;
-		float waist_height = 2.5f;
-		float hip_height = 1.5f;
-		float hip_side = 0.5f;
-
-		// Right arm
-		limb_id_t right_arm = create_limb(vec3(0, shoulder_height, +1), quat_identity, &pop->limbs);
-		add_bone_to_limb(right_arm, vec3(0, (shoulder_height + waist_height) /2, +1.5), &pop->limbs);
-		add_bone_to_limb(right_arm, vec3(0, waist_height, +1.25), &pop->limbs);
-		attach_limb_to_actor(right_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
-		create_limb_swing(right_arm, &pop->limbs, &pop->limb_swings);
-
-		// Left arm
-		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &pop->limbs);
-		add_bone_to_limb(left_arm, vec3(0, (shoulder_height + waist_height) /2, -1.5), &pop->limbs);
-		add_bone_to_limb(left_arm, vec3(0, waist_height, -1.25), &pop->limbs);
-		attach_limb_to_actor(left_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
-		create_limb_swing(left_arm, &pop->limbs, &pop->limb_swings);
-
-		// Pair arms
-		pair_limbs(left_arm, right_arm, &pop->limbs);
-
-		// Right leg
-		limb_id_t right_leg = create_limb(vec3(0, hip_height, +1 * hip_side), quat_identity, &pop->limbs);
-		attach_limb_to_actor(right_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
-		uint16_t right_hip =
-			add_bone_to_limb(right_leg, vec3(0.1, hip_height/2, +1 * hip_side), &pop->limbs);
-		apply_hinge_constraint(right_hip, -0.6 * pi, 0.4 * pi, &pop->limbs);
-		uint16_t right_knee =
-			add_bone_to_limb(right_leg, vec3(0, 0, +1 * hip_side), &pop->limbs);
-		apply_hinge_constraint(right_knee, -0.9 * pi, 0 * pi, &pop->limbs);
-
-		// Left leg
-		limb_id_t left_leg = create_limb(vec3(0, hip_height, -1 * hip_side), quat_identity, &pop->limbs);
-		attach_limb_to_actor(left_leg, actor, &pop->limbs, &pop->actors, &pop->legs);
-		uint16_t left_hip =
-			add_bone_to_limb(left_leg, vec3(0.1, hip_height/2, -1 * hip_side), &pop->limbs);
-		apply_hinge_constraint(left_hip, -0.6 * pi, 0.4 * pi, &pop->limbs);
-		uint16_t left_knee =
-			add_bone_to_limb(left_leg, vec3(0, 0, -1 * hip_side), &pop->limbs);
-		apply_hinge_constraint(left_knee, -0.9 * pi, 0 * pi, &pop->limbs);
-
-		// Pair legs
-		pair_limbs(left_leg, right_leg, &pop->limbs);
+		create_person(vec3(0,3,0), 0, pop);
 	}
 
 	// Large arm from origo
@@ -141,7 +96,73 @@ void init_app(app_mode_e mode, app_t * app) {
 	}
 }
 
+actor_id_t create_person(vec3_t center_point, float ori_y, population_t *pop) {
+	limb_id_t create_arm(actor_id_t actor, vec3_t root_opos, population_t *);
+	limb_id_t create_leg(actor_id_t actor, vec3_t root_opos, population_t *);
 
+	actor_id_t actor = create_actor(center_point,  ori_y, &pop->actors);
+
+	// Arms
+	limb_id_t right_arm = create_arm(actor, vec3(0, +0.5, +1), pop);
+	limb_id_t left_arm = create_arm(actor, vec3(0, +0.5, -1), pop);
+	pair_limbs(left_arm, right_arm, &pop->limbs);
+
+	// Legs
+	limb_id_t right_leg = create_leg(actor, vec3(0, -1.5, +0.5), pop);
+	limb_id_t left_leg = create_leg(actor, vec3(0, -1.5, -0.5), pop);
+	pair_limbs(left_leg, right_leg, &pop->limbs);
+
+	return actor;
+}
+
+
+limb_id_t create_arm(actor_id_t actor, vec3_t root_opos, population_t *pop) {
+	mat4_t to_world = get_actor_to_world_transform(actor, &pop->actors);
+
+	// Arm root
+	vec3_t root_wpos = mat4_mul_vec3(to_world, root_opos, +1);
+	limb_id_t arm = create_limb(root_wpos, quat_identity, &pop->limbs);
+	attach_limb_to_actor(arm, actor, &pop->limbs, &pop->actors, &pop->arms);
+
+	// Upper arm
+	vec3_t elbow_opos = vec3_add(root_opos, vec3(0,-0.75, root_opos.z));
+	vec3_t elbow_wpos = mat4_mul_vec3(to_world, elbow_opos, 1);
+	uint16_t shoulder = add_bone_to_limb(arm, elbow_wpos, &pop->limbs);
+
+	// Lower arm
+	vec3_t wrist_opos = vec3_add(elbow_opos, vec3(0, -0.75, root_opos.z));
+	vec3_t wrist_wpos = mat4_mul_vec3(to_world, wrist_opos, 1);
+	uint16_t elbow = add_bone_to_limb(arm, wrist_wpos, &pop->limbs);
+
+	//  Swing it
+	create_limb_swing(arm, &pop->limbs, &pop->limb_swings);
+
+	return arm;
+}
+
+
+limb_id_t create_leg(actor_id_t actor, vec3_t root_opos, population_t *pop) {
+	mat4_t to_world = get_actor_to_world_transform(actor, &pop->actors);
+
+	// Limb root
+	vec3_t root_wpos = mat4_mul_vec3(to_world, root_opos, +1);
+	limb_id_t leg = create_limb(root_wpos, quat_identity, &pop->limbs);
+	attach_limb_to_actor(leg, actor, &pop->limbs, &pop->actors, &pop->legs);
+
+	// Hip
+	vec3_t knee_opos = vec3_add(root_opos, vec3(0.1, -0.75, 0));
+	vec3_t knee_wpos = mat4_mul_vec3(to_world, knee_opos, 1);
+	uint16_t hip = add_bone_to_limb(leg, knee_wpos,  &pop->limbs);
+	apply_hinge_constraint(hip, -0.6 * pi, 0.4 * pi, &pop->limbs);
+
+	// Knee
+	vec3_t ancle_opos = vec3_add(root_opos, vec3(0.0, -1.5, 0));
+	vec3_t ancle_wpos = mat4_mul_vec3(to_world, ancle_opos, 1);
+	uint16_t knee = add_bone_to_limb(leg, ancle_wpos, &pop->limbs);
+	apply_hinge_constraint(knee, -0.9 * pi, 0 * pi, &pop->limbs);
+
+	return leg;
+}
 
 /**
 Terminate all the things.
