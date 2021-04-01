@@ -4,7 +4,7 @@
 #define IN_INPUT
 #include "overview.h"
 
-const float actor_walking_speed = 1;
+const float actor_walking_speed = 6.75;
 
 //// Input ////
 

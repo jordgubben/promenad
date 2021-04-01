@@ -117,37 +117,43 @@ void animate_walking_actor_legs(float dt,
 		limb_id_t limb = leg_attachments->limb[i];
 		int limb_index = get_limb_index(limb, limbs);
 
-		// If paired with other leg
-		if (limbs->paired_with[limb_index].id != limb.id) {
-			// ..then skip this limb if it's parner is already going somewhere
-			if (has_limb_goal(limbs->paired_with[limb_index], goals)) {
+		// Finnish what you..
+		if (has_limb_goal(limb, goals)) { continue; }
+
+		// Let other leg finnish
+		limb_id_t other_limb = limbs->paired_with[limb_index];
+		if (other_limb.id != limb.id && has_limb_goal(other_limb, goals)) {
+			continue;
+		}
+
+		// Get transforms
+		const mat4_t to_obj = get_actor_to_object_transform(actor, actors);
+
+		// This foots position in world and actors object space
+		const vec3_t this_foot_wpos = get_limb_tip_position(limb, limbs);
+		const vec3_t this_foot_opos = mat4_mul_vec3(to_obj, this_foot_wpos, 1);
+
+		// Use other limb if it's further behind
+		if (limb.id != other_limb.id) {
+			const vec3_t other_foot_wpos = get_limb_tip_position(other_limb, limbs);
+			const vec3_t other_foot_opos = mat4_mul_vec3(to_obj, other_foot_wpos, 1);
+			if (other_foot_opos.x < this_foot_opos.x) {
 				continue;
 			}
 		}
 
-		// Finnish what you..
-		if (has_limb_goal(limb, goals)) { continue; }
+		// Move foot forward only if behind actor
+		if (this_foot_opos.x >= 0) { continue; }
 
-		// Get transforms
-		// (We will use them quite a bit)
-		const mat4_t to_world = get_actor_to_world_transform(actor, actors);
-		const mat4_t to_obj = get_actor_to_object_transform(actor, actors);
+		// Start where the foot's actually at right now
+		limbs->end_effector[limb_index] = get_limb_tip_position(limb, limbs);
 
 		// Root position in world and actors bject space
 		const vec3_t leg_root_wpos = limbs->position[limb_index];
 		const vec3_t leg_root_opos = mat4_mul_vec3(to_obj, leg_root_wpos, 1);
 
-		// End effector in world and actors object space
-		const vec3_t foot_wpos = get_limb_tip_position(limb, limbs);
-		const vec3_t foot_opos = mat4_mul_vec3(to_obj, foot_wpos, 1);
-
-		// Move foot forward only if behind actor
-		if (foot_opos.x >= 0) { continue; }
-
-		// Start where the foot's actually at right now
-		limbs->end_effector[limb_index] = get_limb_tip_position(limb, limbs);
-
 		// First lift foot forward
+		const mat4_t to_world = get_actor_to_world_transform(actor, actors);
 		{
 			printf("Move foot [#%u|%u] forward!\n", limb.id, limb_index);
 			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(up_x, 0, 0));
