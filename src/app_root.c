@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 
 	// Define the camera to look into our 3d world
 	Camera3D camera = { 0 };
-	camera.position = (Vector3){ 15.0f, 5.0f, 35.0f };
+	camera.position = (Vector3){ 10.0f, 5.0f, 25.0f };
 	camera.target = (Vector3){ 5.0f, 0.0f, 0.0f };
 	camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };
 	camera.fovy = 45.0f;
