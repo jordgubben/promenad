@@ -73,24 +73,23 @@ void init_app(app_mode_e mode, app_t * app) {
 		actor_id_t actor = create_actor(vec3(0,3,0), 0, &pop->actors);
 
 		float shoulder_height = 3.5f;
+		float waist_height = 2.5f;
 		float hip_height = 1.5f;
 		float hip_side = 0.5f;
 
 		// Right arm
 		limb_id_t right_arm = create_limb(vec3(0, shoulder_height, +1), quat_identity, &pop->limbs);
-		add_bone_to_limb(right_arm, vec3(0, shoulder_height, +3), &pop->limbs);
-		add_bone_to_limb(right_arm, vec3(0, shoulder_height, +4), &pop->limbs);
+		add_bone_to_limb(right_arm, vec3(0, (shoulder_height + waist_height) /2, +1.5), &pop->limbs);
+		add_bone_to_limb(right_arm, vec3(0, waist_height, +1.25), &pop->limbs);
 		attach_limb_to_actor(right_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
 		create_limb_swing(right_arm, &pop->limbs, &pop->limb_swings);
-		set_limb_end_effector(right_arm, vec3(2, shoulder_height, +1), &pop->limbs);
 
 		// Left arm
 		limb_id_t left_arm = create_limb(vec3(0, shoulder_height, -1), quat_identity, &pop->limbs);
-		add_bone_to_limb(left_arm, vec3(0, shoulder_height, -3), &pop->limbs);
-		add_bone_to_limb(left_arm, vec3(0, shoulder_height, -4), &pop->limbs);
+		add_bone_to_limb(left_arm, vec3(0, (shoulder_height + waist_height) /2, -1.5), &pop->limbs);
+		add_bone_to_limb(left_arm, vec3(0, waist_height, -1.25), &pop->limbs);
 		attach_limb_to_actor(left_arm, actor, &pop->limbs, &pop->actors, &pop->arms);
 		create_limb_swing(left_arm, &pop->limbs, &pop->limb_swings);
-		set_limb_end_effector(left_arm, vec3(2, shoulder_height, -1), &pop->limbs);
 
 		// Pair arms
 		pair_limbs(left_arm, right_arm, &pop->limbs);
