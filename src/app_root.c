@@ -98,6 +98,7 @@ void update_population(float dt, population_t *pop) {
 	// Update kinematics
 	animate_walking_actor_legs(dt, &pop->actors, &pop->legs, &pop->limb_goals, &pop->limbs);
 	perpetuate_limb_momentums(dt, &pop->limb_swings, &pop->limbs);
+	apply_gravity_to_limbs(dt, vec3(0,-4,0), &pop->limb_swings, &pop->limbs);
 	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
 	move_limbs_directly_to_end_effectors(&pop->limbs);
 	delete_accomplished_limb_goals(&pop->limbs, &pop->limb_goals);

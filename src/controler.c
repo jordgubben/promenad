@@ -372,13 +372,29 @@ void perpetuate_limb_momentums(float dt, limb_swing_table_t *momentums, limb_tab
 		// Move things (assuming fixed time step)
 		vec3_t last_move = vec3_between(prev_pos, curr_pos);
 		vec3_t next_pos = vec3_add(curr_pos, last_move);
-		// TODO: Gravity (?)
 		limbs->end_effector[limb_index] = next_pos;
 
 		// Save position for next pass
 		momentums->prev_position[momentum_index] = curr_pos;
 	}
 }
+
+
+/**
+Apply gravity to limbs with momentum.
+**/
+void apply_gravity_to_limbs(float dt, vec3_t gravity, limb_swing_table_t *momentums, limb_table_t *limbs) {
+	vec3_t gravity_step = vec3_mul(gravity, dt * dt / 2);
+
+	FOR_ROWS(momentum_index, *momentums) {
+		limb_id_t limb = momentums->dense_id[momentum_index];
+		int limb_index = get_limb_index(limb, limbs);
+
+		// Move end effectors
+		add_vec3(gravity_step, &limbs->end_effector[limb_index]);
+	}
+}
+
 
 //// Misc. ////
 

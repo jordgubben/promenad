@@ -121,6 +121,7 @@ static inline vec3_t vec3_add(vec3_t v1, vec3_t v2) {
 	return r;
 }
 
+static inline void add_vec3(vec3_t val, vec3_t *sum) { *sum = vec3_add(*sum, val); }
 
 /**
 Subrtact the second vector from the first.

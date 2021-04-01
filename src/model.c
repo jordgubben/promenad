@@ -564,7 +564,6 @@ void create_limb_swing(limb_id_t limb, const limb_table_t *limbs, limb_swing_tab
 	}
 
 	table->prev_position[index] = get_limb_tip_position(limb, limbs);
-	table->gravity[index] = vec3(0, 10, 0);
 }
 
 

@@ -193,7 +193,6 @@ typedef struct limb_swing_table_ {
 
 	// Column data
 	vec3_t prev_position[max_limb_swing_table_rows];
-	vec3_t gravity[max_limb_swing_table_rows];
 } limb_swing_table_t;
 
 // Limb swing CRUD
@@ -201,6 +200,7 @@ void create_limb_swing(limb_id_t, const limb_table_t *, limb_swing_table_t *);
 
 // Limb swing kinematics
 void perpetuate_limb_momentums(float dt, limb_swing_table_t *, limb_table_t *);
+void apply_gravity_to_limbs(float dt, vec3_t gravity, limb_swing_table_t *, limb_table_t *);
 
 //// Animate actors
 void animate_walking_actor_legs(float dt,
