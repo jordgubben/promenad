@@ -62,7 +62,12 @@ int main(int argc, char** argv) {
 Update all the things.
 **/
 void update_app(float dt, app_t *app) {
-	if (app->paused) { return; }
+	if (app->step_once) {
+		dt += step_time;
+		app->step_once = false;
+	} else if (app->paused) {
+		return;
+	}
 
 	// Simulate in a fixed time step
 	app->buffered_time += dt;

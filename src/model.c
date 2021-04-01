@@ -35,6 +35,7 @@ Init all the things.
 **/
 void init_app(app_mode_e mode, app_t * app) {
 	app->paused = false;
+	app->step_once = false;
 	app->buffered_time = 0;
 	app->mode = mode;
 

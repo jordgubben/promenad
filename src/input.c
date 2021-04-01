@@ -17,6 +17,9 @@ void process_input(float dt, app_t *app) {
 	// Toggle pause
 	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
 
+	// Step once
+	if (IsKeyPressed(KEY_N)) { app->step_once = true; }
+
 	// Control playback
 	if (app->paused) {
 		int step_count =  (shift_down ? 10 : 1);
