@@ -11,28 +11,31 @@ const float actor_walking_speed = 0.5;
 void process_input(float dt, app_t *app) {
 	population_t *pop = &app->population_history[app->frame_count % max_pop_history_frames];
 
+	// Meta keys
+	bool shift_down = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+
 	// Toggle pause
 	if (IsKeyPressed(KEY_P)) { app->paused = !app->paused; }
 
 	// Control playback
 	if (app->paused) {
+		int step_count =  (shift_down ? 10 : 1);
 
 		// Step backwards
-		if (IsKeyPressed(KEY_R) && app->frame_count >0) {
-			app->frame_count--;
+		if (IsKeyPressed(KEY_R) && app->frame_count >= step_count) {
+			app->frame_count -= step_count;
 		}
 
 		// Step forwards
 		if (IsKeyPressed(KEY_F)) {
-			app->frame_count++;
+			app->frame_count += step_count;
 		}
-
 	} else if (IsKeyDown(KEY_R) && app->frame_count >= 2) {
 		app->frame_count -= 2;
 	}
 
 	// Move global cursor with arrow keys
-	if (IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT)) {
+	if (shift_down) {
 		if (IsKeyDown(KEY_RIGHT)) { app->world_cursor.z -= dt; }
 		if (IsKeyDown(KEY_LEFT)) { app->world_cursor.z += dt; }
 	} else {
