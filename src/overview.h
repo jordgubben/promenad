@@ -165,6 +165,8 @@ typedef struct limb_attachment_table_ {
 void attach_limb_to_actor(
 	limb_id_t, actor_id_t, const limb_table_t*, const actor_table_t *,
 	limb_attachment_table_t *);
+
+// Limb attachement kinematics
 void reposition_attached_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
 
 
@@ -182,6 +184,9 @@ typedef struct limb_link_table_ {
 
 // Limb link CRUD
 void link_limb_to(limb_id_t, limb_id_t, limb_link_table_t *);
+
+// Limb link kinematics
+void move_limb_tips_to_their_linked_partners(const limb_link_table_t *, limb_table_t *);
 
 //// Limb path
 enum {max_limb_goal_table_rows = max_limb_table_rows };

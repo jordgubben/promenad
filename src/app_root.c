@@ -107,6 +107,7 @@ void update_population(float dt, population_t *pop) {
 	perpetuate_limb_momentums(dt, &pop->limb_swings, &pop->limbs);
 	apply_gravity_to_limbs(dt, vec3(0,-4,0), &pop->limb_swings, &pop->limbs);
 	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
+	move_limb_tips_to_their_linked_partners(&pop->limb_tip_links, &pop->limbs);
 	move_limbs_directly_to_end_effectors(&pop->limbs);
 	delete_accomplished_limb_goals(&pop->limbs, &pop->limb_goals);
 }

@@ -181,6 +181,22 @@ void animate_walking_actor_legs(float dt,
 	}
 }
 
+//// Limb linking (hand holding) ////
+
+/**
+Move the end effecto of a linked limb to the tip the limb it is linked to.
+**/
+void move_limb_tips_to_their_linked_partners(const limb_link_table_t *links, limb_table_t * limbs) {
+	FOR_ROWS(link_index, *links) {
+		limb_id_t this_limb = links->dense_id[link_index];
+		limb_id_t other_limb = links->other_limb[link_index];
+
+		vec3_t tip_pos = get_limb_tip_position(other_limb, limbs);
+		set_limb_end_effector(this_limb, tip_pos, limbs);
+	}
+}
+
+
 //// Limb kinematics ////
 
 /**
