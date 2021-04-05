@@ -65,6 +65,7 @@ extern const float actor_walking_speed;
 actor_id_t create_actor(vec3_t, float, actor_table_t *);
 actor_id_t get_actor_id(uint16_t index, const actor_table_t *);
 vec3_t get_actor_forward_dir(actor_id_t, const actor_table_t *);
+vec3_t get_actor_velocity_in_object_space(actor_id_t, const actor_table_t *);
 mat4_t get_actor_to_object_transform(actor_id_t, const actor_table_t *);
 mat4_t get_actor_to_world_transform(actor_id_t, const actor_table_t *);
 void set_actor_velocity(actor_id_t, vec3_t, actor_table_t *);

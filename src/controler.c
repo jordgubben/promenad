@@ -117,6 +117,10 @@ void animate_walking_actor_legs(float dt,
 		limb_id_t limb = leg_attachments->limb[i];
 		int limb_index = get_limb_index(limb, limbs);
 
+		// Current forward velocity
+		const float vel_x = get_actor_velocity_in_object_space(actor, actors).x;
+		if (vel_x <= 0) { continue; }
+
 		// Finnish what you..
 		if (has_limb_goal(limb, goals)) { continue; }
 

@@ -225,6 +225,21 @@ mat4_t get_actor_to_world_transform(actor_id_t actor, const actor_table_t *table
 	return table->to_world[T_INDEX(*table, actor)];
 }
 
+
+/**
+Get actors velocity in its own coordinate space (i.e. +x == forward).
+**/
+vec3_t get_actor_velocity_in_object_space(actor_id_t actor, const actor_table_t * table) {
+	mat4_t to_obj = get_actor_to_object_transform(actor, table);
+	vec3_t wvel = table->movement[T_INDEX(*table, actor)].velocity;
+	vec3_t ovel = mat4_mul_vec3(to_obj, wvel, 0);
+	return ovel;
+}
+
+
+/**
+Set actor velocity (in world space).
+**/
 void set_actor_velocity(actor_id_t actor, vec3_t new_vel, actor_table_t *table) {
 	table->movement[T_INDEX(*table, actor)].velocity = new_vel;
 }
