@@ -238,6 +238,7 @@ void update_population(float dt, population_t *pop);
 typedef enum app_mode_ {
 	am_limb_forest,
 	am_single_actor,
+	am_actor_pair,
 	am_actor_row,
 	am_robot_arm,
 

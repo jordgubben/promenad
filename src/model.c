@@ -74,6 +74,12 @@ void init_app(app_mode_e mode, app_t * app) {
 		create_person(vec3(0,3,0), 0, pop);
 	}
 
+	// Setup actor pair
+	if (mode == am_actor_pair) {
+		create_person(vec3(-2,+3,0), -pi/2, pop);
+		create_person(vec3(+2,+3,0), -pi/2, pop);
+	}
+
 	// Setp row of actors
 	if (mode == am_actor_row) {
 		float movement_speed = 0.5;

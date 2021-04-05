@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	UpdateCamera(&camera);
 
 	// App setup
-	init_app(am_actor_row, &app);
+	init_app(am_actor_pair, &app);
 
 	// Ah-Gogogoggogogogo!
 	while(!WindowShouldClose()) {
@@ -78,7 +78,7 @@ void update_app(float dt, app_t *app) {
 	}
 
 	// Keep history
-	unsigned old_frame =  app->frame_count % max_pop_history_frames;
+	unsigned old_frame = app->frame_count % max_pop_history_frames;
 	app->frame_count++;
 	unsigned new_frame = (app->frame_count % max_pop_history_frames);
 	app->population_history[new_frame] = app->population_history[old_frame];
