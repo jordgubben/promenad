@@ -76,8 +76,12 @@ void init_app(app_mode_e mode, app_t * app) {
 
 	// Setp row of actors
 	if (mode == am_actor_row) {
-		for (float z = -10; z <= +10; z += 2.5) {
-			create_person(vec3(0, 3, z), 0, pop);
+		float movement_speed = 0.5;
+		for (float z = +10; z >= -10; z -= 2.5) {
+			actor_id_t actor = create_person(vec3(0, 3, z), 0, pop);
+			vec3_t new_vel = vec3_mul(get_actor_forward_dir(actor, &pop->actors), movement_speed);
+			movement_speed += 0.25;
+			set_actor_velocity(actor, new_vel, &pop->actors);
 		}
 	}
 
@@ -219,6 +223,10 @@ mat4_t get_actor_to_object_transform(actor_id_t actor, const actor_table_t *tabl
 
 mat4_t get_actor_to_world_transform(actor_id_t actor, const actor_table_t *table) {
 	return table->to_world[T_INDEX(*table, actor)];
+}
+
+void set_actor_velocity(actor_id_t actor, vec3_t new_vel, actor_table_t *table) {
+	table->movement[T_INDEX(*table, actor)].velocity = new_vel;
 }
 
 /**
