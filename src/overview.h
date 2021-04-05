@@ -168,6 +168,21 @@ void attach_limb_to_actor(
 void reposition_attached_limbs(const limb_attachment_table_t *, const actor_table_t *, limb_table_t *);
 
 
+//// Limb link table
+enum { max_limb_link_table_rows = max_limb_table_rows * 2};
+typedef struct limb_link_table_ {
+	// Table meta
+	uint16_t sparse_id[limb_table_id_range];
+	limb_id_t dense_id[max_limb_link_table_rows];
+	uint16_t num_rows;
+
+	// Column data
+	limb_id_t other_limb[max_limb_link_table_rows];
+} limb_link_table_t;
+
+// Limb link CRUD
+void link_limb_to(limb_id_t, limb_id_t, limb_link_table_t *);
+
 //// Limb path
 enum {max_limb_goal_table_rows = max_limb_table_rows };
 enum {max_limb_goal_curve_points = 4 };
@@ -229,6 +244,7 @@ typedef struct population_ {
 	limb_attachment_table_t arms, legs;
 	limb_goal_table_t limb_goals;
 	limb_swing_table_t limb_swings;
+	limb_link_table_t limb_tip_links;
 } population_t;
 
 actor_id_t create_person(vec3_t pos, float rot_y, population_t *);

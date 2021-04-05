@@ -497,9 +497,29 @@ void reposition_attached_limbs(
 	}
 }
 
+//// Limb link CRUD
 
-//// Limb goals
+void link_limb_to(limb_id_t l1, limb_id_t l2, limb_link_table_t *table) {
+	// Figgure out where to put the data
+	int index;
+	if (T_HAS_ID(*table, l1)) {
+		index = T_INDEX(*table, l1);
+	} else {
+		// Check tha there is room
+		assert(table->num_rows < max_limb_goal_table_rows);
 
+		// Add new row to sparse set
+		index = table->num_rows++;
+		table->sparse_id[l1.id] = index;
+		table->dense_id[index] = l1;
+	}
+
+	// Set row data
+	table->other_limb[index] = l2;
+}
+
+
+//// Limb goal CRUD
 
 /**
 Give the limb end effector a new goal.
