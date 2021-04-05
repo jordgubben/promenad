@@ -207,6 +207,18 @@ static inline vec3_t vec3_orthogonal(vec3_t v) {
 
 
 /**
+Linear interpolation between the two given vectors.
+**/
+static inline vec3_t vec3_lerp(float s, vec3_t v1, vec3_t v2) {
+	vec3_t r = vec3_add(
+		vec3_mul(v1, 1.f - s),
+		vec3_mul(v2, s));
+	assert_vec3(r);
+	return r;
+}
+
+
+/**
 Round every scalar in the vector.
 **/
 static inline vec3_t vec3_round(vec3_t v){
