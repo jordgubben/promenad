@@ -69,9 +69,16 @@ void init_app(app_mode_e mode, app_t * app) {
 	app->actor_model = malloc(sizeof(Model));
 	*app->actor_model = LoadModelFromMesh(GenMeshCube(0.5f, 2.0f, 1.0f));
 
-	// Setup actors
+	// Setup single actor
 	if (mode == am_single_actor) {
 		create_person(vec3(0,3,0), 0, pop);
+	}
+
+	// Setp row of actors
+	if (mode == am_actor_row) {
+		for (float z = -10; z <= +10; z += 2.5) {
+			create_person(vec3(0, 3, z), 0, pop);
+		}
 	}
 
 	// Large arm from origo
