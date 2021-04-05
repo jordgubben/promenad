@@ -519,6 +519,30 @@ void link_limb_to(limb_id_t l1, limb_id_t l2, limb_link_table_t *table) {
 }
 
 
+/**
+Does this limb have a link to another limb?
+**/
+bool limb_has_link(limb_id_t limb, const limb_link_table_t *table) {
+	return T_HAS_ID(*table, limb);
+}
+
+
+/**
+Remove link to other limb.
+**/
+void unlink_limb(limb_id_t limb, limb_link_table_t *table) {
+	int index = T_INDEX(*table, limb);
+
+	// Update meta
+	int m = --table->num_rows;
+	table->dense_id[index] = table->dense_id[m];
+	table->sparse_id[table->dense_id[index].id] = index;
+
+	// Update data
+	table->other_limb[index] = table->other_limb[m];
+}
+
+
 //// Limb goal CRUD
 
 /**

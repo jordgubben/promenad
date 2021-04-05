@@ -70,10 +70,22 @@ void process_input(float dt, app_t *app) {
 
 	// Hand holding in video games
 	if (app->mode == am_actor_pair && IsKeyPressed(KEY_H)) {
-		printf("%s() – Activate hand holding\n", __func__);
+		printf("%s() – Toggle hand holding\n", __func__);
 		limb_id_t limb_1 = {1}, limb_2 = {4};
-		link_limb_to(limb_1, limb_2, &pop->limb_tip_links);
-		link_limb_to(limb_2, limb_1, &pop->limb_tip_links);
+
+		// Toggle first limb
+		if (limb_has_link(limb_1, &pop->limb_tip_links)) {
+			unlink_limb(limb_1, &pop->limb_tip_links);
+		} else {
+			link_limb_to(limb_1, limb_2, &pop->limb_tip_links);
+		}
+
+		// Toggle second limb
+		if (limb_has_link(limb_2, &pop->limb_tip_links)) {
+			unlink_limb(limb_2, &pop->limb_tip_links);
+		} else {
+			link_limb_to(limb_2, limb_1, &pop->limb_tip_links);
+		}
 	}
 }
 

@@ -184,6 +184,8 @@ typedef struct limb_link_table_ {
 
 // Limb link CRUD
 void link_limb_to(limb_id_t, limb_id_t, limb_link_table_t *);
+bool limb_has_link(limb_id_t, const limb_link_table_t *);
+void unlink_limb(limb_id_t, limb_link_table_t *);
 
 // Limb link kinematics
 void move_limb_tips_to_their_linked_partners(const limb_link_table_t *, limb_table_t *);
