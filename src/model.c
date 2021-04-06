@@ -116,6 +116,11 @@ void init_app(app_mode_e mode, app_t * app) {
 	create_terrain_block(5,6, -10, 10, 0.10, &app->landscape.ground);
 	create_terrain_block(6,7, -10, 10, 0.25, &app->landscape.ground);
 	create_terrain_block(7,8, -10, 10, 0.50, &app->landscape.ground);
+
+	// More terain (Up and down)
+	create_terrain_block(-3,-1, 2.25, 3.50, 0.3, &app->landscape.ground);
+	create_terrain_block(-3,-1, 4.50, 5.75, 0.5, &app->landscape.ground);
+	create_terrain_block(-3,-1, 7.25, 8.50, 0.3, &app->landscape.ground);
 }
 
 actor_id_t create_person(vec3_t center_point, float ori_y, population_t *pop) {
