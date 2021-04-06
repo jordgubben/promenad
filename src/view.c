@@ -39,6 +39,8 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 		DrawCube(vec3(0,0,5).rl, .1f, .1f, 1.f, BLUE);
 #endif // DRAW_COORDINATE_SYSTEM_HELPERS
 
+		render_terrain(&app->landscape.ground);
+
 		DrawGrid(20, 1.f);
 	}
 	EndMode3D();
@@ -148,6 +150,29 @@ void render_bone_joint_orientations(vec3_t origin_pos, bone_t bones[], size_t nu
 		render_orientation_gizmo(joint_pos, joint_ori);
 	}
 }
+
+//// Landscape ////
+
+void render_terrain(const terrain_table_t *table) {
+	FOR_ROWS(i, *table) {
+		vec3_t center = {
+			(table->block[i].x1 + table->block[i].x2)/2.f,
+			table->block[i].height/2.f,
+			(table->block[i].z1 + table->block[i].z2)/2.f,
+		};
+		vec3_t size = {
+			table->block[i].x2 - table->block[i].x1,
+			table->block[i].height,
+			table->block[i].z2 - table->block[i].z1,
+		};
+		Color color = GRAY;
+		color.g = 128 + (127.f * table->block[i].height * 2.f);
+		DrawCubeV(center.rl, size.rl, color);
+	}
+}
+
+
+//// Helpers ////
 
 void render_orientation_gizmo(vec3_t pos, quat_t ori) {
 	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(1,0,0))).rl, RED);

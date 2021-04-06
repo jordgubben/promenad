@@ -111,6 +111,11 @@ void init_app(app_mode_e mode, app_t * app) {
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
 		put_limb_goal(arm, vec3(0,5,0), 1, 10, &pop->limb_goals);
 	}
+
+	// Some terrain (A simple staircase)
+	create_terrain_block(5,6, -10, 10, 0.10, &app->landscape.ground);
+	create_terrain_block(6,7, -10, 10, 0.25, &app->landscape.ground);
+	create_terrain_block(7,8, -10, 10, 0.50, &app->landscape.ground);
 }
 
 actor_id_t create_person(vec3_t center_point, float ori_y, population_t *pop) {
@@ -677,6 +682,23 @@ void create_limb_swing(limb_id_t limb, const limb_table_t *limbs, limb_swing_tab
 	table->prev_position[index] = get_limb_tip_position(limb, limbs);
 }
 
+
+//// Terrain CRUD ////
+
+
+/**
+Add one  block to terrain.
+**/
+void create_terrain_block(float x1, float x2, float z1, float z2, float height, terrain_table_t *table) {
+	assert(table->num_rows < max_terrain_table_rows);
+
+	table->block[table->num_rows].x1 = minf(x1, x2);
+	table->block[table->num_rows].x2 = maxf(x1, x2);
+	table->block[table->num_rows].z1 = minf(z1, z2);
+	table->block[table->num_rows].z2 = maxf(z1, z2);
+	table->block[table->num_rows].height = height;
+	table->num_rows++;
+}
 
 //// Cyclic list ////
 
