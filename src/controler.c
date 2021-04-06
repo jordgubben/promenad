@@ -186,6 +186,17 @@ void animate_walking_actor_legs(float dt, const animation_env_i *env) {
 	}
 }
 
+/**
+Keep actors at a fixed height above the ground.
+**/
+void keep_actors_actors_above_ground(float h, const terrain_table_t *ground, actor_table_t *actors) {
+	FOR_ROWS(a, *actors) {
+		vec3_t *pos = &actors->location[a].position;
+		pos->y = get_terrain_height(pos->x, pos->z, ground) + h;
+	}
+}
+
+
 //// Limb linking (hand holding) ////
 
 /**

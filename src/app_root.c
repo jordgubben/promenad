@@ -109,6 +109,7 @@ void update_population(float dt, const landscape_t *land, population_t *pop) {
 		&pop->limbs, &pop->limb_goals
 	};
 	animate_walking_actor_legs(dt, &anim_env);
+	keep_actors_actors_above_ground(3.0, &land->ground, &pop->actors);
 
 	// Update (secondary) kinematics
 	perpetuate_limb_momentums(dt, &pop->limb_swings, &pop->limbs);

@@ -273,7 +273,7 @@ typedef struct animation_env_ {
 } animation_env_i;
 
 void animate_walking_actor_legs(float dt, const animation_env_i *);
-
+void keep_actors_actors_above_ground(float h, const terrain_table_t *, actor_table_t *);
 
 //// Landscape (everything in game world that remains unchanged)
 typedef struct landscape_ {
