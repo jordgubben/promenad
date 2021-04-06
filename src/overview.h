@@ -263,8 +263,16 @@ float get_terrain_height(float x, float z, const terrain_table_t *);
 void render_terrain(const terrain_table_t *);
 
 //// Animate actors
-void animate_walking_actor_legs(float dt,
-	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
+typedef struct animation_env_ {
+	const actor_table_t *actors;
+	const limb_attachment_table_t *arm_attachments;
+	const limb_attachment_table_t *leg_attachments;
+	limb_table_t *limbs;
+	limb_goal_table_t *goals;
+} animation_env_i;
+
+void animate_walking_actor_legs(float dt, const animation_env_i *);
+
 
 //// Population (everything in game world that changes)
 typedef struct population_ {

@@ -96,11 +96,13 @@ void accelrate_toward_goal_velocity(vec3_t  goal_vel, float max_speed_change, ve
 /**
 Move legs forward one at the time.
 **/
-void animate_walking_actor_legs(float dt,
-		const actor_table_t *actors,
-		const limb_attachment_table_t *leg_attachments,
-		limb_goal_table_t *goals,
-		limb_table_t *limbs) {
+void animate_walking_actor_legs(float dt, const animation_env_i *env) {
+
+	// Get what you need
+	const actor_table_t *actors = env->actors;
+	const limb_attachment_table_t *leg_attachments = env->leg_attachments;
+	limb_goal_table_t *goals = env->goals;
+	limb_table_t *limbs = env->limbs;
 
 	// Speeds
 	const float leg_acceleration_factor = 30;

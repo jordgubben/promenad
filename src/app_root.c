@@ -101,8 +101,15 @@ void update_population(float dt, population_t *pop) {
 	reposition_attached_limbs(&pop->arms, &pop->actors, &pop->limbs);
 	reposition_attached_limbs(&pop->legs, &pop->actors, &pop->limbs);
 
-	// Update kinematics
-	animate_walking_actor_legs(dt, &pop->actors, &pop->legs, &pop->limb_goals, &pop->limbs);
+	// Animate actors
+	animation_env_i anim_env = {
+		&pop->actors,
+		&pop->arms, &pop->legs,
+		&pop->limbs, &pop->limb_goals
+	};
+	animate_walking_actor_legs(dt, &anim_env);
+
+	// Update (secondary) kinematics
 	perpetuate_limb_momentums(dt, &pop->limb_swings, &pop->limbs);
 	move_limbs_toward_goals(dt, &pop->limb_goals, &pop->limbs);
 	move_limb_tips_to_their_linked_partners(&pop->limb_tip_links, &pop->limbs);
