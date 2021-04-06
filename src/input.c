@@ -6,6 +6,12 @@
 
 const float actor_walking_speed = 6.75;
 
+typedef struct tank_controls_ {
+	KeyboardKey rot_left, rot_right, move_forward, move_backward;
+} tank_controls_t;
+
+void process_tank_controls(float dt, actor_id_t, const tank_controls_t *, actor_table_t *);
+
 //// Input ////
 
 void process_input(float dt, app_t *app) {
@@ -54,19 +60,14 @@ void process_input(float dt, app_t *app) {
 		push_limb_goal(id, app->world_cursor, 1, 5, &pop->limb_goals);
 	}
 
-	// Tank controls
-	int actor_index = 0;
-	actor_id_t actor = get_actor_id(actor_index, &pop->actors);
-	vec3_t actor_forward = get_actor_forward_dir(actor, &pop->actors);
-	if (IsKeyDown(KEY_W)) {
-		pop->actors.movement[actor_index].velocity = vec3_mul(actor_forward, +1.f * actor_walking_speed);
-	} else if (IsKeyDown(KEY_S)) {
-		pop->actors.movement[actor_index].velocity = vec3_mul(actor_forward, -1.f * actor_walking_speed);
-	} else {
-		pop->actors.movement[actor_index].velocity = vec3(0,0,0);
+	// Controls
+	{
+		actor_id_t actor_1 = { 0 }, actor_2 = { 1 };
+		tank_controls_t controls_1 = { KEY_A, KEY_D, KEY_W, KEY_S };
+		tank_controls_t controls_2 = { KEY_J, KEY_L, KEY_I, KEY_K };
+		process_tank_controls(dt, actor_1, &controls_1, &pop->actors);
+		process_tank_controls(dt, actor_2, &controls_2, &pop->actors);
 	}
-	if (IsKeyDown(KEY_A)) { pop->actors.location[0].orientation_y += dt * 0.25 * tau; }
-	if (IsKeyDown(KEY_D)) { pop->actors.location[0].orientation_y -= dt * 0.25 * tau; }
 
 	// Hand holding in video games
 	if (app->mode == am_actor_pair && IsKeyPressed(KEY_H)) {
@@ -89,3 +90,20 @@ void process_input(float dt, app_t *app) {
 	}
 }
 
+
+void process_tank_controls(float dt, actor_id_t actor, const tank_controls_t *controls, actor_table_t *actors) {
+	if (!actor_exists(actor, actors)) { return; }
+	int actor_index = get_actor_index(actor, actors);
+	vec3_t actor_forward = get_actor_forward_dir(actor, actors);
+
+	if (IsKeyDown(controls->move_forward)) {
+		actors->movement[actor_index].velocity = vec3_mul(actor_forward, +1.f * actor_walking_speed);
+	} else if (IsKeyDown(controls->move_backward)) {
+		actors->movement[actor_index].velocity = vec3_mul(actor_forward, -1.f * actor_walking_speed);
+	} else {
+		actors->movement[actor_index].velocity = vec3(0,0,0);
+	}
+
+	if (IsKeyDown(controls->rot_left)) { actors->location[actor_index].orientation_y += dt * 0.25 * tau; }
+	if (IsKeyDown(controls->rot_right)) { actors->location[actor_index].orientation_y -= dt * 0.25 * tau; }
+}

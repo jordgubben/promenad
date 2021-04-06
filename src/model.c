@@ -219,6 +219,14 @@ actor_id_t get_actor_id(uint16_t index, const actor_table_t *table) {
 	return T_ID(*table, index);
 }
 
+uint16_t get_actor_index(actor_id_t actor, const actor_table_t *table) {
+	return T_INDEX(*table, actor);
+}
+
+bool actor_exists(actor_id_t actor, const actor_table_t *table) {
+	return T_HAS_ID(*table, actor);
+}
+
 vec3_t get_actor_forward_dir(actor_id_t actor, const actor_table_t *table) {
 	return mat4_mul_vec3(table->to_world[T_INDEX(*table, actor)], vec3(1,0,0), 0);
 }
