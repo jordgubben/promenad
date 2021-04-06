@@ -26,7 +26,9 @@ void render_app(const struct Camera3D *camera,  const app_t *app) {
 		DrawSphere(app->world_cursor.rl, 0.1f, GOLD);
 		{
 			vec3_t shadow = app->world_cursor;
-			shadow.y = 0;
+			float x = app->world_cursor.x;
+			float z = app->world_cursor.z;
+			shadow.y = get_terrain_height(x, z, &app->landscape.ground);
 			DrawSphere(shadow.rl, 0.1f, ORANGE);
 		}
 

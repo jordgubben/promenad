@@ -257,6 +257,7 @@ typedef struct terrain_table_ {
 
 // Terrain CRUD
 void create_terrain_block(float x1, float x2, float z1, float z2, float height, terrain_table_t *);
+float get_terrain_height(float x, float z, const terrain_table_t *);
 
 // Terain rendering
 void render_terrain(const terrain_table_t *);

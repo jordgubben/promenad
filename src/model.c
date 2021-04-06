@@ -700,6 +700,21 @@ void create_terrain_block(float x1, float x2, float z1, float z2, float height, 
 	table->num_rows++;
 }
 
+
+/**
+Get the height above the y-plane at (x,z).
+**/
+float get_terrain_height(float x, float z, const terrain_table_t *table) {
+	float h = 0;
+	FOR_ROWS(i, *table) {
+		if ( x < table->block[i].x1) { continue; }
+		if ( x > table->block[i].x2) { continue; }
+		if ( z < table->block[i].z1) { continue; }
+		if ( z > table->block[i].z2) { continue; }
+		h = maxf(h, table->block[i].height);
+	}
+	return h;
+}
 //// Cyclic list ////
 
 /*
