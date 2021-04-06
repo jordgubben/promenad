@@ -242,11 +242,30 @@ void create_limb_swing(limb_id_t, const limb_table_t *, limb_swing_table_t *);
 void perpetuate_limb_momentums(float dt, limb_swing_table_t *, limb_table_t *);
 void apply_gravity_to_limbs(float dt, vec3_t gravity, limb_swing_table_t *, limb_table_t *);
 
+
+//// Terrain
+enum { max_terrain_table_rows = 16 };
+typedef struct terrain_table_ {
+	uint16_t num_rows;
+
+	// Columns
+	struct {
+		float x1, x2, z1, z2;
+		float height;
+	} block[max_terrain_table_rows];
+} terrain_table_t;
+
+// Terrain CRUD
+void create_terrain_block(float x1, float x2, float z1, float z2, float height, terrain_table_t *);
+
+// Terain rendering
+void render_terrain(const terrain_table_t *);
+
 //// Animate actors
 void animate_walking_actor_legs(float dt,
 	const actor_table_t *, const limb_attachment_table_t *, limb_goal_table_t *, limb_table_t *);
 
-//// Population (everything that changes)
+//// Population (everything in game world that changes)
 typedef struct population_ {
 	actor_table_t actors;
 	limb_table_t limbs;
@@ -259,7 +278,12 @@ typedef struct population_ {
 actor_id_t create_person(vec3_t pos, float rot_y, population_t *);
 void update_population(float dt, population_t *pop);
 
-// App
+//// Landscape (everything in game world that remains unchanged)
+typedef struct landscape_ {
+	terrain_table_t ground;
+} landscape_t;
+
+//// App
 typedef enum app_mode_ {
 	am_limb_forest,
 	am_single_actor,
@@ -278,6 +302,7 @@ typedef struct app_ {
 	bool step_once;
 	float buffered_time;
 	struct Model *actor_model;
+	landscape_t landscape;
 	population_t population_history[max_pop_history_frames];
 	vec3_t world_cursor;
 	unsigned frame_count;
