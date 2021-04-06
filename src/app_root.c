@@ -8,7 +8,6 @@
 static const float step_time = 1.f/60.f;
 static app_t app= { 0 };
 
-float minf(float a, float b) { return (a > b ? a : b); }
 
 int main(int argc, char** argv) {
 #define PRINT_SIZE_OF(t) printf("%s: %zub\n", #t, sizeof(t))
@@ -38,7 +37,7 @@ int main(int argc, char** argv) {
 	// Ah-Gogogoggogogogo!
 	while(!WindowShouldClose()) {
 		// Update
-		float dt = minf(GetFrameTime(), 1.f/30.f);
+		float dt = maxf(GetFrameTime(), 1.f/30.f);
 		process_input(dt, &app);
 		update_app(dt, &app);
 

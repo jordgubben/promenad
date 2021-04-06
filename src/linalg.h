@@ -4,9 +4,21 @@
 #include <math.h>
 #include <assert.h>
 
+
+#define LADEF static inline
 // Important constants
 static const float tau = 6.28318530717958647692f;
 static const float pi = 3.14159265358979323846f;
+
+/***
+Scalar math.
+***/
+
+/** The loewst of two floats **/
+LADEF float minf(float a, float b) { return (a < b ? a : b); }
+
+/** The highest of twho floats **/
+LADEF float maxf(float a, float b) { return (a > b ? a : b); }
 
 
 /***
@@ -722,6 +734,8 @@ TEST_CASE("Quaternion operations") {
 }
 
 #endif // IN_TESTS
+
+#undef LADEF
 #else
 #warning "Header linalg.h included more than once"
 #endif
