@@ -101,6 +101,7 @@ void animate_walking_actor_legs(float dt, const animation_env_i *env) {
 	// Get what you need
 	const actor_table_t *actors = env->actors;
 	const limb_attachment_table_t *leg_attachments = env->leg_attachments;
+	const terrain_table_t * ground = env->ground;
 	limb_goal_table_t *goals = env->goals;
 	limb_table_t *limbs = env->limbs;
 
@@ -167,7 +168,8 @@ void animate_walking_actor_legs(float dt, const animation_env_i *env) {
 		{
 			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(up_x, 0, 0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
-			leg_goal_wpos.y = step_height;
+			leg_goal_wpos.y =
+				step_height + get_terrain_height(leg_goal_wpos.x, leg_goal_wpos.z, ground);
 			const float speed = vel_x * leg_forward_speed_factor;
 			put_limb_goal(limb, leg_goal_wpos, speed, leg_acceleration, goals);
 		}
@@ -176,7 +178,8 @@ void animate_walking_actor_legs(float dt, const animation_env_i *env) {
 		{
 			vec3_t leg_goal_opos = vec3_add(leg_root_opos, vec3(contact_x, 0,0));
 			vec3_t leg_goal_wpos = mat4_mul_vec3(to_world, leg_goal_opos, 1);
-			leg_goal_wpos.y = 0;
+			leg_goal_wpos.y =
+				get_terrain_height(leg_goal_wpos.x, leg_goal_wpos.z, ground);
 			const float speed = vel_x * leg_forward_speed_factor;
 			push_limb_goal(limb, leg_goal_wpos, speed, leg_acceleration, goals);
 		}

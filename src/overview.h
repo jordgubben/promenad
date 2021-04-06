@@ -267,11 +267,18 @@ typedef struct animation_env_ {
 	const actor_table_t *actors;
 	const limb_attachment_table_t *arm_attachments;
 	const limb_attachment_table_t *leg_attachments;
+	const terrain_table_t *ground;
 	limb_table_t *limbs;
 	limb_goal_table_t *goals;
 } animation_env_i;
 
 void animate_walking_actor_legs(float dt, const animation_env_i *);
+
+
+//// Landscape (everything in game world that remains unchanged)
+typedef struct landscape_ {
+	terrain_table_t ground;
+} landscape_t;
 
 
 //// Population (everything in game world that changes)
@@ -285,12 +292,8 @@ typedef struct population_ {
 } population_t;
 
 actor_id_t create_person(vec3_t pos, float rot_y, population_t *);
-void update_population(float dt, population_t *pop);
+void update_population(float dt, const landscape_t *, population_t *);
 
-//// Landscape (everything in game world that remains unchanged)
-typedef struct landscape_ {
-	terrain_table_t ground;
-} landscape_t;
 
 //// App
 typedef enum app_mode_ {

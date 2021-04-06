@@ -84,14 +84,14 @@ void update_app(float dt, app_t *app) {
 	population_t *pop = &app->population_history[new_frame];
 
 	// Update world
-	update_population(step_time, pop);
+	update_population(step_time, &app->landscape, pop);
 }
 
 
 /**
 Update the dynamically changing part of the simulation.
 **/
-void update_population(float dt, population_t *pop) {
+void update_population(float dt, const landscape_t *land, population_t *pop) {
 
 	// Move whole actors
 	move_actors(dt, &pop->actors);
@@ -105,6 +105,7 @@ void update_population(float dt, population_t *pop) {
 	animation_env_i anim_env = {
 		&pop->actors,
 		&pop->arms, &pop->legs,
+		&land->ground,
 		&pop->limbs, &pop->limb_goals
 	};
 	animate_walking_actor_legs(dt, &anim_env);
