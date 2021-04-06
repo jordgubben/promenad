@@ -9,7 +9,7 @@
 
 //// Rendering ////
 
-void render_orientation_gizmo(vec3_t pos, quat_t ori);
+void render_orientation_gizmo(float l, vec3_t pos, quat_t ori);
 void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s, Color c);
 
 /**
@@ -85,7 +85,7 @@ void render_limb_skeletons(const limb_table_t *table) {
 		// Render root
 		const vec3_t root_pos = table->position[l];
 		const quat_t root_ori = table->orientation[l];
-		render_orientation_gizmo(root_pos, root_ori);
+		render_orientation_gizmo(0.6, root_pos, root_ori);
 		DrawSphere(root_pos.rl, 0.15, BLACK);
 
 		// Render individual end effectors
@@ -149,7 +149,7 @@ void render_bone_joint_orientations(vec3_t origin_pos, bone_t bones[], size_t nu
 	FOR_IN(i, num_bones) {
 		vec3_t joint_pos = bones[i].joint_pos;
 		quat_t joint_ori = bones[i].orientation;
-		render_orientation_gizmo(joint_pos, joint_ori);
+		render_orientation_gizmo(0.3, joint_pos, joint_ori);
 	}
 }
 
@@ -176,10 +176,10 @@ void render_terrain(const terrain_table_t *table) {
 
 //// Helpers ////
 
-void render_orientation_gizmo(vec3_t pos, quat_t ori) {
-	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(1,0,0))).rl, RED);
-	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(0,1,0))).rl, GREEN);
-	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(0,0,1))).rl, BLUE);
+void render_orientation_gizmo(float l, vec3_t pos, quat_t ori) {
+	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(l,0,0))).rl, RED);
+	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(0,l,0))).rl, GREEN);
+	DrawLine3D(pos.rl, vec3_add(pos, quat_rotate_vec3(ori, vec3(0,0,l))).rl, BLUE);
 }
 
 void draw_matrix_as_text(const char* title, mat4_t m, float x, float y, float s, Color c) {
