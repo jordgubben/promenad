@@ -4,7 +4,7 @@
 #define IN_INPUT
 #include "overview.h"
 
-const float actor_walking_speed = 6.75;
+const float actor_walking_speed = 2.25;
 
 typedef struct tank_controls_ {
 	KeyboardKey rot_left, rot_right, move_forward, move_backward;
