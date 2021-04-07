@@ -1,6 +1,8 @@
 # Promenad
 An slice of life adventure in procedural animation and possibly some AI. Specialization course at TGA (The Game Assembly).
 
+[![Build the darn thing](https://github.com/jordgubben/promenad/actions/workflows/build.yml/badge.svg)](https://github.com/jordgubben/promenad/actions/workflows/build.yml)
+
 ## Dependencies
 
  - [Catch 2](https://github.com/catchorg/Catch2/)
