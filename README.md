@@ -1,5 +1,7 @@
 # Promenad
-An slice of life adventure in procedural animation and possibly some AI. Specialization course at TGA (The Game Assembly).
+An purely procedural animation system that can walkn and hold hands. Created in the spring of 2021 as the specialization course at [The Game Assembly](https://www.thegameassembly.com/).
+
+![Two actors holding hands while one of them is waling on terrain](./doc/images/walk_on_terrain_holding_hands.png)
 
 ## How to build and run
 
