@@ -6,8 +6,16 @@ An purely procedural animation system that can walk and hold hands. Created in t
 ## Feature highlights
 
 Inverse kinematics animation system constrained by hinge joints.
+Supports paths with multiple consecutive target positions (green lines and spheres).
 
 ![Robot arm demonstrating hinge jonits](./doc/animations/robotic_arm.gif)
+
+Proceduraly generated walk cycle supporting a wide range of movement speeds.
+Movement animation automatically adjusts to current speed and feet rarely do not drag/slide noticably.
+
+[(Higher resolution video available on Vimeo)](https://vimeo.com/533895253)
+
+![Actors walking at different speads](./doc/animations/walk_together.gif)
 
 ## Controls
 
