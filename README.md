@@ -3,6 +3,9 @@ An purely procedural animation system that can walkn and hold hands. Created in 
 
 ![Two actors holding hands while one of them is waling on terrain](./doc/images/walk_on_terrain_holding_hands.png)
 
+<iframe src="https://player.vimeo.com/video/531699522?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="640" height="252" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="Gotta go fast">
+</iframe>
+
 ## Controls
 
 ### World cursor
