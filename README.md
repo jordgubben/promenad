@@ -3,6 +3,35 @@ An purely procedural animation system that can walkn and hold hands. Created in 
 
 ![Two actors holding hands while one of them is waling on terrain](./doc/images/walk_on_terrain_holding_hands.png)
 
+## Controls
+
+### World cursor
+
+| Input | Desciption |
+| ---   | --- |
+| ⬅️/➡️ | Move in world cursor along the X-axis |
+| ⬆️/⬇️ | Move in world cursor along the Y-axis |
+| Shift + ⬅️/➡️ | Move in world cursor along the Z-axis |
+| Space | Set end effector goal of one specific (hard coded) limb |
+
+### Actors
+| Input | Desciption |
+| ---   | --- |
+| WASD  | Move actor #1 (if available) |
+| IJKL  | Move actor #2 (if available) |
+| H | Toggle hand holding |
+
+### Playback
+
+| Input | Desciption |
+| ---   | --- |
+| P | Toggle pause |
+| R/F (while paused) | Rewind / Replay one simulation step |
+| Shift + R/F (while paused) | Rewind / Replay ten simulation steps |
+| R (if not paused)  | Rewind up to 1024 simulation steps)
+| N | Take one simulation step forward|
+
+
 ## How to build and run
 
 Full rebuild:
