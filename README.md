@@ -1,7 +1,28 @@
 # Promenad
 An slice of life adventure in procedural animation and possibly some AI. Specialization course at TGA (The Game Assembly).
 
+## How to build and run
+
+Full rebuild:
+
+```bash
+make clean all
+```
+
+Run application (while developing):
+
+```bash
+make run
+```
+
+Run test suite:
+
+```bash
+make check
+```
+
 [![Build the darn thing](https://github.com/jordgubben/promenad/actions/workflows/build.yml/badge.svg)](https://github.com/jordgubben/promenad/actions/workflows/build.yml)
+
 
 ## Dependencies
 
