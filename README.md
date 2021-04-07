@@ -1,7 +1,13 @@
 # Promenad
-An purely procedural animation system that can walkn and hold hands. Created in the spring of 2021 as the specialization course at [The Game Assembly](https://www.thegameassembly.com/).
+An purely procedural animation system that can walk and hold hands. Created in the spring of 2021 as the specialization course at [The Game Assembly](https://www.thegameassembly.com/).
 
 ![Two actors holding hands while one of them is waling on terrain](./doc/images/walk_on_terrain_holding_hands.png)
+ 
+## Feature highlights
+
+Inverse kinematics animation system constrained by hinge joints.
+
+![Robot arm demonstrating hinge jonits](./doc/animations/robotic_arm.gif)
 
 ## Controls
 
