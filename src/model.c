@@ -24,6 +24,8 @@
 	(assert(T_HAS_ID(t,r)), (t).c[T_INDEX(t,r)] = (v))
 
 
+void create_some_terrain(app_t *);
+
 void init_cl_pool(cl_node_t [], size_t num_nodes);
 unsigned short take_free_cl_node(cl_node_t []);
 unsigned short append_cl_node_after(unsigned short anchor, cl_node_t []);
@@ -72,12 +74,14 @@ void init_app(app_mode_e mode, app_t * app) {
 	// Setup single actor
 	if (mode == am_single_actor) {
 		create_person(vec3(0,3,0), 0, pop);
+		create_some_terrain(app);
 	}
 
 	// Setup actor pair
 	if (mode == am_actor_pair) {
 		create_person(vec3(-2,+3,0), -pi/2, pop);
 		create_person(vec3(+2,+3,0), -pi/2, pop);
+		create_some_terrain(app);
 	}
 
 	// Setp row of actors
@@ -89,6 +93,7 @@ void init_app(app_mode_e mode, app_t * app) {
 			movement_speed += 0.25;
 			set_actor_velocity(actor, new_vel, &pop->actors);
 		}
+		create_some_terrain(app);
 	}
 
 	// Large arm from origo
@@ -111,7 +116,9 @@ void init_app(app_mode_e mode, app_t * app) {
 		set_limb_end_effector(arm, vec3(1,2,0), &pop->limbs);
 		put_limb_goal(arm, vec3(0,5,0), 1, 10, &pop->limb_goals);
 	}
+}
 
+void create_some_terrain(app_t *app) {
 	// Some terrain (A simple staircase)
 	create_terrain_block(5,6, -10, 10, 0.10, &app->landscape.ground);
 	create_terrain_block(6,7, -10, 10, 0.25, &app->landscape.ground);
