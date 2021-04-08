@@ -13,9 +13,11 @@ Supports paths with multiple consecutive target positions (green lines and spher
 Proceduraly generated **walk cycle** supporting a wide range of movement speeds.
 Movement animation automatically adjusts to current speed and feet rarely do not drag/slide noticably.
 
-[(Higher resolution video available on Vimeo)](https://vimeo.com/533895253)
-
 ![Actors walking at different speads](./doc/animations/walk_together.gif)
+
+Foot placement handles **uneven terain** withy some grace (altough it's far from perfect).
+
+![Actor walking up and down staircase](./doc/animations/walk_on_stairs_2--12fps.gif)
 
 Despite popular belief I think we have to little **hand holding** in contemporary videogames.
 
