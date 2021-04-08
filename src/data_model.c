@@ -124,9 +124,9 @@ void init_app(app_mode_e mode, app_t * app) {
 
 void create_some_terrain(app_t *app) {
 	// Some terrain (A simple staircase)
-	create_terrain_block(5,6, -10, 10, 0.10, &app->landscape.ground);
-	create_terrain_block(6,7, -10, 10, 0.25, &app->landscape.ground);
-	create_terrain_block(7,8, -10, 10, 0.50, &app->landscape.ground);
+	create_terrain_block(4,6, -10, 10, 0.10, &app->landscape.ground);
+	create_terrain_block(6,8, -10, 10, 0.25, &app->landscape.ground);
+	create_terrain_block(8,10, -10, 10, 0.50, &app->landscape.ground);
 
 	// More terain (Up and down)
 	create_terrain_block(-3,-1, 2.25, 3.50, 0.3, &app->landscape.ground);
