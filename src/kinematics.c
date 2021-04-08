@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 
-#define IN_CONTROLER
+#define IN_KINEMATICS
 #include "overview.h"
 
 #ifdef LOG_CONTROLER

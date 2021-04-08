@@ -145,7 +145,7 @@ void reposition_bones_with_fabrik(
 	bone_t [], size_t num);
 vec3_t get_bone_tip(bone_t);
 
-#if defined(IN_CONTROLER) || defined(IN_TESTS)
+#if defined(IN_KINEMATICS) || defined(IN_TESTS)
 void constrain_to_next_bone(const bone_t *next_bone, bone_t *this_bone);
 void constrain_to_prev_bone(const bone_t *prev_bone, bone_t *this_bone);
 bone_t bone_from_root_tip(vec3_t root, vec3_t tip);

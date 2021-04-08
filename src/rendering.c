@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <raylib.h>
 
-#define IN_VIEW
+#define IN_RENDERING
 #include "overview.h"
 
 #define DRAW_COORDINATE_SYSTEM_HELPERS 1

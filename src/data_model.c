@@ -1,7 +1,7 @@
 #include <assert.h>
 #include <raylib.h>
 
-#define IN_MODEL
+#define IN_DATA_MODEL
 #include "overview.h"
 
 
