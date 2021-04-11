@@ -1,5 +1,5 @@
 # Promenad
-An purely procedural animation system that can walk and hold hands. Created in the spring of 2021 as the specialization course at [The Game Assembly](https://www.thegameassembly.com/).
+A purely procedural animation system that can walk and hold hands. Created in the spring of 2021 as the specialization course at [The Game Assembly](https://www.thegameassembly.com/).
 
 ![Two actors holding hands while one of them is waling on terrain](./doc/images/walk_on_terrain_holding_hands.png)
  
@@ -11,11 +11,11 @@ Supports paths with multiple consecutive target positions (green lines and spher
 ![Robot arm demonstrating hinge jonits](./doc/animations/robotic_arm.gif)
 
 Proceduraly generated **walk cycle** supporting a wide range of movement speeds.
-Movement animation automatically adjusts to current speed and feet rarely do not drag/slide noticably.
+Movement animation automatically adjusts to current speed and feet rarely drag/slide noticably.
 
 ![Actors walking at different speads](./doc/animations/walk_together.gif)
 
-Foot placement handles **uneven terain** withy some grace (altough it's far from perfect).
+Foot placement handles **uneven terain** with some grace (altough it's far from perfect).
 
 ![Actor walking up and down staircase](./doc/animations/walk_on_stairs_2--12fps.gif)
 
